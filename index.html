@@ -841,10 +841,10 @@
     // ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
     function buildWhatsappTextFromOrder(order){
       const { customer, items, total } = order;
-      let msg = `🍗 NUEVO PEDIDO - POLLERÍA EL POLLÓN 🍗\n\n`;
-      msg += `━━━━━━━━━━━━━━━━━━━━━━\n*📋 DATOS DEL CLIENTE*\n━━━━━━━━━━━━━━━━━━━━━━\n`;
-      msg += `👤 Nombre:    ${customer.name}\n`;
-      msg += `📱 Teléfono:  ${customer.phone}\n`;
+      let msg = `🍗 PEDIDO - POLLERÍA EL POLLÓN 🍗\n\n`;
+      msg += `━━━━━━━━━━━━━━━━━━━━━━\n📋 DATOS DEL CLIENTE\n━━━━━━━━━━━━━━━━━━━━━━\n`;
+      msg += `👤 Nombre:   ${customer.name}\n`;
+      msg += `📱 Teléfono: ${customer.phone}\n`;
       msg += `📍 Dirección: ${customer.address}\n\n`;
       msg += `━━━━━━━━━━━━━━━━━━━━━━\n🛒 DETALLE DEL PEDIDO\n━━━━━━━━━━━━━━━━━━━━━━\n\n`;
 
@@ -861,8 +861,8 @@
       });
 
       msg += `━━━━━━━━━━━━━━━━━━━━━━\n💵 TOTAL A PAGAR: ${money(total)}\n━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-      msg += `⚠️ EL delivery tiene costo adicional\n`;
-      msg += `📍 segun la distancia- $2.500 a $4.000`;
+      msg += `⚠️ Delivery tiene costo adicional\n`;
+      msg += `📍segun la distancia $2.500 a $4.000`;
 
       return msg;
     }
