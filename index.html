@@ -20,7 +20,7 @@
     .category-btn{transition:.3s}
     .category-btn:hover{transform:translateY(-2px)}
     .product-card{transition:.3s}
-    .product-card:hover{transform:translateY(-5px);box-shadow:0 10px 25px rgba(0,0,0,.15)}
+    .product-card:hover{transform:translateY(-5px);box-shadow:0 10px 25px rgba(8, 8, 8, 0.15)}
     .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
     .scrollbar-hide::-webkit-scrollbar{display:none}
     .cart-badge{animation:pulse .5s ease}
@@ -29,15 +29,15 @@
   
     @media (max-width:768px){
       .floating-cart{
-        bottom: 10px;
+        bottom: 30px;
         right:2px;
         left:auto;        /* ✔ YA NO SE ESTIRA DE CANTO A CANTO */
-        padding:6px 8px;  /* ✔ BOTÓN MÁS PEQUEÑO */
+        padding:0px 0px;  /* ✔ BOTÓN MÁS PEQUEÑO */
         transform:scale(0.90); /* ✔ REDUCCIÓN VISUAL ELEGANTE */
       }
       .floating-cart>div{
         justify-content:flex-start;
-        gap:5px;
+        gap:2px;
       }
       .floating-cart .text-2xl{
        font-size:1.5rem;
@@ -46,7 +46,7 @@
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
     .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;overflow-y:auto}
     .modal.active{display:flex;align-items:center;justify-content:center}
-    .toast{position:fixed;bottom:100px;right:20px;background:#1d944b;color:#fff;padding:16px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2000;animation:slideIn .3s ease}
+    .toast{position:fixed;bottom:100px;right:20px;background:#1d944b;color:#e9e6e6;padding:16px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2000;animation:slideIn .3s ease}
     @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
     .logo-container{width:120px;height:120px;background:#fff;border-radius:50%;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;overflow:hidden}
     .product-image{width:100%;height:200px;object-fit:cover}
@@ -448,7 +448,7 @@
 
   <!-- Asistente virtual tipo chatbot -->
   <div id="chatbot-toggle" class="chatbot-toggle">
-    <span>🟢</span><span>chatbot</span>
+    <span>🟢</span><span></span>
   </div>
 
   <div id="chatbot-panel" class="chatbot-panel hidden">
