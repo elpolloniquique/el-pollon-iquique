@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://elpolloniquique.github.io/el-pollon-iquique/sitemap.xml
