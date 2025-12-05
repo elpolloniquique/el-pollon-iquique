@@ -63,7 +63,7 @@ body {
     gap: 2px;
   }
   .floating-cart .text-2xl {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 }
 @keyframes float {
