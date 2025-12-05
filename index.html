@@ -1,271 +1,81 @@
-<!doctype html> 
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>Pollería El Pollón - Iquique - Delivery rápido y seguro</title>
 
+  <!-- Favicon -->
   <link rel="icon" href="img/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="img/logo.png">
   <link rel="shortcut icon" href="img/logo.png">
 
-
+  <!-- SEO / Open Graph -->
+  <meta name="description" content="Pollo a la brasa, comida peruana, combos familiares y atención de calidad en Iquique.">
   <meta property="og:title" content="Pollería El Pollón - Iquique - DELIVERY">
   <meta property="og:description" content="Delicioso pollo a la brasa en Iquique — ¡haz tu pedido online!">
   <meta property="og:image" content="https://tuservidor.com/portada.jpg">
   <meta property="og:url" content="https://elpolloniquique.github.io/el-pollon-iquique/">
   <meta property="og:type" content="website">
 
-
-
-
-  <link rel="icon" href="img/logo pollon.png" type="image/png">
-  <title>Pollería El Pollón - Iquique - DELIVERY</title>
-  <meta name="description" content="Pollo a la brasa, comida peruana, combos familiares y atención de calidad en Iquique.">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Pollería El Pollón - Iquique - DELIVERY</title>
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- =================== FIREBASE (BASE DE DATOS EN LÍNEA) =================== -->
-  <!-- Versión 8.x para usar la API global "firebase" -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <!-- Dejamos Realtime Database cargado (por compatibilidad), aunque ahora usamos Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-  <!-- Firestore (aquí es donde realmente guardaremos los pedidos) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <!-- ======================================================================== -->
-
-  <style>
-    body{box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;margin:0;padding:0;padding-bottom:100px}
-    .category-btn{transition:.3s}
-    .category-btn:hover{transform:translateY(-2px)}
-    .product-card{transition:.3s}
-    .product-card:hover{transform:translateY(-5px);box-shadow:0 10px 25px rgba(8, 8, 8, 0.15)}
-    .scrollbar-hide{-ms-overflow-style:none;scrollbar-width:none}
-    .scrollbar-hide::-webkit-scrollbar{display:none}
-    .cart-badge{animation:pulse .5s ease}
-    @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
-    .floating-cart{position:fixed;bottom:20px;right:20px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:float 3s ease-in-out infinite}
-  
-    @media (max-width:768px){
-      .floating-cart{
-        bottom: 30px;
-        right:2px;
-        left:auto;        /* ✔ YA NO SE ESTIRA DE CANTO A CANTO */
-        padding:0px 0px;  /* ✔ BOTÓN MÁS PEQUEÑO */
-        transform:scale(0.90); /* ✔ REDUCCIÓN VISUAL ELEGANTE */
-      }
-      .floating-cart>div{
-        justify-content:flex-start;
-        gap:2px;
-      }
-      .floating-cart .text-2xl{
-       font-size:1.5rem;
-     }
-    }
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;overflow-y:auto}
-    .modal.active{display:flex;align-items:center;justify-content:center}
-    .toast{position:fixed;bottom:100px;right:20px;background:#2fb661;color:#e9e6e6;padding:16px 24px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.3);z-index:2000;animation:slideIn .3s ease}
-    @keyframes slideIn{from{transform:translateX(400px);opacity:0}to{transform:translateX(0);opacity:1}}
-    .logo-container{width:120px;height:120px;background:#fff;border-radius:50%;padding:10px;box-shadow:0 4px 12px rgba(0,0,0,.2);display:flex;align-items:center;justify-content:center;overflow:hidden}
-    .product-image{width:100%;height:200px;object-fit:cover}
-
-    /* === CHATBOT VIRTUAL WHATSAPP === */
-    .chatbot-toggle{
-      position:fixed;
-      left:16px;
-      bottom:170px;
-      z-index:950;
-      background:#0ec752;
-      color:#fff;
-      padding:5px 5px;
-      border-radius:999px;
-      display:flex;
-      align-items:center;
-      gap:2px;
-      box-shadow:0 8px 20px rgba(0,0,0,.3);
-      cursor:pointer;
-      font-weight:600;
-      font-size:0.9rem;
-    }
-    .chatbot-panel{
-      position:fixed;
-      left:16px;
-      bottom:110px;
-      width:320px;
-      max-height:420px;
-      background:#ffffff;
-      border-radius:16px;
-      box-shadow:0 12px 30px rgba(0,0,0,.35);
-      z-index:960;
-      display:flex;
-      flex-direction:column;
-      overflow:hidden;
-    }
-    .chatbot-header{
-      background:linear-gradient(135deg,#178840 0%,#16a34a 100%);
-      color:#fff;
-      padding:10px 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .chatbot-header-left{
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .chatbot-avatar{
-      width:32px;
-      height:32px;
-      border-radius:50%;
-      background:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:18px;
-    }
-    .chatbot-body{
-      padding:10px;
-      flex:1;
-      overflow-y:auto;
-      background:#f3f4f6;
-    }
-    .chatbot-msg{
-      max-width:90%;
-      padding:8px 10px;
-      border-radius:12px;
-      font-size:13px;
-      margin-bottom:6px;
-      line-height:1.4;
-    }
-    .chatbot-msg-bot{
-      background:#ffffff;
-      border-radius:12px 12px 12px 4px;
-      align-self:flex-start;
-      box-shadow:0 2px 4px rgba(0,0,0,.1);
-    }
-    .chatbot-msg-user{
-      background:#10b361;
-      color:#fff;
-      border-radius:12px 12px 4px 12px;
-      align-self:flex-end;
-      box-shadow:0 2px 4px rgba(0,0,0,.15);
-    }
-    .chatbot-quick-actions{
-      padding:8px 10px 10px;
-      border-top:1px solid #e5e7eb;
-      background:#ffffff;
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-    }
-    .chatbot-chip{
-      font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
-      border:1px solid #23c05d;
-      color:#2d8b51;
-      background:#ecfdf3;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-
-    /* === BOTÓN ADMIN (ESTÁTICO) === */
-    #admin-open-btn{
-      background:linear-gradient(135deg,#111827 0%,#4b5563 100%);
-      color:#f9fafb;
-      padding:8px 14px;
-      border-radius:999px;
-      font-size:13px;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      box-shadow:0 4px 12px rgba(0,0,0,.3);
-      cursor:pointer;
-      font-weight:600;
-    }
-
-    /* === MODAL ADMIN === */
-    .admin-badge{
-      font-size:11px;
-      padding:2px 8px;
-      border-radius:999px;
-      font-weight:600;
-      display:inline-block;
-    }
-    .admin-badge-pendiente{
-      background:#fef3c7;
-      color:#92400e;
-    }
-    .admin-badge-preparacion{
-      background:#e0f2fe;
-      color:#1d4ed8;
-    }
-    .admin-badge-entregado{
-      background:#dcfce7;
-      color:#166534;
-    }
-    .admin-badge-cancelado{
-      background:#fee2e2;
-      color:#b91c1c;
-    }
-    .admin-stat-card{
-      border-radius:12px;
-      padding:10px 12px;
-      background:#f9fafb;
-      border:1px solid #e5e7eb;
-    }
-    .admin-stat-label{
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.04em;
-      color:#6b7280;
-      margin-bottom:4px;
-    }
-    .admin-stat-value{
-      font-size:18px;
-      font-weight:700;
-      color:#111827;
-    }
-    @media(max-width:640px){
-      .chatbot-panel{ width:260px; }
-    }
-
-    /* logo  */
-
-    .logo {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      overflow: hidden;
-      border: 1px solid #ffb109;
-    }
-
-    .logo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-  </style>
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-white">
+
   <!-- Header -->
-  <header class="text-white py-4 px-4 sticky top-0 z-50" style="background:linear-gradient(135deg,#dc2626 0%,#991b1b 100%);box-shadow:0 4px 6px rgba(0,0,0,.1);">
+  <header class="text-white py-3 px-4 sticky top-0 z-50 shadow-lg"
+          style="background:linear-gradient(135deg,#f97316 0%,#dc2626 100%);">
     <div class="max-w-7xl mx-auto">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <!-- LOGO -->
-          <div class="logo"><img src="img/logo.png" alt="Logo Pollería" onerror="this.src=''; this.alt='Logo no disponible'; this.style.display='none';">
+          <div class="logo">
+            <img src="img/logo pollon.png" alt="Logo Pollería"
+                 onerror="this.src=''; this.alt='Logo no disponible'; this.style.display='none';">
           </div>
           <div class="hidden md:block">
             <h1 class="text-2xl font-bold">Pollería El Pollón</h1>
             <p class="text-sm opacity-90">📍 Iquique</p>
           </div>
         </div>
+          
+                 <!-- NUEVO: selector de tipo de pedido -->
+      <div class="mt-4">
+      <p class="text-center text-xs sm:text-sm md:text-base font-semibold mb-2">
+        ¿Cómo desea hacer su pedido?
+      </p>
+      <div class="flex flex-wrap justify-center gap-2">
+        <button
+          id="btn-delivery"
+          class="px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-red-700 hover:bg-red-100 shadow"
+        >
+          DELIVERY
+        </button>
+        <button
+          id="btn-reservas"
+          class="px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-red-700 hover:bg-red-100 shadow"
+        >
+          RESERVAS
+        </button>
+        <button
+          id="btn-retiros"
+          class="px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-semibold bg-white text-red-700 hover:bg-red-100 shadow"
+        >
+          RETIROS
+        </button>
+       </div>
+      </div>
+
+
+            
+
+        
+
         <div class="hidden lg:flex items-center gap-4">
           <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
             <span>📞</span>
@@ -274,42 +84,61 @@
               <p class="font-bold text-sm">+56 9 8692 5310</p>
             </div>
           </div>
-          <button id="view-cart-desktop" class="bg-yellow-400 text-red-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-300 transition flex items-center gap-2">
+          <button id="view-cart-desktop"
+                  class="bg-yellow-400 text-red-900 px-6 py-3 rounded-lg font-bold hover:bg-yellow-300 transition flex items-center gap-2">
             <span>🛒</span><span>Ver Mi Pedido</span>
-            <span id="cart-badge-desktop" class="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">0</span>
+            <span id="cart-badge-desktop"
+                  class="bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs">0</span>
           </button>
         </div>
-        <button id="hamburger-btn" class="lg:hidden text-white p-2 hover:bg-white/20 rounded-lg transition">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+
+        <!-- Botón menú móvil -->
+        <button id="hamburger-btn"
+                class="lg:hidden text-white p-2 hover:bg-white/20 rounded-lg transition">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
         </button>
       </div>
     </div>
   </header>
 
-  <h1 class="text-2xl font-bold text-red-800">pollon</h1>
-
   <!-- Sidebar -->
-  <div id="sidebar-menu" class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-[60] overflow-y-auto">
+  <div id="sidebar-menu"
+       class="fixed top-0 left-0 h-full w-80 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-[60] overflow-y-auto">
     <div class="p-6">
       <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-red-600">
         <h2 class="text-2xl font-bold text-red-800">📋 Menú</h2>
         <button id="close-sidebar" class="text-gray-500 hover:text-red-600 transition">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"/>
+          </svg>
         </button>
       </div>
 
-      <button id="view-cart-mobile" class="w-full bg-yellow-400 text-red-900 px-6 py-4 rounded-lg font-bold hover:bg-yellow-300 transition mb-6 flex items-center justify-between">
-        <span class="flex items-center gap-2"><span class="text-2xl">🛒</span><span>Ver Mi Pedido</span></span>
-        <span id="cart-badge-mobile" class="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">0</span>
+      <button id="view-cart-mobile"
+              class="w-full bg-yellow-400 text-red-900 px-6 py-4 rounded-lg font-bold hover:bg-yellow-300 transition mb-6 flex items-center justify-between">
+        <span class="flex items-center gap-2">
+          <span class="text-2xl">🛒</span><span>Ver Mi Pedido</span>
+        </span>
+        <span id="cart-badge-mobile"
+              class="bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">0</span>
       </button>
 
       <div class="space-y-3">
         <h3 class="text-lg font-bold text-gray-700 mb-3">🍽️ Categorías</h3>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600" data-category="ofertas-familiares">👨‍👩‍👧‍👦 Ofertas Familiares</button>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600" data-category="ofertas-dos">👫 Ofertas para Dos</button>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600" data-category="ofertas-personales">🧑 Ofertas Personales</button>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600" data-category="platos-extras">🍽️ Platos Extras</button>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600" data-category="agregados">➕ Agregados</button>
+        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
+                data-category="ofertas-familiares">👨‍👩‍👧‍👦 Ofertas Familiares</button>
+        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
+                data-category="ofertas-dos">👫 Ofertas para Dos</button>
+        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
+                data-category="ofertas-personales">🧑 Ofertas Personales</button>
+        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
+                data-category="platos-extras">🍽️ Platos Extras</button>
+        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
+                data-category="agregados">➕ Agregados</button>
       </div>
 
       <div class="mt-8 pt-6 border-t-2 border-gray-200 text-sm text-gray-600 space-y-2">
@@ -320,8 +149,8 @@
     </div>
   </div>
   <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-[55] hidden"></div>
- 
-  <!-- Banner -->
+
+  <!-- Banner / Carrusel -->
   <section class="py-0 px-0">
     <div class="relative overflow-hidden" style="height:400px;">
       <div id="carousel-container" class="flex transition-transform duration-1000 ease-in-out h-full">
@@ -340,36 +169,143 @@
   </section>
 
   <!-- Menú -->
-  <section class="py-8 px-4 bg-gray-50" style="box-shadow:0 4px 6px rgba(0,0,0,.05);">
+  <section class="py-8 px-4 bg-gray-50 shadow-inner">
     <div class="max-w-7xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-8 text-red-800">🍽️ Nuestro Menú</h2>
-      
+      <h2 class="text-4xl font-bold text-center mb-8 text-red-800"> Nuestro Menú</h2>
+
+      <!-- Botones de categorías -->
+      <div class="mb-4 bg-[#C4362E]"></div>
       <div class="mb-8 overflow-x-auto scrollbar-hide">
         <div class="flex lg:flex-wrap lg:justify-center gap-4 min-w-max lg:min-w-0 px-2 lg:px-0">
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0" data-category="ofertas-familiares">👨‍👩‍👧‍👦 Ofertas Familiares</button>
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0" data-category="ofertas-dos">👫 Ofertas para Dos</button>
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0" data-category="ofertas-personales">🧑 Ofertas Personales</button>
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0" data-category="platos-extras">🍽️ Platos Extras</button>
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0" data-category="agregados">➕ Agregados</button>
+          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
+                  data-category="ofertas-familiares"> Ofertas Familiares</button>
+          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
+                  data-category="ofertas-dos"> Ofertas para Dos</button>
+          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
+                  data-category="ofertas-personales"> Ofertas Personales</button>
+          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
+                  data-category="platos-extras"> Platos Extras</button>
+          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
+                  data-category="agregados"> Agregados</button>
         </div>
       </div>
-      <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 gap-6"></div>
+
+      
+
+
+      <!-- Tarjetas de productos -->
+      <div id="products-container"
+           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 gap-6"></div>
     </div>
   </section>
 
+
+
+
   <!-- Carrito flotante -->
-  <div id="floating-cart" class="floating-cart bg-red-600 text-white px-8 py-2 rounded-full cursor-pointer hover:bg-red-700 transition">
+  <div id="floating-cart"
+       class="floating-cart bg-red-600 text-white px-8 py-2 rounded-full cursor-pointer hover:bg-red-700 transition">
     <div class="flex items-center gap-1">
       <span class="text-2xl">🛒</span>
       <div>
         <div class="font-bold">Mi Carrito</div>
-        <div class="text-sm"><span id="floating-cart-count">0</span> productos - <span id="floating-cart-total">$0</span></div>
+        <div class="text-sm">
+          <span id="floating-cart-count">0</span> productos -
+          <span id="floating-cart-total">$0</span>
+        </div>
       </div>
-      <span id="floating-cart-badge" class="cart-badge bg-yellow-400 text-red-900 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-2">0</span>
+      <span id="floating-cart-badge"
+            class="cart-badge bg-yellow-400 text-red-900 rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold ml-2">0</span>
     </div>
   </div>
 
-  <!-- Modal opciones -->
+     <!-- NUEVOS MODALES PARA DELIVERY / RESERVAS / RETIROS -->
+
+  <!-- Modal DELIVERY -->
+  <div id="modal-delivery" class="modal">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 my-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-red-800">🚚 Pedido con Delivery</h3>
+        <button id="modal-delivery-close" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+      </div>
+      <p class="text-sm text-gray-700 mb-3">
+        Esta plataforma está diseñada para que realices tu pedido con
+        <strong>entrega a domicilio</strong>.
+      </p>
+      <p class="text-sm text-gray-700 mb-2 font-semibold">
+        ¿Cómo hacer tu pedido por delivery?
+      </p>
+      <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1 mb-4">
+        <li>Elige tus combos y platos desde el menú.</li>
+        <li>Agrega los productos al carrito presionando <strong>“Agregar”</strong>.</li>
+        <li>Cuando termines, abre <strong>“Mi Carrito”</strong> y revisa tu pedido.</li>
+        <li>Presiona <strong>“Realizar Pedido por WhatsApp”</strong>.</li>
+        <li>Completa tus datos y confirma el envío del mensaje.</li>
+      </ul>
+      <p class="text-xs text-gray-500">
+        * Recuerda que el delivery tiene un costo adicional según tu zona
+        (aprox. $2.500 a $4.000).
+      </p>
+    </div>
+  </div>
+
+  <!-- Modal RESERVAS -->
+  <div id="modal-reservas" class="modal">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 my-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-red-800">📅 Reservas</h3>
+        <button id="modal-reservas-close" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+      </div>
+      <p class="text-sm text-gray-700 mb-3">
+        Para realizar una <strong>reserva</strong> en Pollería El Pollón se requiere:
+      </p>
+      <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1 mb-4">
+        <li>Monto mínimo de consumo: <strong>$200.000</strong>.</li>
+        <li>Reserva sujeta a disponibilidad de horario en el local.</li>
+        <li>La confirmación se realiza directamente con nuestro equipo.</li>
+      </ul>
+      <p class="text-xs text-gray-500 mb-4">
+        * Una vez enviada tu solicitud, nos pondremos en contacto para confirmar
+        el horario y los detalles de tu reserva.
+      </p>
+      <button
+        id="modal-reserva-go"
+        class="w-full bg-red-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-red-700 text-sm"
+      >
+        Realizar mi reserva
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal RETIROS -->
+  <div id="modal-retiros" class="modal">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 my-8">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-red-800">🛍️ Pedido con Retiro en Local</h3>
+        <button id="modal-retiros-close" class="text-gray-500 hover:text-gray-700 text-2xl leading-none">&times;</button>
+      </div>
+      <p class="text-sm text-gray-700 mb-3">
+        Para realizar un <strong>pedido con retiro</strong> en el local:
+      </p>
+      <ul class="text-sm text-gray-700 list-disc pl-5 space-y-1 mb-4">
+        <li>Monto mínimo de compra: <strong>$100.000</strong>.</li>
+        <li>Debes coordinar tu pedido con <strong>mínimo 2 horas de anticipación</strong>.</li>
+        <li>La hora de retiro se confirma por WhatsApp.</li>
+      </ul>
+      <p class="text-xs text-gray-500 mb-4">
+        * Este canal es exclusivo para pedidos grandes con retiro en local.
+      </p>
+      <button
+        id="modal-retiro-go"
+        class="w-full bg-green-600 text-white font-semibold px-4 py-2 rounded-lg hover:bg-green-700 text-sm"
+      >
+        Solicitar con retiro
+      </button>
+    </div>
+  </div>
+
+
+  <!-- Modal opciones producto -->
   <div id="options-modal" class="modal">
     <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
       <h3 class="text-2xl font-bold mb-4 text-red-800">Personaliza tu pedido</h3>
@@ -377,29 +313,37 @@
       <!-- Bebidas -->
       <div id="drink-section" class="mb-6 hidden">
         <div class="flex items-center justify-between mb-2">
-          <label class="block font-bold text-gray-800 text-sm md:text-base">BEBIDAS — <span class="text-gray-600 font-normal">elija su sabor</span></label>
+          <label class="block font-bold text-gray-800 text-sm md:text-base">
+            BEBIDAS —
+            <span class="text-gray-600 font-normal">elija su sabor</span>
+          </label>
           <span class="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold">Obligatorio</span>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer drink-option-label">
-            <input type="radio" name="drink" class="drink-radio" value="Coca Cola"><span class="font-semibold text-gray-800">COCA COLA</span>
+            <input type="radio" name="drink" class="drink-radio" value="Coca Cola">
+            <span class="font-semibold text-gray-800">COCA COLA</span>
           </label>
           <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer drink-option-label">
-            <input type="radio" name="drink" class="drink-radio" value="Inca Kola"><span class="font-semibold text-gray-800">INCA KOLA</span>
+            <input type="radio" name="drink" class="drink-radio" value="Inca Kola">
+            <span class="font-semibold text-gray-800">INCA KOLA</span>
           </label>
           <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer drink-option-label">
-            <input type="radio" name="drink" class="drink-radio" value="Coca Cero"><span class="font-semibold text-gray-800">COCA CERO</span>
+            <input type="radio" name="drink" class="drink-radio" value="Coca Cero">
+            <span class="font-semibold text-gray-800">COCA CERO</span>
           </label>
           <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer drink-option-label">
-            <input type="radio" name="drink" class="drink-radio" value="Sprite"><span class="font-semibold text-gray-800">SPRITE</span>
+            <input type="radio" name="drink" class="drink-radio" value="Sprite">
+            <span class="font-semibold text-gray-800">SPRITE</span>
           </label>
           <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer drink-option-label col-span-2">
-            <input type="radio" name="drink" class="drink-radio" value="Fanta"><span class="font-semibold text-gray-800">FANTA</span>
+            <input type="radio" name="drink" class="drink-radio" value="Fanta">
+            <span class="font-semibold text-gray-800">FANTA</span>
           </label>
         </div>
       </div>
 
-      <!-- Bolsa -->
+      <!-- Bolsa ecológica -->
       <div id="bag-section" class="mb-4">
         <div class="flex items-center justify-between mb-2">
           <label class="block font-bold text-gray-800 text-sm md:text-base">BOLSA ECOLÓGICA</label>
@@ -413,20 +357,27 @@
       <div class="mb-4">
         <label class="block font-bold mb-2 text-gray-700">Cantidad:</label>
         <div class="flex items-center gap-4">
-          <button type="button" id="decrease-quantity" class="w-12 h-12 bg-gray-300 text-gray-700 rounded-full font-bold text-2xl hover:bg-gray-400">-</button>
-          <span id="product-quantity" class="text-3xl font-bold text-gray-800 min-w-[60px] text-center">1</span>
-          <button type="button" id="increase-quantity" class="w-12 h-12 bg-red-600 text-white rounded-full font-bold text-2xl hover:bg-red-700">+</button>
+          <button type="button" id="decrease-quantity"
+                  class="w-12 h-12 bg-gray-300 text-gray-700 rounded-full font-bold text-2xl hover:bg-gray-400">-</button>
+          <span id="product-quantity"
+                class="text-3xl font-bold text-gray-800 min-w-[60px] text-center">1</span>
+          <button type="button" id="increase-quantity"
+                  class="w-12 h-12 bg-red-600 text-white rounded-full font-bold text-2xl hover:bg-red-700">+</button>
         </div>
       </div>
 
       <!-- Total -->
       <div class="mb-6">
-        <div class="text-xl font-extrabold text-red-800">Total: <span id="live-total">$0</span></div>
+        <div class="text-xl font-extrabold text-red-800">
+          Total: <span id="live-total">$0</span>
+        </div>
       </div>
 
       <div class="flex gap-3">
-        <button id="cancel-options" class="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400">Cancelar</button>
-        <button id="confirm-add" class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700">Agregar al Carrito</button>
+        <button id="cancel-options"
+                class="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400">Cancelar</button>
+        <button id="confirm-add"
+                class="flex-1 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700">Agregar al Carrito</button>
       </div>
     </div>
   </div>
@@ -440,9 +391,14 @@
       </div>
       <div id="cart-items" class="mb-6 max-h-96 overflow-y-auto"></div>
       <div class="border-t-2 pt-4 mb-6">
-        <div class="flex justify-between items-center text-xl font-bold text-red-800"><span>Total:</span><span id="cart-total">$0</span></div>
+        <div class="flex justify-between items-center text-xl font-bold text-red-800">
+          <span>Total:</span><span id="cart-total">$0</span>
+        </div>
       </div>
-      <button id="checkout-btn" class="w-full bg-green-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-green-700">💬 Realizar Pedido por WhatsApp</button>
+      <button id="checkout-btn"
+              class="w-full bg-green-600 text-white px-6 py-4 rounded-lg font-bold text-lg hover:bg-green-700">
+        💬 Realizar Pedido por WhatsApp
+      </button>
     </div>
   </div>
 
@@ -453,19 +409,29 @@
       <form id="checkout-form">
         <div class="mb-4">
           <label class="block font-bold mb-2 text-gray-700">Nombre Completo:</label>
-          <input type="text" id="customer-name" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none" placeholder="Ej: Juan Pérez">
+          <input type="text" id="customer-name" required
+                 class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none"
+                 placeholder="Ej: Juan Pérez">
         </div>
         <div class="mb-4">
           <label class="block font-bold mb-2 text-gray-700">Dirección de Entrega:</label>
-          <textarea id="customer-address" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none" rows="3" placeholder="Ej: Av. Principal 123, Iquique"></textarea>
+          <textarea id="customer-address" required
+                    class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none"
+                    rows="3" placeholder="Ej: Av. Principal 123, Iquique"></textarea>
         </div>
         <div class="mb-6">
           <label class="block font-bold mb-2 text-gray-700">Número de Teléfono:</label>
-          <input type="tel" id="customer-phone" required class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none" placeholder="+56 9 8692 5310">
+          <input type="tel" id="customer-phone" required
+                 class="w-full border-2 border-gray-300 rounded-lg p-3 focus:border-red-500 focus:outline-none"
+                 placeholder="+56 9 8692 5310">
         </div>
         <div class="flex gap-3">
-          <button type="button" id="cancel-checkout" class="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400">Cancelar</button>
-          <button type="submit" class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">📤 Enviar Mi Pedido</button>
+          <button type="button" id="cancel-checkout"
+                  class="flex-1 bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-400">Cancelar</button>
+          <button type="submit"
+                  class="flex-1 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700">
+            📤 Enviar Mi Pedido
+          </button>
         </div>
       </form>
     </div>
@@ -473,13 +439,13 @@
 
   <!-- Asistente virtual tipo chatbot -->
   <div id="chatbot-toggle" class="chatbot-toggle">
-    <span>🟢</span><span></span>
+    <!-- <span>🟢</span><span></span> -->
   </div>
 
   <div id="chatbot-panel" class="chatbot-panel hidden">
     <div class="chatbot-header">
       <div class="chatbot-header-left">
-        <div class="chatbot-avatar">🟢</div>
+        <!-- <div class="chatbot-avatar">🟢</div> -->
         <div>
           <div class="text-xs opacity-80">Asistente virtual</div>
           <div class="text-sm font-semibold">El Pollón Iquique</div>
@@ -508,11 +474,17 @@
         Panel privado para gestión de pedidos de <strong>Pollería El Pollón</strong>.
       </p>
       <label class="block text-sm font-semibold text-gray-700 mb-2">Contraseña de acceso</label>
-      <input type="password" id="admin-password" class="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 focus:outline-none focus:border-red-500" placeholder="Ingresa la contraseña">
-      <p id="admin-login-error" class="text-xs text-red-600 mb-3 hidden">Contraseña incorrecta. Intente nuevamente.</p>
+      <input type="password" id="admin-password"
+             class="w-full border-2 border-gray-300 rounded-lg p-2 mb-3 focus:outline-none focus:border-red-500"
+             placeholder="Ingresa la contraseña">
+      <p id="admin-login-error" class="text-xs text-red-600 mb-3 hidden">
+        Contraseña incorrecta. Intente nuevamente.
+      </p>
       <div class="flex gap-3">
-        <button id="admin-login-cancel" class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">Cancelar</button>
-        <button id="admin-login-submit" class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700">Ingresar</button>
+        <button id="admin-login-cancel"
+                class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300">Cancelar</button>
+        <button id="admin-login-submit"
+                class="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700">Ingresar</button>
       </div>
     </div>
   </div>
@@ -557,7 +529,7 @@
         </div>
       </div>
 
-      <!-- Stats fila 2 extra -->
+      <!-- Stats fila 2 -->
       <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
         <div class="admin-stat-card">
           <div class="admin-stat-label">% pedidos entregados</div>
@@ -578,15 +550,18 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-3">
           <div>
             <label class="block font-semibold text-gray-700 mb-1">Desde</label>
-            <input type="date" id="admin-filter-from" class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
+            <input type="date" id="admin-filter-from"
+                   class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
           </div>
           <div>
             <label class="block font-semibold text-gray-700 mb-1">Hasta</label>
-            <input type="date" id="admin-filter-to" class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
+            <input type="date" id="admin-filter-to"
+                   class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
           </div>
           <div>
             <label class="block font-semibold text-gray-700 mb-1">Estado</label>
-            <select id="admin-filter-status" class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
+            <select id="admin-filter-status"
+                    class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm">
               <option value="todos">Todos</option>
               <option value="Pendiente">Pendiente</option>
               <option value="En preparación">En preparación</option>
@@ -596,22 +571,34 @@
           </div>
           <div>
             <label class="block font-semibold text-gray-700 mb-1">Buscar (nombre / teléfono)</label>
-            <input type="text" id="admin-filter-search" class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm" placeholder="Ej: Juan, +569...">
+            <input type="text" id="admin-filter-search"
+                   class="w-full border border-gray-300 rounded-md px-2 py-1 text-xs md:text-sm"
+                   placeholder="Ej: Juan, +569...">
           </div>
         </div>
         <div class="flex flex-wrap gap-2 justify-between items-center">
           <div class="text-[11px] text-gray-600">
-            Pedidos en el rango seleccionado: <span id="admin-filter-count" class="font-semibold">0</span>
+            Pedidos en el rango seleccionado:
+            <span id="admin-filter-count" class="font-semibold">0</span>
           </div>
           <div class="flex flex-wrap gap-2">
-            <button id="admin-copy" class="px-3 py-1 rounded-md bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold text-[11px] md:text-xs">📋 Copiar pedidos (Excel)</button>
-            <button id="admin-refresh" class="px-3 py-1 rounded-md bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold text-[11px] md:text-xs">🔃 Actualizar</button>
-            <button id="admin-filter-clear" class="px-3 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold text-[11px] md:text-xs">✖ Limpiar filtros</button>
+            <button id="admin-copy"
+                    class="px-3 py-1 rounded-md bg-emerald-100 text-emerald-800 hover:bg-emerald-200 font-semibold text-[11px] md:text-xs">
+              📋 Copiar pedidos (Excel)
+            </button>
+            <button id="admin-refresh"
+                    class="px-3 py-1 rounded-md bg-sky-100 text-sky-800 hover:bg-sky-200 font-semibold text-[11px] md:text-xs">
+              🔃 Actualizar
+            </button>
+            <button id="admin-filter-clear"
+                    class="px-3 py-1 rounded-md bg-gray-200 text-gray-800 hover:bg-gray-300 font-semibold text-[11px] md:text-xs">
+              ✖ Limpiar filtros
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Tabla -->
+      <!-- Tabla pedidos -->
       <div class="border border-gray-200 rounded-lg overflow-hidden max-h-80 overflow-y-auto text-sm">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
@@ -625,13 +612,15 @@
               <th class="px-3 py-2 text-left text-xs font-semibold text-gray-600">Acciones</th>
             </tr>
           </thead>
-          <tbody id="admin-orders-body" class="bg-white divide-y divide-gray-100">
-          </tbody>
+          <tbody id="admin-orders-body" class="bg-white divide-y divide-gray-100"></tbody>
         </table>
       </div>
 
       <div class="flex justify-end mt-4">
-        <button id="admin-close" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-900">Cerrar panel</button>
+        <button id="admin-close"
+                class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-gray-900">
+          Cerrar panel
+        </button>
       </div>
     </div>
   </div>
@@ -639,10 +628,11 @@
   <!-- Ubicación -->
   <section class="py-12 px-4 bg-gray-100">
     <div class="max-w-7xl mx-auto">
-      <h2 class="text-4xl font-bold text-center mb-8 text-red-800">📍 Nuestra Ubicación</h2>
+      <h5 class="text-2xl font-bold text-center mb-2 text-red-900">📍 Nuestra Ubicación</h5>
       <div class="bg-white rounded-lg shadow-lg overflow-hidden">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3747.8!2d-70.1502!3d-20.2141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDEyJzUwLjgiUyA3MMKwMDknMDAuNyJX!5e0!3m2!1ses!2scl!4v1234567890" width="100%" height="450" style="border:0" allowfullscreen loading="lazy"></iframe>
-        <div class="p-6 bg-red-600 text-white">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3747.8!2d-70.1502!3d-20.2141!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjDCsDEyJzUwLjgiUyA3MMKwMDknMDAuNyJX!5e0!3m2!1ses!2scl!4v1234567890"
+                width="100%" height="450" style="border:0" allowfullscreen loading="lazy"></iframe>
+        <div class="p-3 bg-red-600 text-white">
           <h3 class="text-2xl font-bold mb-2">🏪 Pollería El Pollón</h3>
           <p class="text-lg">📍 Calle Vivar 1086, Iquique, Chile</p>
           <p class="text-lg mt-2">📞 +56 9 8692 5310</p>
@@ -653,18 +643,20 @@
   </section>
 
   <!-- Sección Administración visible al final -->
-  <section class="py-10 px-4 bg-gray-900">
+  <section class="py-10 px-4 bg-gray-100">
     <div class="max-w-7xl mx-auto">
-      <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 text-white">
+      <div class="bg-white border border-gray-200 rounded-xl p-6 text-gray-900 shadow">
         <h2 class="text-2xl font-bold mb-2 flex items-center gap-2">
-          <span>🛠️</span><span>Administración</span>
+          <span>🛠️</span><span>correo electronico</span>
         </h2>
-        <p class="text-sm text-gray-300 mb-4">
-          Panel interno para ver, filtrar, copiar e imprimir los pedidos de la carta digital. Solo uso del equipo de Pollería El Pollón.
+        <p class="text-sm text-gray-600 mb-4">
+          <!-- Panel interno para ver, filtrar, copiar e imprimir los pedidos de la carta digital.
+          Solo uso del equipo de Pollería El Pollón. -->
         </p>
         <!-- Botón Admin (estático) -->
-        <button id="admin-open-btn" class="hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-          <span>🔐</span><span>Admin</span>
+        <button id="admin-open-btn"
+                class="hover:bg-gray-100 text-gray-900 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 shadow">
+          <span>🔐</span><span>ingresar</span>
         </button>
       </div>
     </div>
@@ -701,1039 +693,41 @@
         <div>
           <h3 class="text-xl font-bold mb-4 text-yellow-400">Síguenos</h3>
           <div class="flex flex-col gap-3">
-            <a href="https://wa.me/56968788613" target="_blank" class="flex items-center gap-3 bg-green-600 px-4 py-2 rounded-lg hover:bg-green-800 transition">🟢 <span class="font-bold">WhatsApp</span></a>
-            <a href="https://www.facebook.com/polloniquique?locale=es_LA" target="_blank" class="flex items-center gap-3 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-800 transition">📘 <span class="font-bold">Facebbok</span></a>
-            <a href="#" class="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition">📸 <span class="font-bold">Instagram</span></a>
-            <a href="#" class="flex items-center gap-3 bg-black px-4 py-2 rounded-lg hover:bg-gray-800 transition">🎵 <span class="font-bold">TikTok</span></a>
+            <a href="https://wa.me/56968788613" target="_blank"
+               class="flex items-center gap-3 bg-green-600 px-4 py-2 rounded-lg hover:bg-green-800 transition">
+              <!-- 🟢 <span class="font-bold">WhatsApp</span> -->
+            </a>
+            <a href="https://www.facebook.com/polloniquique?locale=es_LA" target="_blank"
+               class="flex items-center gap-3 bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-800 transition">
+              📘 <span class="font-bold">Facebook</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-2 rounded-lg hover:from-purple-700 hover:to-pink-700 transition">
+              📸 <span class="font-bold">Instagram</span>
+            </a>
+            <a href="#" class="flex items-center gap-3 bg-black px-4 py-2 rounded-lg hover:bg-gray-800 transition">
+              🎵 <span class="font-bold">TikTok</span>
+            </a>
           </div>
         </div>
       </div>
       <div class="border-t border-gray-700 pt-8 text-center">
         <p class="text-gray-400">© 2024 Pollería El Pollón - Iquique, Chile. Todos los derechos reservados.</p>
-        <p class="text-gray-500 text-sm mt-2">Desarrollado con ❤️ para los amantes del buen pollo a la brasa</p>
+        <p class="text-gray-500 text-sm mt-2">
+          Desarrollado con ❤️ para los amantes del buen pollo a la brasa
+        </p>
       </div>
     </div>
   </footer>
 
-  <script>
-    // --------- Config ----------
-
-    const CURRENCY = new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', maximumFractionDigits:0 });
-    const BAG_PRICE = 200; // CLP
-    const WHATSAPP_NUMBER = '56986925310';
-
-    // ======================= FIREBASE CONFIGURACIÓN =========================
-    // IMPORTANTE:
-    // 1) Entra a https://console.firebase.google.com
-    // 2) Crea un proyecto Web y activa "Cloud Firestore"
-    // 3) Copia la configuración de tu app web y reemplaza los valores de abajo
-    // 4) En Firestore crea una colección llamada: pollon_orders_v1
-    // -----------------------------------------------------------------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
-      authDomain: "polleria-el-pollon.firebaseapp.com",
-      databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com", // no se usa, pero no molesta
-      projectId: "polleria-el-pollon",
-      storageBucket: "polleria-el-pollon.firebasestorage.app",
-      messagingSenderId: "421303971066",
-      appId: "1:421303971066:web:f0adeac505350cfc41ed43",
-      measurementId: "G-NRMKTLE3EZ"
-    };
-
-    let ordersRef = null; // referencia a la colección de Firestore
-    let db = null;        // referencia a Firestore
-    const ORDERS_PATH = 'pollon_orders_v1'; // nombre de la colección en Firestore
-
-    // Base de datos de pedidos (en memoria, sincronizada con Firestore)
-    let orders = [];
-    const ORDERS_KEY = 'pollon_orders_v1'; // respaldo local
-
-    // Inicializa Firestore y suscripción en tiempo real
-    function initOrdersBackend(){
-      try{
-        if(typeof firebase !== 'undefined' && !firebase.apps.length){
-          firebase.initializeApp(firebaseConfig);
-        }
-        if(typeof firebase !== 'undefined'){
-          db = firebase.firestore();
-          ordersRef = db.collection(ORDERS_PATH);
-
-          // Suscripción en tiempo real a la colección (ordenada por fecha)
-          ordersRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
-            const list = [];
-            snapshot.forEach(doc => {
-              const data = doc.data() || {};
-              list.push({
-                id: doc.id,
-                ...data
-              });
-            });
-            orders = list;
-            // Aseguramos orden por fecha por si acaso
-            orders.sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''));
-            const adminVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
-            if(adminVisible){
-              renderAdminPanel();
-            }
-          });
-        }
-      }catch(e){
-        console.warn('No se pudo inicializar Firebase/Firestore. Se usará solo almacenamiento local.', e);
-      }
-    }
-
-    // Guarda el array completo de pedidos (Firestore + respaldo local)
-    function saveOrders(){
-      if(ordersRef && db){
-        // Usamos un batch para escribir todos los pedidos
-        const batch = db.batch();
-        orders.forEach(o => {
-          // Garantizamos que tenga un ID
-          if(!o.id){
-            o.id = 'P' + Date.now();
-          }
-          const docRef = ordersRef.doc(o.id);
-          batch.set(docRef, o, { merge:true });
-        });
-        batch.commit().catch(err=>{
-          console.error('Error guardando pedidos en Firestore', err);
-        });
-      }else{
-        // Respaldo local si no hay Firebase/Firestore
-        try{
-          localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
-        }catch(e){
-          console.error('Error guardando pedidos en localStorage', e);
-        }
-      }
-    }
-
-    // Cargar pedidos (si no hay Firestore, usamos respaldo local)
-    function loadOrders(){
-      if(ordersRef && db){
-        // Con Firestore, la suscripción onSnapshot ya los carga en "orders"
-        return;
-      }else{
-        try{
-          const raw = localStorage.getItem(ORDERS_KEY);
-          orders = raw ? JSON.parse(raw) : [];
-        }catch(e){
-          orders = [];
-        }
-      }
-    }
-    // ===================== FIN CONFIG FIREBASE / BACKEND ====================
-
-    const products = {
-      "ofertas-familiares": [
-        { name: "Oferton mas chaufa", description: "Pollo entero, papas fritas, arroz chaufa, ensalada y bebidas 1.5lt.", price: 24500, image: "img/oferton mas chaufa.png" },
-        { name: "Oferton mas fideo", description: "Pollo entero, papas fritas, fideos al pesto, ensalada y bebidas 1.5lt.", price: 24500, image: "img/oferton mas fideo.png" },
-        { name: "Oferton mas chaufa pura papa", description: "Pollo entero, papas fritas, extra papa frita, arroz chaufa y bebidas 1.5lt.", price: 24500, image: "img/oferton mas chaufa pura papa.png" },
-        { name: "Oferton con fideo", description: "Pollo entero, papas fritas, fideos al pesto y bebidas 1.5lt", price: 23500, image:"img/oferton con fideo.png" },
-        { name: "Oferton sin ensalada", description: "Pollo entero, papas fritas, arroz chaufa y bebidas 1.5lt", price: 23500, image: "img/oferton sin ensalada.png" },
-        { name: "Oferton pura papa", description: "Pollo entero, papas fritas, 1/2 porcion de papa frita y bebidas 1.5lt", price: 23500, image: "img/oferton pura papa.png" },
-        { name: "oferton familiar", description: "Pollo entero, papas fritas, ensalada y bebidas 1.5lt", price: 22500, image: "img/oferton familiar.png" },
-        { name: "Mega Familiar", description: "Pollo entero, papas fritas, ensalada y bebidas 1.5lt", price: 22500, image:"img/oferton familiar.png" }
-      ],
-      "ofertas-dos": [
-        { name: "1/2 combo chaufa", description: "Medio pollo, papas fritas, arroz chaufa", price: 15600, image: "img/medio combo chaufa.png" },
-        { name: "1/2 combo", description: "Medio pollo, papas fritas, ensalada personal", price: 15100, image: "img/medio combo.png" },
-        { name: "1/2 combo pura papa", description: "Medio pollo, papas fritas mas cantidad,", price: 15100, image: "img/medio combo pura papa.png" }
-      ],
-      "ofertas-personales": [
-        { name: "1/4 combo", description: "1/4 pollo, papas fritas personales, ensalada personal", price: 8100, image: "img/personal combo.png" },
-        { name: "1/4 combo pura papa", description: "1/4 pollo, papas fritas personales mas cantidad.", price: 8100, image: "img/personal pura papa.png" },
-        { name: "Chaufa brasa", description: "1/4 pollo, arroz chaufa", price: 8200, image: "img/chaufa brasa.png" },
-        { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, fideos al pesto", price: 8100, image: "img/personal pesto con pollo.png" },
-        { name: "Chaufa brasa con papas fritas", description: "1/4 pollo, papas fritas personal, arroz chaufa", price: 9200, image: "img/chaufa brasa con papas fritas.png" }
-      ],
-      "platos-extras": [
-        { name: "Lomo saltado con chaufa", description: "", price: 12200, image: "img/lomo saltado con chaufa.png" },
-        { name: "Lomo saltado de carne con arroz blanco ", description: "", price: 11700, image: "" },
-        { name: "Lomo saltado de pollo con arroz blanco", description: "", price: 11700, image: "img/lomo saltado de pollo con arroz blanco.png" },
-        { name: "Tallarin saltado", description: "", price: 11700, image: "img/tallarin saltado de carne.png" },
-        { name: "Bistec a lo pobre", description: "", price: 10700, image: "img/bistec a lo pobre.png" },
-        { name: "Bistec con fideos al pesto", description: "", price: 10700, image: "" },
-        { name: "Chuleta de cerdo", description: "", price: 10700, image: "img/chuleta de cerdo.png" },
-        { name: "Pechuga a la plancha", description: "", price: 10200, image: "img/pechuga a la plancha.png" },
-        { name: "Combo nuggets", description: "", price: 6700, image: "img/nugget.png" },
-        { name: "Salchipapas", description: "", price: 6700, image: "img/salchipapa.png" }
-      ],
-      "agregados": [
-        { name: "1 Pollo entero solo", description: "1 pollo entero", price: 15000, image: "img/pollo solo.png" },
-        { name: "1/2 Pollo solo", description: " 1/2 pollo  -  parte truto y pechuga", price: 9900, image: "img/medio pollo solo.png" },
-        { name: "1/4 pollo solo", description: "1/4 de polo -- truto o pechuga ---segun el stock", price: 5800, image: "" },
-        { name: "Porcion de papas fritas familiar", description: "Porción grande de papas crujientes", price: 9000, image: "img/porcion de papa.png" },
-        { name: "1/2 porcion de papas fritas", description: "Media Porción  de papas crujientes", price: 6100, image: "img/media porcion papa.png" },
-        { name: "Porcion de arroz chaufa", description: "1 Porción de arroz chaufa", price: 5300, image: "img/porcion arroz chaufa.png" },
-        { name: "Porcion de fideos al pesto", description: "1 Porción de fideos al pesto", price: 5300, image: "img/porcion de fideo.png" },
-        { name: "Porcion de ensalada familiar", description: "Ensalada surtida - familiar ", price: 5400, image: "img/ensalada familiar.png" },
-        { name: "Porcion de ensalada personal", description: "Ensalada surtida - personal", price: 3700, image: "img/ensalada personal.png" }
-      ]
-    };
-
-    // --------- Estado ----------
-    let cart = [];
-    let currentProduct = null;
-    let currentCategory = "ofertas-familiares";
-    let selectedDrink = null;
-    let productQuantity = 1;
-    let bagChoice = null;
-
-    // Admin
-    let isAdminAuthenticated = false;
-    let adminFilters = { from:'', to:'', status:'todos', search:'' };
-
-    // --------- Util ----------
-    function money(v){ return CURRENCY.format(v); }
-    function showToast(msg){
-      const t=document.createElement('div'); t.className='toast'; t.textContent=msg;
-      document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
-    }
-
-    // ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
-    function buildWhatsappTextFromOrder(order){
-      const { customer, items, total } = order;
-      let msg = `🍗 PEDIDO - POLLERÍA EL POLLÓN 🍗\n\n`;
-      msg += `━━━━━━━━━━━━━━━━━━━━━━\n📋 DATOS DEL CLIENTE\n━━━━━━━━━━━━━━━━━━━━━━\n`;
-      msg += `👤 Nombre:   ${customer.name}\n`;
-      msg += `📱 Teléfono: ${customer.phone}\n`;
-      msg += `📍 Dirección: ${customer.address}\n\n`;
-      msg += `━━━━━━━━━━━━━━━━━━━━━━\n🛒 DETALLE DEL PEDIDO\n━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-
-      items.forEach((it,i)=>{
-        msg += `${i+1}. ${it.name} × ${it.qty}\n`;
-        msg += `   ━ Subtotal: ${money(it.total)}\n`;
-        if(it.drink){
-          msg += `   ━ Bebida: ${it.drink}\n`;
-        }
-        if(it.bagQty>0){
-          msg += `   ━ Bolsa: x ${it.bagQty} (+ ${money(BAG_PRICE)} /u)\n`;
-        }
-        msg += `\n`;
-      });
-
-      msg += `━━━━━━━━━━━━━━━━━━━━━━\n💵 TOTAL A PAGAR: ${money(total)}\n━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-      msg += `⚠️ Delivery tiene costo adicional\n`;
-      msg += `📍segun la distancia $2.500 a $4.000`;
-
-      return msg;
-    }
-
-    // --------- Render products ----------
-    function renderProducts(category){
-      currentCategory = category;
-      const container = document.getElementById('products-container');
-      if(!container) return;
-      container.innerHTML = '';
-      (products[category]||[]).forEach(p=>{
-        const card=document.createElement('div');
-        card.className='product-card bg-white rounded-lg shadow-lg overflow-hidden';
-        card.innerHTML = `
-          <img src="${p.image}" alt="${p.name}" class="product-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-          <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 hidden items-center justify-center text-6xl">🍗</div>
-          <div class="p-4">
-            <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
-            <p class="text-gray-600 text-sm mb-3">${p.description}</p>
-            <div class="flex justify-between items-center">
-              <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
-              <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90" style="background-color:#dc2626" data-product='${JSON.stringify(p)}'>Agregar</button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
-
-      document.querySelectorAll('.category-btn').forEach(btn=>{
-        btn.style.backgroundColor = btn.dataset.category===category ? '#dc2626' : '#6b7280';
-      });
-    }
-
-    // --------- Carrito UI ----------
-    function updateCartUI(){
-      const c = cart.length;
-      const total = cart.reduce((s,i)=>s+i.total,0);
-      const fc=document.getElementById('floating-cart-count');
-      const fb=document.getElementById('floating-cart-badge');
-      const ft=document.getElementById('floating-cart-total');
-      const mb=document.getElementById('cart-badge-mobile');
-      const db=document.getElementById('cart-badge-desktop');
-      if(fc) fc.textContent=c;
-      if(fb){ fb.textContent=c; fb.classList.add('cart-badge'); setTimeout(()=>fb.classList.remove('cart-badge'),500); }
-      if(ft) ft.textContent=money(total);
-      if(mb) mb.textContent=c;
-      if(db) db.textContent=c;
-    }
-    function renderCart(){
-      const wrap=document.getElementById('cart-items');
-      const t=document.getElementById('cart-total');
-      if(!wrap || !t) return;
-      if(cart.length===0){ wrap.innerHTML='<p class="text-center text-gray-500 py-8">Tu carrito está vacío</p>'; t.textContent=money(0); return; }
-      let total=0;
-      wrap.innerHTML = cart.map((it,i)=>{
-        total+=it.total;
-        const bagLine = it.bagQty>0 ? `♻️ Bolsa Ecológica: x ${it.bagQty} (+ ${money(BAG_PRICE)} c/u)` : '';
-        const drinkLine = it.drink ? `🥤 Bebida: ${it.drink}` : '';
-        return `
-          <div class="flex justify-between items-center mb-4 pb-4 border-b">
-            <div class="flex-1">
-              <h4 class="font-bold text-gray-800">${it.name} × ${it.qty}</h4>
-              <p class="text-sm text-gray-600">${drinkLine}</p>
-              <p class="text-sm text-green-600">${bagLine}</p>
-            </div>
-            <div class="text-right">
-              <p class="font-bold text-lg text-red-700">${money(it.total)}</p>
-              <button class="remove-item text-red-600 text-sm hover:underline" data-index="${i}">Eliminar</button>
-            </div>
-          </div>`;
-      }).join('');
-      t.textContent = money(total);
-    }
-
-    // --------- Modal helpers ----------
-    function setDrinkVisible(visible){
-      const s = document.getElementById('drink-section');
-      if(s) s.classList.toggle('hidden', !visible);
-    }
-    function paintBagOptions(){
-      const badge = document.getElementById('bag-badge');
-      const opts = document.getElementById('bag-options');
-      const note = document.getElementById('bag-note');
-      if(!badge || !opts || !note) return;
-
-      opts.innerHTML=''; note.textContent=''; bagChoice=null;
-
-      const isFamiliares = currentCategory==='ofertas-familiares';
-      const isOtherMandatory = ['ofertas-dos','ofertas-personales','platos-extras'].includes(currentCategory);
-      const isAgregados = currentCategory==='agregados';
-
-      if(isFamiliares || isOtherMandatory){
-        badge.textContent='Obligatorio';
-        badge.className='text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold';
-        opts.innerHTML = `
-          <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
-            <input type="radio" name="bag" value="add" class="bag-radio">
-            <span class="font-semibold text-gray-800">Agregar bolsa (+ ${money(BAG_PRICE)})</span>
-          </label>
-        `;
-        note.innerHTML = isFamiliares
-          ? `* Esta categoría requiere agregar bolsa. Costo por bolsa: <strong>${money(BAG_PRICE)}</strong>. Se agregará <strong>1 bolsa por cada unidad</strong>.`
-          : `* Esta categoría requiere agregar bolsa. Costo por bolsa: <strong>${money(BAG_PRICE)}</strong>. Se agregará <strong>1 bolsa por pedido</strong>.`;
-      } else if(isAgregados){
-        badge.textContent='Opcional';
-        badge.className='text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full font-semibold';
-        opts.innerHTML = `
-          <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
-            <input type="radio" name="bag" value="add" class="bag-radio">
-            <span class="font-semibold text-gray-800">Agregar bolsa (+ ${money(BAG_PRICE)})</span>
-          </label>
-          <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
-            <input type="radio" name="bag" value="none" class="bag-radio">
-            <span class="font-semibold text-gray-800">Sin bolsa</span>
-          </label>
-        `;
-        note.textContent = `* La bolsa es opcional en esta categoría.`;
-      }
-    }
-    function computeLiveTotal(){
-      if(!currentProduct) return { total:0, bagQty:0 };
-      const base = currentProduct.price * productQuantity;
-      let bagQty = 0;
-      if(currentCategory==='ofertas-familiares'){
-        bagQty = (bagChoice==='add') ? productQuantity : 0;
-      }else if(['ofertas-dos','ofertas-personales','platos-extras'].includes(currentCategory)){
-        bagQty = (bagChoice==='add') ? 1 : 0;
-      }else if(currentCategory==='agregados'){
-        bagQty = (bagChoice==='add') ? 1 : 0;
-      }
-      const total = base + (bagQty * BAG_PRICE);
-      const lt = document.getElementById('live-total');
-      if(lt) lt.textContent = money(total);
-      return { total, bagQty };
-    }
-
-    // --------- ADMIN helpers ----------
-    function getTodayString(){
-      const now = new Date();
-      const yyyy = now.getFullYear();
-      const mm = String(now.getMonth()+1).padStart(2,'0');
-      const dd = String(now.getDate()).padStart(2,'0');
-      return `${yyyy}-${mm}-${dd}`;
-    }
-
-    function filteredOrders(){
-      return orders.filter(o=>{
-        const d = o.createdAt ? o.createdAt.substring(0,10) : '';
-        if(adminFilters.from && d < adminFilters.from) return false;
-        if(adminFilters.to && d > adminFilters.to) return false;
-        if(adminFilters.status!=='todos' && o.status!==adminFilters.status) return false;
-        if(adminFilters.search){
-          const term = adminFilters.search.toLowerCase();
-          const inName = (o.customer.name || '').toLowerCase().includes(term);
-          const inPhone = (o.customer.phone || '').toLowerCase().includes(term);
-          if(!inName && !inPhone) return false;
-        }
-        return true;
-      });
-    }
-
-    function computeAdminStats(){
-      const today = getTodayString();
-      const totalPedidos = orders.length;
-      const pedidosHoy = orders.filter(o => o.createdAt && o.createdAt.startsWith(today));
-      const ventasHoy = pedidosHoy.reduce((s,o)=>s+o.total,0);
-      const pendientes = orders.filter(o=>o.status==='Pendiente').length;
-      const entregados = orders.filter(o=>o.status==='Entregado');
-      const ventasTotales = orders.reduce((s,o)=>s+o.total,0);
-      const ticketPromedio = totalPedidos ? (ventasTotales/totalPedidos) : 0;
-      const entregadosConTiempo = entregados.filter(o=>o.deliveredAt);
-      const promedioMinutos = entregadosConTiempo.length
-        ? entregadosConTiempo.reduce((s,o)=>{
-            const diff = (new Date(o.deliveredAt) - new Date(o.createdAt))/60000;
-            return s + Math.max(diff,0);
-          },0) / entregadosConTiempo.length
-        : 0;
-      const porcentajeEntregados = totalPedidos ? (entregados.length/totalPedidos*100) : 0;
-
-      const elTotal = document.getElementById('admin-stat-total');
-      const elHoy = document.getElementById('admin-stat-hoy');
-      const elVentas = document.getElementById('admin-stat-ventas-hoy');
-      const elPend = document.getElementById('admin-stat-pendientes');
-      const elPctEnt = document.getElementById('admin-stat-entregados-pct');
-      const elTicket = document.getElementById('admin-stat-ticket-promedio');
-      const elTiempo = document.getElementById('admin-stat-tiempo-prom');
-
-      if(elTotal) elTotal.textContent = totalPedidos;
-      if(elHoy) elHoy.textContent = pedidosHoy.length;
-      if(elVentas) elVentas.textContent = money(ventasHoy);
-      if(elPend) elPend.textContent = pendientes;
-      if(elPctEnt) elPctEnt.textContent = `${porcentajeEntregados.toFixed(0)}%`;
-      if(elTicket) elTicket.textContent = money(ticketPromedio);
-      if(elTiempo) elTiempo.textContent = `${promedioMinutos.toFixed(1)} min`;
-    }
-
-    function statusBadgeClass(status){
-      if(status==='Pendiente') return 'admin-badge admin-badge-pendiente';
-      if(status==='En preparación') return 'admin-badge admin-badge-preparacion';
-      if(status==='Entregado') return 'admin-badge admin-badge-entregado';
-      if(status==='Cancelado') return 'admin-badge admin-badge-cancelado';
-      return 'admin-badge';
-    }
-
-    function nextStatus(current){
-      const order = ['Pendiente','En preparación','Entregado','Cancelado'];
-      const idx = order.indexOf(current);
-      return order[(idx+1) % order.length];
-    }
-
-    function renderAdminPanel(){
-      computeAdminStats();
-      const tbody = document.getElementById('admin-orders-body');
-      const countEl = document.getElementById('admin-filter-count');
-      if(!tbody) return;
-      const list = filteredOrders();
-      if(countEl) countEl.textContent = list.length;
-      if(list.length===0){
-        tbody.innerHTML = `<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500 text-sm">No hay pedidos con los filtros actuales.</td></tr>`;
-        return;
-      }
-      tbody.innerHTML = list.map(o=>{
-        const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
-        return `
-          <tr>
-            <td class="px-3 py-2 text-xs font-mono text-gray-700">${o.id}</td>
-            <td class="px-3 py-2 text-xs text-gray-800">${o.customer.name || '-'}</td>
-            <td class="px-3 py-2 text-xs text-gray-700">${o.customer.phone || '-'}</td>
-            <td class="px-3 py-2 text-xs font-semibold text-gray-900">${money(o.total)}</td>
-            <td class="px-3 py-2 text-xs">
-              <span class="${statusBadgeClass(o.status)}">${o.status}</span>
-            </td>
-            <td class="px-3 py-2 text-xs text-gray-600">${dateStr}</td>
-            <td class="px-3 py-2 text-xs">
-              <div class="flex flex-wrap gap-1">
-                <button class="px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 admin-view" data-id="${o.id}">Ver</button>
-                <button class="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 admin-status" data-id="${o.id}">Estado</button>
-                <button class="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 admin-wa" data-id="${o.id}">WhatsApp</button>
-                <button class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 admin-print" data-id="${o.id}">🖨️ Imprimir</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function openAdminPanelModal(){
-      const modal = document.getElementById('admin-panel-modal');
-      if(modal){
-        const today = getTodayString();
-        if(!adminFilters.from && !adminFilters.to){
-          adminFilters.from = today;
-          adminFilters.to = today;
-        }
-        const fromInput = document.getElementById('admin-filter-from');
-        const toInput = document.getElementById('admin-filter-to');
-        if(fromInput) fromInput.value = adminFilters.from;
-        if(toInput) toInput.value = adminFilters.to;
-        renderAdminPanel();
-        modal.classList.add('active');
-      }
-    }
-    function closeAdminPanelModal(){
-      const modal = document.getElementById('admin-panel-modal');
-      if(modal) modal.classList.remove('active');
-    }
-
-    // ======== IMPRESIÓN TÉRMICA: MISMO TEXTO QUE WHATSAPP ========
-    function printOrderTicket(order){
-      const contenido = buildWhatsappTextFromOrder(order);
-
-      const win = window.open('', '_blank', 'width=400,height=600');
-      if(!win) return;
-      win.document.write(`
-        <html>
-          <head>
-            <title>Ticket ${order.id}</title>
-            <style>
-              body{
-                font-family:monospace;
-                font-size:12px;
-                padding:10px;
-                white-space:pre;
-              }
-              @page{
-                margin:0;
-              }
-              @media print{
-                body{margin:0;padding:4px;}
-              }
-            </style>
-          </head>
-          <body>${contenido}</body>
-        </html>
-      `);
-      win.document.close();
-      win.focus();
-      win.print();
-    }
-
-    // --------- Eventos globales ----------
-    document.addEventListener('click', (e)=>{
-      // cambiar categoría
-      if(e.target.classList.contains('category-btn') || (e.target.closest && e.target.closest('.category-btn'))){
-        const btn = e.target.closest('.category-btn');
-        renderProducts(btn.dataset.category);
-      }
-
-      // abrir modal opciones
-      if(e.target.classList.contains('add-to-cart')){
-        currentProduct = JSON.parse(e.target.dataset.product);
-        selectedDrink=null; productQuantity=1; bagChoice=null;
-
-        const qEl = document.getElementById('product-quantity');
-        if(qEl) qEl.textContent='1';
-        document.querySelectorAll('.drink-radio').forEach(r=>r.checked=false);
-
-        setDrinkVisible(currentCategory==='ofertas-familiares');
-        paintBagOptions();
-        computeLiveTotal();
-
-        const om = document.getElementById('options-modal');
-        if(om) om.classList.add('active');
-      }
-
-      // seleccionar bebida
-      if(e.target.classList.contains('drink-radio')){
-        selectedDrink = e.target.value;
-      }
-
-      // seleccionar bolsa
-      if(e.target.classList.contains('bag-radio')){
-        bagChoice = e.target.value;
-        computeLiveTotal();
-      }
-
-      // qty +
-      if(e.target.id==='increase-quantity'){
-        productQuantity++; 
-        const qEl = document.getElementById('product-quantity');
-        if(qEl) qEl.textContent=productQuantity;
-        computeLiveTotal();
-      }
-      // qty -
-      if(e.target.id==='decrease-quantity'){
-        if(productQuantity>1){ 
-          productQuantity--; 
-          const qEl = document.getElementById('product-quantity');
-          if(qEl) qEl.textContent=productQuantity; 
-          computeLiveTotal(); 
-        }
-      }
-
-      // cancelar opciones
-      if(e.target.id==='cancel-options'){
-        const om = document.getElementById('options-modal');
-        if(om) om.classList.remove('active'); 
-        currentProduct=null;
-      }
-
-      // confirmar agregar
-      if(e.target.id==='confirm-add'){
-        if(currentCategory==='ofertas-familiares' && !selectedDrink){
-          showToast('⚠️ Debes seleccionar un sabor de bebida.');
-          return;
-        }
-        const mustBag = currentCategory!=='agregados';
-        if(mustBag && bagChoice!=='add'){
-          showToast('⚠️ Debes agregar la bolsa (obligatorio).');
-          return;
-        }
-        if(currentCategory==='agregados' && !bagChoice){ bagChoice='none'; }
-
-        const { total, bagQty } = computeLiveTotal();
-
-        cart.push({
-          name: currentProduct.name,
-          price: currentProduct.price,
-          qty: productQuantity,
-          drink: currentCategory==='ofertas-familiares' ? selectedDrink : null,
-          bagQty,
-          total
-        });
-
-        updateCartUI();
-        showToast('¡Producto agregado al carrito!');
-        const om = document.getElementById('options-modal');
-        if(om) om.classList.remove('active');
-        selectedDrink=null; productQuantity=1; bagChoice=null; currentProduct=null;
-      }
-
-      // abrir carrito
-      if(e.target.id==='floating-cart' || (e.target.closest && e.target.closest('#floating-cart'))){
-        renderCart(); 
-        const cm = document.getElementById('cart-modal');
-        if(cm) cm.classList.add('active');
-      }
-      if(e.target.id==='close-cart'){ 
-        const cm = document.getElementById('cart-modal');
-        if(cm) cm.classList.remove('active'); 
-      }
-
-      // eliminar item
-      if(e.target.classList.contains('remove-item')){
-        const idx=parseInt(e.target.dataset.index); 
-        cart.splice(idx,1);
-        updateCartUI(); 
-        renderCart(); 
-        showToast('Producto eliminado del carrito');
-      }
-
-      // checkout
-      if(e.target.id==='checkout-btn'){
-        if(cart.length===0){ showToast('Tu carrito está vacío'); return; }
-        const cm = document.getElementById('cart-modal');
-        const chm = document.getElementById('checkout-modal');
-        if(cm) cm.classList.remove('active');
-        if(chm) chm.classList.add('active');
-      }
-      if(e.target.id==='cancel-checkout'){ 
-        const chm = document.getElementById('checkout-modal');
-        if(chm) chm.classList.remove('active'); 
-      }
-
-      // ADMIN open btn
-      if(e.target.id==='admin-open-btn' || (e.target.closest && e.target.closest('#admin-open-btn'))){
-        if(!isAdminAuthenticated){
-          const lm = document.getElementById('admin-login-modal');
-          if(lm) lm.classList.add('active');
-          const err = document.getElementById('admin-login-error');
-          if(err) err.classList.add('hidden');
-        }else{
-          openAdminPanelModal();
-        }
-      }
-
-      // ADMIN login
-      if(e.target.id==='admin-login-cancel'){
-        const lm = document.getElementById('admin-login-modal');
-        if(lm) lm.classList.remove('active');
-      }
-      if(e.target.id==='admin-login-submit'){
-        const passInput = document.getElementById('admin-password');
-        const err = document.getElementById('admin-login-error');
-        const val = (passInput.value || '').trim();
-        if(val==='HUILLCA123'){
-          isAdminAuthenticated = true;
-          if(err) err.classList.add('hidden');
-          const lm = document.getElementById('admin-login-modal');
-          if(lm) lm.classList.remove('active');
-          showToast('✅ Acceso concedido al panel de administración.');
-          openAdminPanelModal();
-        }else{
-          if(err) err.classList.remove('hidden');
-        }
-      }
-
-      // ADMIN close panel
-      if(e.target.id==='admin-close'){
-        closeAdminPanelModal();
-      }
-
-      // ADMIN limpiar filtros
-      if(e.target.id==='admin-filter-clear'){
-        const ff = document.getElementById('admin-filter-from');
-        const ft = document.getElementById('admin-filter-to');
-        const fs = document.getElementById('admin-filter-status');
-        const fsearch = document.getElementById('admin-filter-search');
-        if(ff) ff.value='';
-        if(ft) ft.value='';
-        if(fs) fs.value='todos';
-        if(fsearch) fsearch.value='';
-        adminFilters = { from:'', to:'', status:'todos', search:'' };
-        renderAdminPanel();
-      }
-
-      // ADMIN copiar pedidos
-      if(e.target.id==='admin-copy'){
-        const list = filteredOrders();
-        if(list.length===0){
-          showToast('No hay pedidos en el rango seleccionado.');
-          return;
-        }
-        let lines = 'ID\tFecha\tNombre\tTeléfono\tDirección\tTotal\tEstado\n';
-        list.forEach(o=>{
-          const fecha = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
-          const dir = (o.customer.address || '').replace(/\s+/g,' ');
-          lines += `${o.id}\t${fecha}\t${o.customer.name || ''}\t${o.customer.phone || ''}\t${dir}\t${o.total}\t${o.status}\n`;
-        });
-        const copiar = async ()=>{
-          try{
-            if(navigator.clipboard && navigator.clipboard.writeText){
-              await navigator.clipboard.writeText(lines);
-            }else{
-              throw new Error('no-clipboard');
-            }
-            showToast('Pedidos copiados. Puedes pegarlos en Excel.');
-          }catch{
-            const ta=document.createElement('textarea');
-            ta.value=lines;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            document.body.removeChild(ta);
-            showToast('Pedidos copiados. Puedes pegarlos en Excel.');
-          }
-        };
-        copiar();
-      }
-
-      // ADMIN refresh
-      if(e.target.id==='admin-refresh'){
-        // Con Firestore se actualiza solo, pero forzamos recálculo de estadísticas y filtros
-        loadOrders();
-        renderAdminPanel();
-        showToast('Panel actualizado (datos en tiempo real).');
-      }
-
-      // ADMIN tabla acciones
-      if(e.target.classList.contains('admin-view')){
-        const id = e.target.dataset.id;
-        const order = orders.find(o=>o.id===id);
-        if(order){
-          const txt = buildWhatsappTextFromOrder(order);
-          alert(txt);
-        }
-      }
-
-      if(e.target.classList.contains('admin-status')){
-        const id = e.target.dataset.id;
-        const order = orders.find(o=>o.id===id);
-        if(order){
-          const nuevo = nextStatus(order.status);
-          order.status = nuevo;
-          if(nuevo === 'Entregado' && !order.deliveredAt){
-            order.deliveredAt = new Date().toISOString();
-          }
-          saveOrders(); // se guarda en Firestore + respaldo local
-          renderAdminPanel();
-          showToast(`Estado actualizado a: ${nuevo}`);
-        }
-      }
-
-      if(e.target.classList.contains('admin-wa')){
-        const id = e.target.dataset.id;
-        const order = orders.find(o=>o.id===id);
-        if(order){
-          const phoneRaw = (order.customer.phone || '').replace(/\D/g,'');
-          const to = phoneRaw || WHATSAPP_NUMBER;
-          let msg = `Hola ${order.customer.name || ''}, te escribimos de Pollería El Pollón respecto a tu pedido ${order.id} (${order.status}).`;
-          const url = `https://wa.me/${to}?text=${encodeURIComponent(msg)}`;
-          window.open(url,'_blank','noopener,noreferrer');
-        }
-      }
-
-      if(e.target.classList.contains('admin-print')){
-        const id = e.target.dataset.id;
-        const order = orders.find(o=>o.id===id);
-        if(order){
-          printOrderTicket(order);
-        }
-      }
-
-      // CHATBOT toggle
-      if(e.target.id==='chatbot-toggle' || (e.target.closest && e.target.closest('#chatbot-toggle'))){
-        const panel = document.getElementById('chatbot-panel');
-        if(panel) panel.classList.toggle('hidden');
-      }
-      if(e.target.id==='chatbot-close'){
-        const panel = document.getElementById('chatbot-panel');
-        if(panel) panel.classList.add('hidden');
-      }
-
-      // CHATBOT chips
-      if(e.target.classList.contains('chatbot-chip')){
-        const action = e.target.dataset.action;
-        handleChatbotAction(action);
-      }
-    });
-
-    // ADMIN filtros (input)
-    document.addEventListener('input', (e)=>{
-      if(e.target.id==='admin-filter-from'){
-        adminFilters.from = e.target.value || '';
-        renderAdminPanel();
-      }
-      if(e.target.id==='admin-filter-to'){
-        adminFilters.to = e.target.value || '';
-        renderAdminPanel();
-      }
-      if(e.target.id==='admin-filter-status'){
-        adminFilters.status = e.target.value || 'todos';
-        renderAdminPanel();
-      }
-      if(e.target.id==='admin-filter-search'){
-        adminFilters.search = e.target.value || '';
-        renderAdminPanel();
-      }
-    });
-
-    // enviar pedido (checkout)
-    const checkoutForm = document.getElementById('checkout-form');
-    if(checkoutForm){
-      checkoutForm.addEventListener('submit',(e)=>{
-        e.preventDefault();
-        const name=document.getElementById('customer-name').value.trim();
-        const address=document.getElementById('customer-address').value.trim();
-        const phone=document.getElementById('customer-phone').value.trim();
-
-        let total=0;
-        const itemsForOrder = [];
-        cart.forEach((it)=>{
-          total += it.total;
-          itemsForOrder.push({
-            name: it.name,
-            qty: it.qty,
-            drink: it.drink,
-            bagQty: it.bagQty,
-            total: it.total
-          });
-        });
-
-        const order = {
-          id: 'P' + Date.now(),
-          createdAt: new Date().toISOString(),
-          customer: { name, address, phone },
-          items: itemsForOrder,
-          total,
-          status: 'Pendiente',
-          deliveredAt: null
-        };
-
-        // Guardar pedido en base (Firestore o local)
-        orders.push(order);
-        saveOrders();
-
-        const rawMsg = buildWhatsappTextFromOrder(order);
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`;
-        window.open(url,'_blank','noopener,noreferrer');
-
-        const adminPanelVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
-        if(adminPanelVisible){
-          renderAdminPanel();
-        }
-
-        cart=[]; 
-        updateCartUI(); 
-        const chm = document.getElementById('checkout-modal');
-        if(chm) chm.classList.remove('active'); 
-        e.target.reset();
-        showToast('✅ ¡Pedido enviado a WhatsApp y registrado en Firestore!');
-      });
-    }
-
-    // Sidebar
-    const hamburgerBtn=document.getElementById('hamburger-btn');
-    const closeSidebar=document.getElementById('close-sidebar');
-    const sidebarMenu=document.getElementById('sidebar-menu');
-    const sidebarOverlay=document.getElementById('sidebar-overlay');
-
-    function openSidebar(){ 
-      if(sidebarMenu) sidebarMenu.style.transform='translateX(0)'; 
-      if(sidebarOverlay) sidebarOverlay.classList.remove('hidden'); 
-      document.body.style.overflow='hidden'; 
-    }
-    function closeSidebarMenu(){ 
-      if(sidebarMenu) sidebarMenu.style.transform='translateX(-100%)'; 
-      if(sidebarOverlay) sidebarOverlay.classList.add('hidden'); 
-      document.body.style.overflow='auto'; 
-    }
-    if(hamburgerBtn) hamburgerBtn.addEventListener('click',openSidebar); 
-    if(closeSidebar) closeSidebar.addEventListener('click',closeSidebarMenu); 
-    if(sidebarOverlay) sidebarOverlay.addEventListener('click',closeSidebarMenu);
-
-    document.querySelectorAll('.sidebar-category').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        renderProducts(btn.dataset.category); 
-        closeSidebarMenu(); 
-        document.querySelector('#products-container').scrollIntoView({behavior:'smooth',block:'start'}); 
-      });
-    });
-    const viewCartMobile = document.getElementById('view-cart-mobile');
-    const viewCartDesktop = document.getElementById('view-cart-desktop');
-    if(viewCartMobile){
-      viewCartMobile.addEventListener('click',()=>{
-        renderCart(); 
-        const cm = document.getElementById('cart-modal');
-        if(cm) cm.classList.add('active'); 
-        closeSidebarMenu(); 
-      });
-    }
-    if(viewCartDesktop){
-      viewCartDesktop.addEventListener('click',()=>{
-        renderCart(); 
-        const cm = document.getElementById('cart-modal');
-        if(cm) cm.classList.add('active'); 
-      });
-    }
-
-    // Carrusel auto
-    let currentSlide=0; const totalSlides=10;
-    const carouselContainer=document.getElementById('carousel-container');
-    function updateCarousel(){ 
-      if(carouselContainer) carouselContainer.style.transform=`translateX(-${currentSlide*100}%)`; 
-    }
-    setInterval(()=>{ 
-      currentSlide=(currentSlide+1)%totalSlides; 
-      updateCarousel(); 
-    },2000);
-    updateCarousel();
-
-    // --------- CHATBOT LÓGICA ----------
-    const chatbotMessagesEl = document.getElementById('chatbot-messages');
-
-    function appendChatbotMessage(text, from='bot'){
-      if(!chatbotMessagesEl) return;
-      const div = document.createElement('div');
-      div.className = 'chatbot-msg ' + (from==='bot' ? 'chatbot-msg-bot' : 'chatbot-msg-user');
-      div.innerHTML = text;
-      chatbotMessagesEl.appendChild(div);
-      chatbotMessagesEl.scrollTop = chatbotMessagesEl.scrollHeight;
-    }
-
-    function chatbotWelcome(){
-      appendChatbotMessage(`
-        👋 ¡Bienvenido a <strong>Pollería El Pollón</strong> en Iquique!<br><br>
-        Soy tu asistente virtual tipo <strong>WhatsApp</strong> 💬.<br><br>
-        Te puedo ayudar con:<br>
-        • Ver combos familiares, para dos y personales 🍗<br>
-        • Ubicación, horarios y delivery 🚚<br>
-        • Método de pago y redes sociales 💳📲<br>
-        • Dejar tu pedido listo para WhatsApp ✅<br><br>
-        Elige una opción de abajo y te llevo directo donde necesitas.
-      `,'bot');
-    }
-
-    function handleChatbotAction(action){
-      if(action==='familiares'){
-        appendChatbotMessage('Quiero ver los combos familiares más pedidos.','user');
-        appendChatbotMessage(`
-          Excelente elección 🙌<br><br>
-          Nuestros <strong>Combos Familiares</strong> son los más vendidos del local:<br><br>
-          ⭐ <strong>Ofertón más chaufa</strong>: pollo entero + papas + chaufa + ensalada + bebida 1.5L.<br>
-          ⭐ <strong>Ofertón pura papa</strong>: ideal para los que aman las papas fritas 🤤<br>
-          ⭐ <strong>Mega Familiar</strong>: pensado para grupos grandes.<br><br>
-          👉 Te llevo directo a la sección de <strong>Ofertas Familiares</strong> para que agregues tu combo al carrito.
-        `,'bot');
-        const sectionBtn = document.querySelector('.category-btn[data-category="ofertas-familiares"]');
-        if(sectionBtn) sectionBtn.click();
-        document.querySelector('#products-container')?.scrollIntoView({behavior:'smooth',block:'start'});
-      }
-
-      if(action==='horarios'){
-        appendChatbotMessage('Quiero saber los horarios y la dirección.','user');
-        appendChatbotMessage(`
-          Perfecto 🕐<br><br>
-          📍 <strong>Dirección:</strong><br>
-          Calle Vivar 1086, Iquique, Chile.<br><br>
-          🕐 <strong>Horario de atención:</strong><br>
-          Lunes a Domingo de <strong>11:30 a 23:00 hrs</strong>.<br><br>
-          Puedes venir al local, retirar para llevar o pedir delivery.
-        `,'bot');
-      }
-
-      if(action==='delivery'){
-        appendChatbotMessage('Quiero información del delivery.','user');
-        appendChatbotMessage(`
-          Te explico el delivery 🚚<br><br>
-          • Repartimos dentro de Iquique 🏙️<br>
-          • Costo de envío según la zona:<br>
-          &nbsp;&nbsp;👉 Entre <strong>$2.500 y $4.000</strong> aprox.<br><br>
-          El valor exacto se confirma por WhatsApp según tu dirección.<br><br>
-          Sugerencia: arma tu pedido en la carta y al final lo enviamos directo a WhatsApp ✅
-        `,'bot');
-      }
-
-      if(action==='pedido'){
-        appendChatbotMessage('Quiero dejar mi pedido listo por WhatsApp.','user');
-        appendChatbotMessage(`
-          Vamos a dejar tu pedido listo 😋<br><br>
-          1️⃣ Agrega tus combos y platos al carrito.<br>
-          2️⃣ Presiona <strong>"Realizar Pedido por WhatsApp"</strong>.<br>
-          3️⃣ Completa tus datos y confirma.<br><br>
-          También puedes escribirnos directo aquí 👇<br><br>
-          <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero hacer un pedido en Pollería El Pollón. ¿Me pueden ayudar con las opciones de combos familiares?')}" target="_blank" class="inline-block bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">💬 Abrir WhatsApp</a>
-        `,'bot');
-      }
-
-      if(action==='pagos'){
-        appendChatbotMessage('Quiero saber los métodos de pago.','user');
-        appendChatbotMessage(`
-          💳 <strong>Método de pago actual</strong><br><br>
-          • Aceptamos <strong>solo efectivo</strong> en este momento.<br>
-          • El pago se realiza <strong>contra entrega</strong> en el local o al recibir tu pedido a domicilio.<br><br>
-          Cualquier cambio futuro en métodos de pago lo informaremos por nuestras redes sociales.
-        `,'bot');
-      }
-
-      if(action==='redes'){
-        appendChatbotMessage('Quiero ver las redes sociales.','user');
-        appendChatbotMessage(`
-          📲 <strong>Nuestras redes sociales</strong><br><br>
-          • WhatsApp: <a href="https://wa.me/56968788613" target="_blank" class="text-green-600 font-semibold">+56 9 6878 8613</a><br>
-          • Facebook: <span class="font-semibold">Pollería El Pollón (Iquique)</span><br>
-          • Instagram y TikTok: contenido de promociones, combos y novedades 🔥<br><br>
-          Al final de la página tienes los botones directos a todas las redes.
-        `,'bot');
-      }
-    }
-
-    // --------- Inicio ---------
-    initOrdersBackend();   // inicializa Firebase + Firestore + suscripción en tiempo real
-    loadOrders();          // respaldo local en caso de que falle Firestore
-    renderProducts('ofertas-familiares');
-    updateCartUI();
-    if(chatbotMessagesEl){
-      chatbotWelcome();
-    }
-  </script>
+  <!-- =================== FIREBASE (BASE DE DATOS EN LÍNEA) =================== -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <!-- ======================================================================== -->
+
+  <!-- JS principal -->
+  <script src="js/app.js"></script>
+  <!-- JS extra admin (por ahora vacío / opcional) -->
+  <script src="js/admin.js"></script>
 </body>
 </html>
