@@ -688,7 +688,7 @@ document.addEventListener('click', (e) => {
       // Botón "Realizar mi reserva" -> otra página web
       if (e.target.id === 'modal-reserva-go') {
         // ⛔ IMPORTANTE: cambia esta URL por la página real de reservas
-        const urlReservas = 'https://tus-reservas-el-pollon.cl';
+        const urlReservas = 'https://pollon543.github.io/reservas-online-pollon-de-iquique/';
         window.open(urlReservas, '_blank', 'noopener,noreferrer');
       }
 
