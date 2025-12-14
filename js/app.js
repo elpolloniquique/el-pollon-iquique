@@ -15,16 +15,25 @@ const WHATSAPP_NUMBER = '56986925310';
 // 3) Copia la configuración de tu app web y reemplaza los valores de abajo
 // 4) En Firestore crea una colección llamada: pollon_orders_v1
 // -----------------------------------------------------------------------
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
+//   authDomain: "polleria-el-pollon.firebaseapp.com",
+//   databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com",
+//   projectId: "polleria-el-pollon",
+//   storageBucket: "polleria-el-pollon.firebasestorage.app",
+//   messagingSenderId: "421303971066",
+//   appId: "1:421303971066:web:f0adeac505350cfc41ed43",
+//   measurementId: "G-NRMKTLE3EZ"
+// };
 const firebaseConfig = {
-  apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
-  authDomain: "polleria-el-pollon.firebaseapp.com",
-  databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com",
-  projectId: "polleria-el-pollon",
-  storageBucket: "polleria-el-pollon.firebasestorage.app",
-  messagingSenderId: "421303971066",
-  appId: "1:421303971066:web:f0adeac505350cfc41ed43",
-  measurementId: "G-NRMKTLE3EZ"
-};
+  apiKey: "AIzaSyBiNY6GRNxFZusP9kPGz-5lQKA46enCXKk",
+  authDomain: "pollon-db-2025.firebaseapp.com",
+  projectId: "pollon-db-2025",
+  storageBucket: "pollon-db-2025.firebasestorage.app",
+  messagingSenderId: "517449591548",
+  appId: "1:517449591548:web:06b38bb9b176e3f0044579"
+};                                
+
 
 let ordersRef = null; // referencia a la colección de Firestore
 let db = null;        // referencia a Firestore
