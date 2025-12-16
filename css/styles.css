@@ -620,7 +620,7 @@ body {
 }
 
 .location-info{
-  background: linear-gradient(135deg,#b91c1c 0%, #dc2626 100%);
+  background: linear-gradient(135deg,#393030 0%, #4e4545 100%);
   color: #fff;
   padding: 20px 18px;
   display: flex;
@@ -661,7 +661,7 @@ body {
 }
 
 .btn-map{
-  background: #facc15;
+  background: #c0170e;
   color: #7c2d12;
   font-weight: 700;
   padding: 10px 16px;
