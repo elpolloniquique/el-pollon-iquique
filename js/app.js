@@ -1255,7 +1255,10 @@ if (catbarNext && catbarScroll) {
 // --------- Inicio ---------
 initOrdersBackend();   // inicializa Firebase + Firestore + suscripción en tiempo real
 loadOrders();          // respaldo local en caso de que falle Firestore
-renderProducts('ofertas-familiares');
+// renderProducts('ofertas-familiares');
+renderProductsAll();
+currentCategory = 'todo-el-menu';
+
 updateCartUI();
 if (chatbotMessagesEl) {
   chatbotWelcome();
