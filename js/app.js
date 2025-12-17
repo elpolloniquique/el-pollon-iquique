@@ -162,6 +162,22 @@ const products = {
     { name: "Porcion de ensalada personal", description: "Ensalada surtida - personal", price: 3700, image: "img/ensalada personal.png" }
   ]
 };
+const CATEGORY_META = {
+  "ofertas-familiares": { title: "👨‍👩‍👧‍👦 Ofertas Familiares" },
+  "ofertas-dos":        { title: "👫 Ofertas para Dos" },
+  "ofertas-personales": { title: "🧑 Ofertas Personales" },
+  "platos-extras":      { title: "🍽️ Platos Extras" },
+  "agregados":          { title: "➕ Agregados" }
+};
+
+const CATEGORY_ORDER = [
+  "ofertas-familiares",
+  "ofertas-dos",
+  "ofertas-personales",
+  "platos-extras",
+  "agregados"
+];
+
 
 // --------- Estado ----------
 let cart = [];
@@ -252,12 +268,25 @@ function buildWhatsappTextFromOrder(order) {
 
 
 // --------- Render products ----------
-function renderProducts(category) {
+function setActiveCategoryButton(category) {
+  document.querySelectorAll('.category-btn').forEach(btn => {
+    btn.classList.toggle('is-active', btn.dataset.category === category);
+  });
+}
+
+// Render normal: UNA categoría
+function renderProductsSingle(category) {
   currentCategory = category;
+
   const container = document.getElementById('products-container');
   if (!container) return;
+
   container.innerHTML = '';
+
   (products[category] || []).forEach(p => {
+    // 🔥 Guardamos la categoría real dentro del producto:
+    const payload = { ...p, __category: category };
+
     const card = document.createElement('div');
     card.className = 'product-card bg-white rounded-lg shadow-lg overflow-hidden';
     card.innerHTML = `
@@ -266,22 +295,72 @@ function renderProducts(category) {
       <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 hidden items-center justify-center text-6xl">🍗</div>
       <div class="p-4">
         <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
-        <p class="text-gray-600 text-sm mb-3">${p.description}</p>
+        <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
         <div class="flex justify-between items-center">
           <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
           <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
                   style="background-color:#dc2626"
-                  data-product='${JSON.stringify(p)}'>Agregar</button>
+                  data-product='${JSON.stringify(payload)}'>Agregar</button>
         </div>
       </div>
     `;
     container.appendChild(card);
   });
 
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.style.backgroundColor = btn.dataset.category === category ? '#dc2626' : '#6b7280';
-  });
+  setActiveCategoryButton(category);
 }
+
+// Render “TODO EL MENÚ”: todas las categorías con encabezados
+function renderProductsAll() {
+  currentCategory = "todo-el-menu";
+
+  const container = document.getElementById('products-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+
+  CATEGORY_ORDER.forEach(catKey => {
+    const list = products[catKey] || [];
+    if (!list.length) return;
+
+    // Encabezado por categoría (como tu foto)
+    const header = document.createElement('div');
+    header.className = 'col-span-full mt-4 mb-2';
+    header.innerHTML = `
+      <h2 class="text-3xl font-extrabold text-gray-900 flex items-center gap-2">
+        ${CATEGORY_META[catKey]?.title || catKey}
+      </h2>
+      <div class="h-[3px] w-64 bg-red-600 rounded-full mt-3"></div>
+    `;
+    container.appendChild(header);
+
+    list.forEach(p => {
+      const payload = { ...p, __category: catKey };
+
+      const card = document.createElement('div');
+      card.className = 'product-card bg-white rounded-lg shadow-lg overflow-hidden';
+      card.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" class="product-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 hidden items-center justify-center text-6xl">🍗</div>
+        <div class="p-4">
+          <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
+          <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
+            <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+                    style="background-color:#dc2626"
+                    data-product='${JSON.stringify(payload)}'>Agregar</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  });
+
+  setActiveCategoryButton("todo-el-menu");
+}
+
 
 // --------- Carrito UI ----------
 function updateCartUI() {
@@ -568,28 +647,42 @@ function printOrderTicket(order) {
 document.addEventListener('click', (e) => {
   // cambiar categoría
   if (e.target.classList.contains('category-btn') || (e.target.closest && e.target.closest('.category-btn'))) {
-    const btn = e.target.closest('.category-btn');
-    renderProducts(btn.dataset.category);
+  const btn = e.target.closest('.category-btn');
+  const cat = btn.dataset.category;
+
+  if (cat === 'todo-el-menu') {
+    renderProductsAll();
+  } else {
+    renderProductsSingle(cat);
   }
+}
+
 
   // abrir modal opciones
   if (e.target.classList.contains('add-to-cart')) {
-    currentProduct = JSON.parse(e.target.dataset.product);
-    selectedDrink = null;
-    productQuantity = 1;
-    bagChoice = null;
+  const parsed = JSON.parse(e.target.dataset.product);
 
-    const qEl = document.getElementById('product-quantity');
-    if (qEl) qEl.textContent = '1';
-    document.querySelectorAll('.drink-radio').forEach(r => r.checked = false);
+  // ✅ clave: si viene desde "Todo el menú", toma su categoría real
+  currentCategory = parsed.__category || currentCategory;
 
-    setDrinkVisible(currentCategory === 'ofertas-familiares');
-    paintBagOptions();
-    computeLiveTotal();
+  currentProduct = parsed;
 
-    const om = document.getElementById('options-modal');
-    if (om) om.classList.add('active');
-  }
+  selectedDrink = null;
+  productQuantity = 1;
+  bagChoice = null;
+
+  const qEl = document.getElementById('product-quantity');
+  if (qEl) qEl.textContent = '1';
+  document.querySelectorAll('.drink-radio').forEach(r => r.checked = false);
+
+  setDrinkVisible(currentCategory === 'ofertas-familiares');
+  paintBagOptions();
+  computeLiveTotal();
+
+  const om = document.getElementById('options-modal');
+  if (om) om.classList.add('active');
+}
+
 
   // seleccionar bebida
   if (e.target.classList.contains('drink-radio')) {
@@ -1146,6 +1239,18 @@ function handleChatbotAction(action) {
     `, 'bot');   
   }
 }
+
+
+// ===== Flecha para deslizar categorías (móvil) =====
+const catbarScroll = document.getElementById('catbar-scroll');
+const catbarNext = document.getElementById('catbar-next');
+
+if (catbarNext && catbarScroll) {
+  catbarNext.addEventListener('click', () => {
+    catbarScroll.scrollBy({ left: 260, behavior: 'smooth' });
+  });
+}
+
 
 // --------- Inicio ---------
 initOrdersBackend();   // inicializa Firebase + Firestore + suscripción en tiempo real

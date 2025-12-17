@@ -206,20 +206,53 @@
 
       <!-- Botones de categorías -->
       <div class="mb-4 bg-[#C4362E]"></div>
-      <div class="mb-8 overflow-x-auto scrollbar-hide">
-        <div class="flex lg:flex-wrap lg:justify-center gap-4 min-w-max lg:min-w-0 px-2 lg:px-0">
-          <button class="category-btn bg-red-600 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
-                  data-category="ofertas-familiares"> Ofertas Familiares</button>
-          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
-                  data-category="ofertas-dos"> Ofertas para Dos</button>
-          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
-                  data-category="ofertas-personales"> Ofertas Personales</button>
-          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
-                  data-category="platos-extras"> Platos Extras</button>
-          <button class="category-btn bg-gray-500 text-white px-6 py-3 rounded-full font-bold hover:bg-red-700 whitespace-nowrap flex-shrink-0"
-                  data-category="agregados"> Agregados</button>
-        </div>
+      <!-- =================== CATEGORÍAS PRO (con flecha) =================== -->
+<div class="mb-8">
+  <h3 class="text-3xl font-extrabold text-gray-900 mb-5">
+    Selecciona tus Productos
+  </h3>
+
+  <div class="catbar">
+    <!-- Zona scroll -->
+    <div id="catbar-scroll" class="catbar__scroll scrollbar-hide">
+      <div class="catbar__row">
+
+        <!-- NUEVO: TODO EL MENÚ -->
+        <button class="category-btn catbtn is-active" data-category="todo-el-menu" type="button">
+          🔥 <span>Todo el Menú</span>
+        </button>
+
+        <button class="category-btn catbtn" data-category="ofertas-familiares" type="button">
+          👨‍👩‍👧‍👦 <span>Familiares</span>
+        </button>
+
+        <button class="category-btn catbtn" data-category="ofertas-dos" type="button">
+          👫 <span>Para Dos</span>
+        </button>
+
+        <button class="category-btn catbtn" data-category="ofertas-personales" type="button">
+          🧑 <span>Personales</span>
+        </button>
+
+        <button class="category-btn catbtn" data-category="platos-extras" type="button">
+          🍽️ <span>Extras</span>
+        </button>
+
+        <button class="category-btn catbtn" data-category="agregados" type="button">
+          ➕ <span>Agregados</span>
+        </button>
+
       </div>
+    </div>
+
+    <!-- Flecha para avanzar (como en tu imagen) -->
+    <button id="catbar-next" class="catbar__next" type="button" aria-label="Siguiente">
+      ›
+    </button>
+  </div>
+</div>
+<!-- ================================================================ -->
+
 
       
 
