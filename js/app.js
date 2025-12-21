@@ -16,14 +16,14 @@ const WHATSAPP_NUMBER = '56986925310';
 // 4) En Firestore crea una colección llamada: pollon_orders_v1
 // -----------------------------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
-  authDomain: "polleria-el-pollon.firebaseapp.com",
-  databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com",
-  projectId: "polleria-el-pollon",
-  storageBucket: "polleria-el-pollon.firebasestorage.app",
-  messagingSenderId: "421303971066",
-  appId: "1:421303971066:web:f0adeac505350cfc41ed43",
-  measurementId: "G-NRMKTLE3EZ"
+  apiKey: "AIzaSyCks-YWsfvV8NTyebTLC3FHGeyEQiVEUj4",
+  authDomain: "pollon-db-2026.firebaseapp.com",
+  databaseURL: "https://pollon-db-2026-default-rtdb.firebaseio.com",
+  projectId: "pollon-db-2026",
+  storageBucket: "pollon-db-2026.firebasestorage.app",
+  messagingSenderId: "749646607216",
+  appId: "1:749646607216:web:6f26a11f138828eb8695b5",
+  measurementId: "G-XXXXXXXXXX"
 };
 
 let ordersRef = null; // referencia a la colección de Firestore
