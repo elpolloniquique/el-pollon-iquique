@@ -25,14 +25,29 @@ const WHATSAPP_NUMBER = '56986925310';
 //   appId: "1:421303971066:web:f0adeac505350cfc41ed43",
 //   measurementId: "G-NRMKTLE3EZ"
 // };
+
+
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBiNY6GRNxFZusP9kPGz-5lQKA46enCXKk",
-  authDomain: "pollon-db-2025.firebaseapp.com",
-  projectId: "pollon-db-2025",
-  storageBucket: "pollon-db-2025.firebasestorage.app",
-  messagingSenderId: "517449591548",
-  appId: "1:517449591548:web:06b38bb9b176e3f0044579"
-};                                
+  apiKey: "AIzaSyDjvpzP_e7Gz4SxlQH_GnCzppoNzTjeFGM",
+  authDomain: "polleria-el-pollon-ef966.firebaseapp.com",
+  projectId: "polleria-el-pollon-ef966",
+  storageBucket: "polleria-el-pollon-ef966.firebasestorage.app",
+  messagingSenderId: "492976720902",
+  appId: "1:492976720902:web:867f3770b760723c59c787",
+  measurementId: "G-5TW9H1CKYM"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);                              
 
 
 let ordersRef = null; // referencia a la colección de Firestore
@@ -268,11 +283,14 @@ function buildWhatsappTextFromOrder(order) {
 
 
 // --------- Render products ----------
-function setActiveCategoryButton(category) {
-  document.querySelectorAll('.category-btn').forEach(btn => {
-    btn.classList.toggle('is-active', btn.dataset.category === category);
+document.querySelectorAll('.sidebar-category').forEach(btn => {
+  btn.addEventListener('click', () => {
+    renderProductsSingle(btn.dataset.category);
+    closeSidebarMenu();
+    document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-}
+});
+
 
 // Render normal: UNA categoría
 function renderProductsSingle(category) {
