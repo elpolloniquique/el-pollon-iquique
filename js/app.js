@@ -15,40 +15,16 @@ const WHATSAPP_NUMBER = '56986925310';
 // 3) Copia la configuración de tu app web y reemplaza los valores de abajo
 // 4) En Firestore crea una colección llamada: pollon_orders_v1
 // -----------------------------------------------------------------------
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
-//   authDomain: "polleria-el-pollon.firebaseapp.com",
-//   databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com",
-//   projectId: "polleria-el-pollon",
-//   storageBucket: "polleria-el-pollon.firebasestorage.app",
-//   messagingSenderId: "421303971066",
-//   appId: "1:421303971066:web:f0adeac505350cfc41ed43",
-//   measurementId: "G-NRMKTLE3EZ"
-// };
-
-
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDjvpzP_e7Gz4SxlQH_GnCzppoNzTjeFGM",
-  authDomain: "polleria-el-pollon-ef966.firebaseapp.com",
-  projectId: "polleria-el-pollon-ef966",
-  storageBucket: "polleria-el-pollon-ef966.firebasestorage.app",
-  messagingSenderId: "492976720902",
-  appId: "1:492976720902:web:867f3770b760723c59c787",
-  measurementId: "G-5TW9H1CKYM"
+  apiKey: "AIzaSyCkFuQQGrIwxI4ln3t8Ap7wuGUW2VixJL0",
+  authDomain: "polleria-el-pollon.firebaseapp.com",
+  databaseURL: "https://polleria-el-pollon-default-rtdb.firebaseio.com",
+  projectId: "polleria-el-pollon",
+  storageBucket: "polleria-el-pollon.firebasestorage.app",
+  messagingSenderId: "421303971066",
+  appId: "1:421303971066:web:f0adeac505350cfc41ed43",
+  measurementId: "G-NRMKTLE3EZ"
 };
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);                              
-
 
 let ordersRef = null; // referencia a la colección de Firestore
 let db = null;        // referencia a Firestore
@@ -128,6 +104,8 @@ function loadOrders() {
     }
   }
 }
+
+
 // ===================== FIN CONFIG FIREBASE / BACKEND ====================
 
 const products = {
