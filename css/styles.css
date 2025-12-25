@@ -785,11 +785,11 @@ body {
 
 /* =================== AVISO NAVIDEÑO =================== */
 .aviso{
-  background: #fffae5;
-  border: 2px solid #f3cf03;
+  background: #faf4d3;
+  border: 2px solid #ffd000;
   padding: 12px 25px;
   text-align: center;
   font-size: 16px;
-  color: #7a2d00;
+  color: #703702;
   font-weight: 600;
 }
