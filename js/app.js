@@ -323,10 +323,10 @@ function renderProductsAll() {
     const header = document.createElement('div');
     header.className = 'col-span-full mt-4 mb-2';
     header.innerHTML = `
-      <h2 class="text-3xl font-extrabold text-gray-900 flex items-center gap-2">
+      <h3 class="text-2xl font-extrabold text-gray-900 flex items-center gap-2">
         ${CATEGORY_META[catKey]?.title || catKey}
-      </h2>
-      <div class="h-[3px] w-64 bg-red-600 rounded-full mt-3"></div>
+      </h3>
+      <div class="h-[3px] w-70 bg-red-300 rounded-full mt-1"></div>
     `;
     container.appendChild(header);
 
