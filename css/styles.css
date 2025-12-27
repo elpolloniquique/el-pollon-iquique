@@ -797,7 +797,7 @@ body {
 
  /* ===================== ESTILO SECTION COMBOS ===================== */
   .pollon-combos{
-    padding: 28px 14px;
+    padding: 25px 15px;
   }
 
   .combo-wrap{
@@ -915,18 +915,29 @@ body {
   }
 
   /* Responsive */
-  @media (max-width: 980px){
+  @media (max-width: 768px){
     .combo-wrap{
       grid-template-columns: 1fr;
     }
+
     .combo-card{
       grid-template-columns: 1fr;
+      min-height: auto;
     }
+
     .combo-media{
-      border-radius: 18px 18px 0 0;
-      height: 260px;
+      border-top-right-radius: 18px;
+      border-bottom-left-radius: 0;
+      height: 220px;
     }
+
     .combo-content{
-      padding: 20px 20px 22px;
+      padding: 20px 22px;
+      text-align: center;
+    }
+
+    .combo-btn{
+      align-self: center;
     }
   }
+  
