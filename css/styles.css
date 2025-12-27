@@ -832,6 +832,8 @@ body {
     object-fit: cover;
     display: block;
     transform: scale(1.02);
+    transition: transform .3s ease;
+
   }
 
   /* Textos sobre la imagen */
@@ -868,11 +870,12 @@ body {
 
   /* Lado texto */
   .combo-content{
-    padding: 26px 28px;
+    padding: 10px 15px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 12px;
+    gap: 15px;
+
   }
 
   .combo-content h3{
@@ -932,7 +935,7 @@ body {
     }
 
     .combo-content{
-      padding: 20px 22px;
+      padding: 15px 22px;
       text-align: center;
     }
 
@@ -940,4 +943,4 @@ body {
       align-self: center;
     }
   }
-  
+
