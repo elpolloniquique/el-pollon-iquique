@@ -586,9 +586,9 @@ body {
 }
 
 .location-header h2{
-  font-size: 30px;
-  font-weight: 800;
-  color: #7e1212;
+  font-size: 20px;
+  font-weight: 500;
+  color: #0e0e0e;
 }
 
 .location-header p{
@@ -603,9 +603,9 @@ body {
 
 .location-card{
   background: #c10d0d;
-  border-radius: 18px;
+  border-radius: 15px;
   overflow: hidden;
-  box-shadow: 0 18px 40px rgba(226, 221, 221, 0.15);
+  box-shadow: 0 10px 22px rgba(233, 223, 223, 0.15);
   display: grid;
   grid-template-columns: 3.2fr 1.1fr;
 
@@ -785,12 +785,162 @@ body {
 
 /* =================== AVISO NAVIDEÑO =================== */
 .aviso{
-  background: #faf4d3;
-  border: 2px solid #ffd000;
-  padding: 12px 25px;
+  background: #aa1313;
+  /* border: 2px solid #05a012; */
+  padding: 5px 25px;
   text-align: center;
-  font-size: 16px;
-  color: #703702;
-  font-weight: 600;
-  box-shadow: 0 8px 24px rgba(255, 223, 0, 0.25);
+  font-size: 14px;
+  color: #fcfcfc;
+  font-weight: 500;
+ 
 }
+
+ /* ===================== ESTILO SECTION COMBOS ===================== */
+  .pollon-combos{
+    padding: 25px 15px;
+  }
+
+  .combo-wrap{
+    max-width: 1180px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  .combo-card{
+    background: #e6e6e6;
+    border-radius: 18px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 44% 56%;
+    min-height: 280px;
+  }
+
+  /* Lado imagen */
+  .combo-media{
+    position: relative;
+    background: #fff;
+    border-top-left-radius: 18px;
+    border-bottom-left-radius: 18px;
+    overflow: hidden;
+  }
+
+  .combo-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.02);
+    transition: transform .3s ease;
+
+  }
+
+  /* Textos sobre la imagen */
+  .combo-sticker{
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .sticker-top{
+    display: inline-block;
+    background: #ff9800;
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: .6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  .sticker-big{
+    margin-top: 8px;
+    color: #ff1e1e;
+    font-weight: 1000;
+    text-transform: uppercase;
+    line-height: .95;
+    font-size: clamp(22px, 2.4vw, 34px);
+    text-shadow: 0 2px 0 rgba(255,255,255,.55);
+  }
+
+  /* Lado texto */
+  .combo-content{
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+
+  }
+
+  .combo-content h3{
+    margin: 0;
+    font-size: clamp(22px, 2.2vw, 34px);
+    line-height: 1.05;
+    color: #111;
+    font-weight: 900;
+  }
+
+  .combo-content p{
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 360px;
+  }
+
+  .combo-btn{
+    margin-top: 10px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.6px solid #ff2b2b;
+    color: #ff2b2b;
+    background: transparent;
+    font-weight: 800;
+    font-size: 14px;
+    text-decoration: none;
+    transition: transform .12s ease, background .12s ease, color .12s ease;
+  }
+
+  .combo-btn:hover{
+    background: #ff2b2b;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px){
+    .combo-wrap{
+      grid-template-columns: 1fr;
+    }
+
+    .combo-card{
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .combo-media{
+      border-top-right-radius: 18px;
+      border-bottom-left-radius: 0;
+      height: 220px;
+    }
+
+    .combo-content{
+      padding: 15px 22px;
+      text-align: center;
+    }
+
+    .combo-btn{
+      align-self: center;
+    }
+  }
+
