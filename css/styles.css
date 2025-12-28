@@ -945,37 +945,3 @@ body {
     }
   }
 
-/* =================== HERO / CARRUSEL PRINCIPAL =================== */
-
-/* ALTURA POR DEFECTO (CELULAR) → se queda como ahora */
-.hero-carousel {
-  height: 400px;
-}
-
-/* TABLET */
-@media (min-width: 768px) {
-  .hero-carousel {
-    height: 520px;
-  }
-}
-
-/* PC / NOTEBOOK */
-@media (min-width: 1024px) {
-  .hero-carousel {
-    height: 640px;
-  }
-}
-
-/* PANTALLAS GRANDES */
-@media (min-width: 1280px) {
-  .hero-carousel {
-    height: 720px;
-  }
-}
-
-/* Asegura que las imágenes llenen bien el espacio */
-.hero-carousel img {
-  height: 100%;
-  object-fit: cover;
-}
-/* =================== FIN HERO / CARRUSEL PRINCIPAL =================== */
