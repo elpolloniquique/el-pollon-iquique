@@ -797,11 +797,12 @@ body {
 
  /* ===================== ESTILO SECTION COMBOS ===================== */
   .pollon-combos{
-    padding: 25px 15px;
+    padding: 20px 10px;
+    
   }
 
   .combo-wrap{
-    max-width: 1180px;
+    max-width: 1280px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
