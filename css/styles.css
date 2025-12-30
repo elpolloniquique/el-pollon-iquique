@@ -1,3 +1,16 @@
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat";
+    font-size: 11px;
+} */
+
+
+
+
+
+
 body {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -44,15 +57,15 @@ body {
 /* Carrito flotante */
 .floating-cart {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 50px;
+  right: 10px;
   z-index: 999;
-  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+  box-shadow: 0 5px 10px rgba(0,0,0,.3);
   animation: float 3s ease-in-out infinite;
 }
 @media (max-width: 768px) {
   .floating-cart {
-    bottom: 30px;
+    bottom: 20px;
     right: 2px;
     left: auto;
     padding: 0 0;
@@ -60,10 +73,10 @@ body {
   }
   .floating-cart > div {
     justify-content: flex-start;
-    gap: 2px;
+    gap: 1px;
   }
   .floating-cart .text-2xl {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 }
 @keyframes float {
