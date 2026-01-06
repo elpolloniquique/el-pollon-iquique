@@ -605,13 +605,13 @@ body {
 
 .catbar__scroll{
   overflow-x: auto;
-  padding-right: 56px; /* espacio para la flecha */
+  padding-right: 50px; /* espacio para la flecha */
 }
 
 .catbar__row{
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:5px;
   min-width:max-content;
   padding: 2px 6px 10px 2px;
 }
@@ -626,23 +626,23 @@ body {
   font-size:14px;
   white-space:nowrap;
 
-  background:#fff;
+  background:#ffffff;
   color:#111827;
   border:2px solid #e5e7eb;
-  box-shadow: 0 10px 22px rgba(0,0,0,.06);
+  box-shadow: 0 10px 22px rgba(8, 8, 8, 0.06);
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
 }
 
 .catbtn:hover{
   transform: translateY(-1px);
   box-shadow: 0 14px 28px rgba(0,0,0,.10);
-  border-color:#fecaca;
+  border-color:#be5757;
 }
 
 .catbtn.is-active{
-  background: linear-gradient(135deg,#b40000 0%, #e11d2e 100%);
+  background: linear-gradient(135deg,#ec0909 0%, #f70519 100%);
   color:#fff;
-  border-color: rgba(255,255,255,.18);
+  border-color: rgba(253, 253, 253, 0.18);
   box-shadow: 0 18px 34px rgba(180,0,0,.28);
 }
 
