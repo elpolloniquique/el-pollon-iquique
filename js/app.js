@@ -153,14 +153,34 @@ const products = {
     { name: "Porcion de fideos al pesto", description: "1 Porción de fideos al pesto", price: 5300, image: "img/porcion de fideo.png" },
     { name: "Porcion de ensalada familiar", description: "Ensalada surtida - familiar ", price: 5400, image: "img/ensalada familiar.png" },
     { name: "Porcion de ensalada personal", description: "Ensalada surtida - personal", price: 3700, image: "img/ensalada personal.png" }
+  ],
+
+  "bebidas": [
+    { name: "Coca Cola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_cocacola.png" },
+    { name: "Coca Cola Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_cocacero.png" },
+    { name: "Inca Kola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_incakola.png" },
+    { name: "Fanta", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_fanta.png" },
+    { name: "Sprite", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_sprite.png" },
+    { name: "Sprite Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_spritecero.png" }
+  ],
+
+  "descartables": [
+    { name: "Aluza CT5", description: "Envase descartable Aluza CT5.", price: 200, image: "img/desc_ct5.png" },
+    { name: "Aluza CT3", description: "Envase descartable Aluza CT3.", price: 200, image: "img/desc_ct3.png" },
+    { name: "Tenedor descartable", description: "Tenedor plástico descartable.", price: 200, image: "img/desc_tenedor.png" },
+    { name: "Bolsa ecológica", description: "Bolsa ecológica (unidad).", price: 200, image: "img/desc_bolsa.png" }
   ]
+
 };
 const CATEGORY_META = {
   "ofertas-familiares": { title: "👨‍👩‍👧‍👦 Ofertas Familiares" },
   "ofertas-dos":        { title: "👫 Ofertas para Dos" },
   "ofertas-personales": { title: "🧑 Ofertas Personales" },
   "platos-extras":      { title: "🍽️ Platos Extras" },
-  "agregados":          { title: "➕ Agregados" }
+  "agregados":          { title: "➕ Agregados" },
+  "bebidas":           { title: "🥤 Bebidas" },
+  "descartables":      { title: "🍴 Descartables" }
+
 };
 
 const CATEGORY_ORDER = [
@@ -168,7 +188,10 @@ const CATEGORY_ORDER = [
   "ofertas-dos",
   "ofertas-personales",
   "platos-extras",
-  "agregados"
+  "agregados",
+  "bebidas",
+  "descartables"
+
 ];
 
 
@@ -418,6 +441,17 @@ function paintBagOptions() {
   const note = document.getElementById('bag-note');
   if (!badge || !opts || !note) return;
 
+    // ✅ En Bebidas y Descartables NO se usa bolsa
+  const bagSection = document.getElementById('bag-section');
+  if (currentCategory === 'bebidas' || currentCategory === 'descartables') {
+    bagChoice = 'none';
+    if (bagSection) bagSection.classList.add('hidden');
+    return;
+  } else {
+    if (bagSection) bagSection.classList.remove('hidden');
+  }
+
+
   opts.innerHTML = '';
   note.textContent = '';
   bagChoice = null;
@@ -458,6 +492,14 @@ function computeLiveTotal() {
   if (!currentProduct) return { total: 0, bagQty: 0 };
   const base = currentProduct.price * productQuantity;
   let bagQty = 0;
+    // ✅ En bebidas y descartables no se suma bolsa
+  if (currentCategory === 'bebidas' || currentCategory === 'descartables') {
+    const total = base;
+    const lt = document.getElementById('live-total');
+    if (lt) lt.textContent = money(total);
+    return { total, bagQty: 0 };
+  }
+
   if (currentCategory === 'ofertas-familiares') {
     bagQty = (bagChoice === 'add') ? productQuantity : 0;
   } else if (['ofertas-dos', 'ofertas-personales', 'platos-extras'].includes(currentCategory)) {
@@ -669,7 +711,8 @@ document.addEventListener('click', (e) => {
 
   const qEl = document.getElementById('product-quantity');
   if (qEl) qEl.textContent = '1';
-  document.querySelectorAll('.drink-radio').forEach(r => r.checked = false);
+  document.querySelector
+  All('.drink-radio').forEach(r => r.checked = false);
 
   setDrinkVisible(currentCategory === 'ofertas-familiares');
   paintBagOptions();
@@ -721,12 +764,21 @@ document.addEventListener('click', (e) => {
       showToast('⚠️ Debes seleccionar un sabor de bebida.');
       return;
     }
+    
+    // ✅ En bebidas y descartables NO se pide bolsa
+    const noBagCategories = ['bebidas', 'descartables'];
+
+  if (!noBagCategories.includes(currentCategory)) {
     const mustBag = currentCategory !== 'agregados';
-    if (mustBag && bagChoice !== 'add') {
-      showToast('⚠️ Debes agregar la bolsa (obligatorio).');
-      return;
-    }
-    if (currentCategory === 'agregados' && !bagChoice) { bagChoice = 'none'; }
+  if (mustBag && bagChoice !== 'add') {
+    showToast('⚠️ Debes agregar la bolsa (obligatorio).');
+    return;
+   }
+  if (currentCategory === 'agregados' && !bagChoice) { bagChoice = 'none'; }
+  } else {
+    bagChoice = 'none';
+  }
+
 
     const { total, bagQty } = computeLiveTotal();
 
@@ -1094,13 +1146,17 @@ if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
 if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarMenu);
 if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMenu);
 
-document.querySelectorAll('.sidebar-category').forEach(btn => {
+  document.querySelectorAll('.sidebar-category').forEach(btn => {
   btn.addEventListener('click', () => {
-    renderProducts(btn.dataset.category);
+    const cat = btn.dataset.category;
+    if (cat === 'todo-el-menu') renderProductsAll();
+    else renderProductsSingle(cat);
+
     closeSidebarMenu();
     document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+// Ver carrito desde el sidebar
 
 const viewCartMobile = document.getElementById('view-cart-mobile');
 const viewCartDesktop = document.getElementById('view-cart-desktop');
