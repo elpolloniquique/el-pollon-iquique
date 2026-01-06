@@ -57,7 +57,7 @@ body {
 /* Carrito flotante */
 .floating-cart {
   position: fixed;
-  bottom: 50px;
+  bottom: 70px;
   right: 10px;
   z-index: 999;
   box-shadow: 0 5px 10px rgba(0,0,0,.3);
@@ -139,125 +139,10 @@ body {
   width: 100%;
   height: 200px;
   object-fit: cover;
+
 }
 
-/* ========== CHATBOT VIRTUAL WHATSAPP ========== */
-
-.chatbot-toggle {
-  position: fixed;
-  left: 16px;
-  bottom: 170px;
-  z-index: 950;
-  background: #03240f;
-  color: #fff;
-  padding: 5px 5px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.3);
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 0.9rem;
-}
-
-.chatbot-panel {
-  position: fixed;
-  left: 16px;
-  bottom: 110px;
-  width: 320px;
-  max-height: 420px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.35);
-  z-index: 960;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.chatbot-header {
-  background: linear-gradient(135deg,#178840 0%,#16a34a 100%);
-  color: #fff;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.chatbot-header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.chatbot-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-}
-
-.chatbot-body {
-  padding: 10px;
-  flex: 1;
-  overflow-y: auto;
-  background: #f3f4f6;
-}
-
-.chatbot-msg {
-  max-width: 90%;
-  padding: 8px 10px;
-  border-radius: 12px;
-  font-size: 13px;
-  margin-bottom: 6px;
-  line-height: 1.4;
-}
-
-.chatbot-msg-bot {
-  background: #ffffff;
-  border-radius: 12px 12px 12px 4px;
-  align-self: flex-start;
-  box-shadow: 0 2px 4px rgba(0,0,0,.1);
-}
-
-.chatbot-msg-user {
-  background: #10b361;
-  color: #fff;
-  border-radius: 12px 12px 4px 12px;
-  align-self: flex-end;
-  box-shadow: 0 2px 4px rgba(0,0,0,.15);
-}
-
-.chatbot-quick-actions {
-  padding: 8px 10px 10px;
-  border-top: 1px solid #e5e7eb;
-  background: #ffffff;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.chatbot-chip {
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid #23c05d;
-  color: #2d8b51;
-  background: #ecfdf3;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-@media(max-width:640px) {
-  .chatbot-panel {
-    width: 260px;
-  }
-}
+/* =================== ESTILOS ADMIN PRO =================== */
 
 /* Botón Admin (estático) */
 #admin-open-btn {
@@ -341,9 +226,12 @@ body {
 
 /* =================== FOOTER PRO EL POLLÓN =================== */
 .footer-pro{
-  background: radial-gradient(1200px 500px at 20% 0%, rgba(0, 0, 0, 0.12), transparent 60%),
-              radial-gradient(900px 450px at 100% 20%, rgba(0, 0, 0, 0.16), transparent 55%),
-              linear-gradient(180deg, #000000 0%, #020202 100%);
+  background: rgb(0, 0, 0);
+  color: rgb(255, 255, 255);
+  padding: 40px 20px;
+  box-shadow: 0 -8px 30px rgba(255, 253, 253, 0.85);
+  max-width: 100;
+  margin: 0 auto;
 }
 
 .footer-top{ margin-bottom:26px; }
@@ -499,7 +387,7 @@ body {
 /* Pagos */
 .pay-box{
   border-radius: 14px;
-  border: 1px solid rgba(209, 77, 77, 0.997);
+  border: 1px solid rgba(250, 246, 246, 0.997);
   background: rgb(0, 0, 0);
   padding: 12px;
   margin-bottom: 10px;
@@ -540,8 +428,8 @@ body {
   display:flex;
   align-items:center;
   gap:10px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  padding: 0px 0px;
+  border-radius: 999px;
   text-decoration:none;
   color:#fff;
   font-weight: 800;
