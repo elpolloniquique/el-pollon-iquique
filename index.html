@@ -135,13 +135,6 @@
                 data-category="platos-extras">🍽️ Platos Extras</button>
         <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
                 data-category="agregados">➕ Agregados</button>
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
-                 data-category="bebidas">🥤 Bebidas</button>
-
-        <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
-                 data-category="descartables">🍴 Descartables</button>
-
-
       </div>
 
       <div class="mt-8 pt-6 border-t-2 border-gray-200 text-sm text-gray-600 space-y-2">
@@ -155,7 +148,7 @@
 
   <!-- Banner / Carrusel -->
   <section class="py-0 px-0">
-    <div class="relative overflow-hidden" style="height:480px;">
+    <div class="relative overflow-hidden" style="height:500px;">
       <div id="carousel-container" class="flex transition-transform duration-1000 ease-in-out h-full">
         <img class="min-w-full h-full object-cover" src="img/porcion de fideo.png" alt="">
         <img class="min-w-full h-full object-cover" src="img/chuleta de cerdo.png" alt="">
@@ -179,7 +172,7 @@
 
   <!-- Menú -->
   <section class="py-8 px-4 bg-gray-50 shadow-inner">
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
       <h2 class="text-2xl font-bold text-center mb-5 text-red-800"> Nuestro Menú</h2>
 
       <!-- Botones de categorías -->
@@ -220,15 +213,6 @@
           ➕ <span>Agregados</span>
         </button>
 
-        <button class="category-btn catbtn" data-category="bebidas" type="button">
-          🥤 <span>Bebidas</span>
-        </button>
-
-        <button class="category-btn catbtn" data-category="descartables" type="button">
-         🍴 <span>Descartables</span>
-        </button>
-
-
       </div>
     </div>
 
@@ -246,7 +230,7 @@
 
       <!-- Tarjetas de productos -->
       <div id="products-container"
-           class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+           class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl-grid-cols-4 gap-6"></div>
     </div>
   </section>
 
@@ -261,7 +245,7 @@
       <div>
         <div class="font-bold">Mi Carrito</div>
         <div class="text-sm">
-          <span id="floating-cart-count">0</span>  Precio
+          <span id="floating-cart-count">0</span> productos -
           <span id="floating-cart-total">$0</span>
         </div>
       </div>
@@ -488,7 +472,32 @@
     </div>
   </div>
 
- 
+  <!-- Asistente virtual tipo chatbot -->
+  <div id="chatbot-toggle" class="chatbot-toggle">
+    <!-- <span>🟢</span><span></span> -->
+  </div>
+
+  <div id="chatbot-panel" class="chatbot-panel hidden">
+    <div class="chatbot-header">
+      <div class="chatbot-header-left">
+        <!-- <div class="chatbot-avatar">🟢</div> -->
+        <div>
+          <div class="text-xs opacity-80">Asistente virtual</div>
+          <div class="text-sm font-semibold">El Pollón Iquique</div>
+        </div>
+      </div>
+      <button id="chatbot-close" class="text-white text-lg leading-none">&times;</button>
+    </div>
+    <div id="chatbot-messages" class="chatbot-body flex flex-col"></div>
+    <div class="chatbot-quick-actions">
+      <button class="chatbot-chip" data-action="familiares">👨‍👩‍👧‍👦 Combos Familiares</button>
+      <button class="chatbot-chip" data-action="horarios">🕐 Horarios y dirección</button>
+      <button class="chatbot-chip" data-action="delivery">🚚 Delivery y zonas</button>
+      <button class="chatbot-chip" data-action="pedido">💬 Hacer un pedido</button>
+      <button class="chatbot-chip" data-action="pagos">💳 Métodos de pago</button>
+      <button class="chatbot-chip" data-action="redes">📲 Redes sociales</button>
+    </div>
+  </div>
 
   <!-- Modal login Admin -->
   <div id="admin-login-modal" class="modal">
