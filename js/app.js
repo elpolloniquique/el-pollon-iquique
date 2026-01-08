@@ -129,7 +129,8 @@ const products = {
     { name: "1/4 combo pura papa", description: "1/4 pollo, papas fritas personales mas cantidad.", price: 8100, image: "img/personal pura papa.png" },
     { name: "Chaufa brasa", description: "1/4 pollo, arroz chaufa", price: 8200, image: "img/chaufa brasa.png" },
     { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, fideos al pesto", price: 8100, image: "img/personal pesto con pollo.png" },
-    { name: "Chaufa brasa con papas fritas", description: "1/4 pollo, papas fritas personal, arroz chaufa", price: 9200, image: "img/chaufa brasa con papas fritas.png" }
+    { name: "Chaufa brasa con papas fritas", description: "1/4 pollo, papas fritas personal, arroz chaufa", price: 9200, image: "img/chaufa brasa con papas fritas.png" },
+    { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, papas fritas, fideos al pesto", price: 9300, image: "img/personal con papa y fideo.png" }
   ],
   "platos-extras": [
     { name: "Lomo saltado con chaufa", description: "", price: 12200, image: "img/lomo saltado con chaufa.png" },
