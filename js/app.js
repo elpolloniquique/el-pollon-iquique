@@ -133,10 +133,10 @@ const products = {
     { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, papas fritas, fideos al pesto", price: 9300, image: "img/personal con papa y fideo 01.png" }
   ],
   "platos-extras": [
-    { name: "Lomo saltado con chaufa", description: "", price: 12200, image: "img/lomo saltado con chaufa.png" },
-    { name: "Lomo saltado de carne con arroz blanco ", description: "", price: 11700, image: "" },
+    { name: "Lomo saltado de carnecon chaufa", description: "", price: 12200, image: "img/lomo saltado con arroz chaufa.png" },
+    { name: "Lomo saltado de carne con arroz blanco ", description: "", price: 11700, image: "img/lomo saltado de carne con arroz blanco.png" },
     { name: "Lomo saltado de pollo con arroz blanco", description: "", price: 11700, image: "img/lomo saltado de pollo con arroz blanco.png" },
-    { name: "Tallarin saltado", description: "", price: 11700, image: "img/tallarin saltado de carne.png" },
+    { name: "Tallarin saltado", description: "", price: 11700, image: "img/tallarin saltado de carne 01.png" },
     { name: "Bistec a lo pobre", description: "", price: 10700, image: "img/bistec a lo pobre.png" },
     { name: "Bistec con fideos al pesto", description: "", price: 10700, image: "" },
     { name: "Chuleta de cerdo", description: "", price: 10700, image: "img/chuleta de cerdo.png" },
