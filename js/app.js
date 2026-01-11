@@ -157,19 +157,22 @@ const products = {
   ],
     
   "bebidas": [
-    { name: "Coca Cola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_cocacola.png" },
-    { name: "Coca Cola Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_cocacero.png" },
-    { name: "Inca Kola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_incakola.png" },
-    { name: "Fanta", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_fanta.png" },
-    { name: "Sprite", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_sprite.png" },
-    { name: "Sprite Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/bebida_spritecero.png" }
+    { name: "Coca Cola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/coca cola.png" },
+    { name: "Coca Cola Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/coca cola cero.png" },
+    { name: "Inca Kola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/inca kola.png" },
+    { name: "Fanta", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/fanta.png" },
+    { name: "Sprite", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/sprite.png" },
+    { name: "Sprite Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/sprite cero.png" },
+    { name: "Agua Sin Gas", description: "Benedictino de 500 ml. (según stock).", price: 1200, image: "img/agua sin gas.png" },
+    { name: "Agua Con Gas", description: "Benedictino de 500 ml. (según stock).", price: 1200, image: "img/agua con gas.png" }
   ],
 
   "descartables": [
-    { name: "Aluza CT5", description: "Envase descartable Aluza CT5.", price: 200, image: "img/desc_ct5.png" },
-    { name: "Aluza CT3", description: "Envase descartable Aluza CT3.", price: 200, image: "img/desc_ct3.png" },
-    { name: "Tenedor descartable", description: "Tenedor plástico descartable.", price: 200, image: "img/desc_tenedor.png" },
-    { name: "Bolsa ecológica", description: "Bolsa ecológica (unidad).", price: 200, image: "img/desc_bolsa.png" }
+    { name: "Aluza CT5", description: "Envase descartable Aluza CT5.", price: 300, image: "img/aluza ct5.png" },
+    { name: "Aluza CT3", description: "Envase descartable Aluza CT3.", price: 400, image: "img/aluza ct3.png" },
+    { name: "Tenedor descartable", description: "Tenedor y cuchillo plástico descartable.", price: 200, image: "img/servicio descartable.png" },
+    { name: "Bolsa ecológica", description: "Bolsa ecológica (unidad).", price: 200, image: "img/bolsa ecologica.png" },
+    { name: "Vaso descartable", description: "vaso de 10 oz (unidad).", price: 200, image: "img/vaso.png" }
   ]
 
 };
