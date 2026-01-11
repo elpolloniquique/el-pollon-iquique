@@ -60,13 +60,13 @@ body {
   bottom: 70px;
   right: 10px;
   z-index: 999;
-  box-shadow: 0 5px 10px rgba(0,0,0,.3);
-  animation: float 3s ease-in-out infinite;
+  box-shadow: 0 10px 10px rgba(0,0,0,.3);
+  animation: float 1s ease-in-out infinite;
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) {}
   .floating-cart {
-    bottom: 20px;
-    right: 2px;
+    bottom: 50px;
+    right: 20px;
     left: auto;
     padding: 0 0;
     transform: scale(0.90);
@@ -76,8 +76,18 @@ body {
     gap: 1px;
   }
   .floating-cart .text-2xl {
+    font-size: 1.5rem;
+  }
+  .cart-total {
     font-size: 1.1rem;
   }
+  #floating-cart-count {
+    font-size: 0.9rem;
+    color: black;
+  }
+  #floating-cart-total {
+    font-size: 1rem;
+    color: black;
 }
 @keyframes float {
   0%, 100% { transform: translateY(0); }
