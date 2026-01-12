@@ -1321,3 +1321,59 @@ updateCartUI();
 if (chatbotMessagesEl) {
   chatbotWelcome();
 }
+
+
+// =================== MENÚ OVERLAY PC/TABLET ===================
+const menuOpenDesktop = document.getElementById('menu-open-desktop');
+const desktopMenuOverlay = document.getElementById('desktop-menu-overlay');
+const menuCloseDesktop = document.getElementById('menu-close-desktop');
+
+function openDesktopMenu(){
+  if (!desktopMenuOverlay) return;
+  desktopMenuOverlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeDesktopMenu(){
+  if (!desktopMenuOverlay) return;
+  desktopMenuOverlay.classList.add('hidden');
+  document.body.style.overflow = 'auto';
+}
+
+if (menuOpenDesktop) menuOpenDesktop.addEventListener('click', openDesktopMenu);
+if (menuCloseDesktop) menuCloseDesktop.addEventListener('click', closeDesktopMenu);
+
+// Cerrar al tocar fuera del panel
+if (desktopMenuOverlay) {
+  desktopMenuOverlay.addEventListener('click', (e) => {
+    if (e.target === desktopMenuOverlay) closeDesktopMenu();
+  });
+}
+
+// ✅ Función común: ir a una categoría (texto o foto)
+function goToCategoryFromDesktopMenu(cat){
+  closeDesktopMenu();
+
+  // Renderiza la categoría
+  if (cat === 'todo-el-menu') renderProductsAll();
+  else renderProductsSingle(cat);
+
+  // Baja hacia productos
+  document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ✅ Click en links (texto)
+document.querySelectorAll('.desktop-menu-link-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cat = btn.dataset.category;
+    goToCategoryFromDesktopMenu(cat);
+  });
+});
+
+// ✅ Click en fotos (mini galería)
+document.querySelectorAll('.desktop-menu-card').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cat = btn.dataset.category;
+    goToCategoryFromDesktopMenu(cat);
+  });
+});
+

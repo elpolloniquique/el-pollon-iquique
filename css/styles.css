@@ -18,6 +18,51 @@ body {
   padding: 0;
   padding-bottom: 100px;
 }
+/* ================= HEADER LINKS tipo menú (DELIVERY / RESERVAS / RETIROS) ================= */
+.pedido-link{
+  background: transparent;
+  border: none;
+  padding: 6px 2px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: .6px;
+  color: #ffffff; /* texto blanco para tu header rojo */
+  cursor: pointer;
+  position: relative;
+  opacity: .95;
+  transition: opacity .15s ease, transform .15s ease;
+}
+
+/* subrayado elegante al pasar */
+.pedido-link::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 3px;
+  background: rgba(255,255,255,.95);
+  border-radius: 999px;
+  transition: width .18s ease;
+}
+
+.pedido-link:hover{
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.pedido-link:hover::after{
+  width: 100%;
+}
+
+/* En celular: un poco más compacto para que no se baje */
+@media (max-width: 640px){
+  .pedido-link{
+    font-size: 12px;
+    padding: 6px 1px;
+    letter-spacing: .3px;
+  }
+}
+/* =================== EFECTOS GLOBALES =================== */
 
 /* Botones de categoría */
 .category-btn {
@@ -852,4 +897,108 @@ body {
       align-self: center;
     }
   }
+
+  /* =================== MENÚ OVERLAY PC/TABLET (estilo referencia) =================== */
+.desktop-menu-overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 3000;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+/* Panel */
+.desktop-menu-panel{
+  width: min(420px, 92vw);
+  background: #ffffff;
+  padding: 26px 22px 30px;
+  margin-left: auto;             /* pegado a la derecha */
+  height: 100vh;
+  overflow-y: auto;
+  box-shadow: -10px 0 30px rgba(0,0,0,.25);
+  position: relative;
+}
+
+/* Botón cerrar */
+.desktop-menu-close{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: none;
+  background: #f3f4f6;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/* Zona links */
+.desktop-menu-links{
+  margin-top: 42px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: center;
+}
+
+/* Botones tipo link */
+.desktop-menu-link-btn{
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #111827;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: 6px 0;
+}
+
+.desktop-menu-link-btn:hover{
+  font-weight: 800;
+}
+
+/* Título galería */
+.desktop-menu-title{
+  margin: 34px 0 14px;
+  text-align: center;
+  font-weight: 800;
+  letter-spacing: .18em;
+  color: #111827;
+}
+
+/* Grid fotos */
+.desktop-menu-grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  justify-items: center;
+  padding-bottom: 18px;
+}
+
+.desktop-menu-card{
+  width: 92px;
+  height: 92px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+}
+
+.desktop-menu-card img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ✅ En celular no usamos este overlay */
+@media (max-width: 767px){
+  .desktop-menu-overlay{ display: none !important; }
+}
+
 
