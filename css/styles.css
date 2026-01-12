@@ -1037,7 +1037,121 @@ body {
   width: 100%;
   height: 1.5px;
 
-  background: rgba(220,38,38,0.55);
+  background: rgba(207, 22, 22, 0.55);
 }
 
 
+/* ===== BASE RESPONSIVE GLOBAL ===== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body{
+  margin: 0;
+  overflow-x: hidden; /* evita scroll horizontal */
+}
+
+/* Imágenes nunca se salen */
+img{
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Contenedor fluido pro */
+.container-fluid{
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(10px, 2.4vw, 20px);
+}
+
+/* ===== HEADER RESPONSIVE ===== */
+header .max-w-7xl{
+  padding-left: clamp(8px, 2vw, 16px) !important;
+  padding-right: clamp(8px, 2vw, 16px) !important;
+}
+
+@media (max-width: 640px){
+  /* reduce tamaño de logo */
+  .logo{ width: 44px; height: 44px; }
+
+  /* botones header (DELIVERY/RESERVAS/RETIROS) más compactos */
+  .pedido-link{
+    font-size: 11px;
+    letter-spacing: .2px;
+    padding: 6px 0;
+  }
+
+  /* evita que el texto haga salto raro */
+  header h1{ font-size: 18px !important; }
+}
+
+/* ===== SIDEBAR RESPONSIVE ===== */
+#sidebar-menu{
+  width: min(86vw, 340px);   /* en móvil usa % */
+}
+
+@media (min-width: 768px){
+  #sidebar-menu{ width: 360px; }
+}
+
+@media (min-width: 1024px){
+  #sidebar-menu{ width: 390px; }
+}
+
+
+
+
+
+
+
+
+/* ===== GRID PRODUCTOS AUTO RESPONSIVE ===== */
+.products-grid{
+  display: grid;
+  gap: clamp(12px, 1.8vw, 20px);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* en pantallas muy chicas */
+@media (max-width: 360px){
+  .products-grid{
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== PRODUCT CARD RESPONSIVE ===== */
+.product-card{
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.product-image{
+  width: 100%;
+  aspect-ratio: 4 / 3;   /* mantiene proporción bonita */
+  object-fit: cover;
+}
+
+/* textos dentro */
+.product-card h3{
+  font-size: clamp(14px, 1.5vw, 18px);
+}
+.product-card p{
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.35;
+}
+
+/* ===== HERO BANNER RESPONSIVE ===== */
+.hero-banner{
+  height: clamp(220px, 35vw, 520px);
+}
+
+
+
+/* ===== TIPOGRAFÍA FLUIDA GENERAL ===== */
+h2{ font-size: clamp(18px, 2.4vw, 28px); }
+h3{ font-size: clamp(16px, 2vw, 22px); }
+p, li, button, a{ font-size: clamp(12px, 1.3vw, 14px); }
