@@ -130,7 +130,7 @@ const products = {
     { name: "Chaufa brasa", description: "1/4 pollo, arroz chaufa", price: 8200, image: "img/chaufa brasa.png" },
     { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, fideos al pesto", price: 8100, image: "img/personal pesto con pollo.png" },
     { name: "Chaufa brasa con papas fritas", description: "1/4 pollo, papas fritas personal, arroz chaufa", price: 9200, image: "img/chaufa brasa con papas fritas.png" },
-    { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, papas fritas, fideos al pesto", price: 9300, image: "img/personal con papa y fideo 01.png" }
+    { name: "1/4 de pollo con fideo y papa", description: "1/4 pollo, papas fritas, fideos al pesto", price: 9300, image: "img/personal con papa y fideo 01.png" }
   ],
   "platos-extras": [
     { name: "Lomo saltado de carnecon chaufa", description: "", price: 12200, image: "img/lomo saltado con arroz chaufa.png" },
