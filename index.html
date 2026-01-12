@@ -25,6 +25,30 @@
   <!-- Estilos personalizados -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
+<style>
+  /* Logo comportándose como botón */
+  .logo-link{
+    display: inline-block;
+    cursor: pointer;
+  }
+
+  .logo-link .logo{
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+
+  /* Hover tipo botón */
+  .logo-link:hover .logo{
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    filter: brightness(1.05);
+  }
+
+  /* Click (feedback real) */
+  .logo-link:active .logo{
+    transform: scale(0.96);
+  }
+</style>
+
 <body class="bg-white">
 
   <!-- Header -->
@@ -34,10 +58,13 @@
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
           <!-- LOGO -->
-          <div class="logo">
-            <img src="img/logo pollon.png" alt="Logo Pollería"
-                 onerror="this.src=''; this.alt='Logo no disponible'; this.style.display='none';">
-          </div>
+          <!-- LOGO CLICKEABLE → VOLVER AL INICIO -->
+<a href="#top" class="logo-link">
+  <div class="logo">
+    <img src="img/logo pollon.png" alt="Logo Pollería El Pollón">
+  </div>
+</a>
+
           <div class="hidden md:block">
             <h1 class="text-2xl font-bold">Pollería El Pollón</h1>
             <p class="text-sm opacity-90">📍 Iquique</p>
@@ -80,6 +107,12 @@
 
 
         <div class="hidden md:flex items-center gap-4">
+          <button id="menu-open-desktop"
+  class="hidden md:flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-white/20 transition">
+  <span class="text-[10px] uppercase tracking-widest opacity-90">MENÚ</span>
+  <span class="text-2xl leading-none">☰</span>
+</button>
+
           <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
             <span>📞</span>
             <div>
@@ -135,7 +168,8 @@
       </button>
 
       <div class="space-y-3">
-        <h3 class="text-lg font-bold text-gray-700 mb-3">🍽️ Categorías</h3>
+        <h3 class="sidebar-title">🍽️ Categorías</h3>
+
         <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
                 data-category="ofertas-familiares">👨‍👩‍👧‍👦 Ofertas Familiares</button>
         <button class="sidebar-category w-full text-left px-4 py-3 rounded-lg hover:bg-red-50 transition flex items-center gap-3 border-2 border-transparent hover:border-red-600"
@@ -154,6 +188,12 @@
 
                 
       </div>
+      <!-- ✅ GALERÍA (1 foto por categoría) -->
+<div class="mt-8">
+  <h3 class="text-lg font-bold text-gray-700 mb-3">📸 Galería</h3>
+  <div id="sidebar-gallery" class="grid grid-cols-3 gap-3"></div>
+</div>
+
 
       <div class="mt-8 pt-6 border-t-2 border-gray-200 text-sm text-gray-600 space-y-2">
         <p class="flex items-center gap-2"><span>📱</span><span>+56 9 8692 5310</span></p>

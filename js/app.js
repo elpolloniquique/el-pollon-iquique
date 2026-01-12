@@ -199,6 +199,8 @@ const CATEGORY_ORDER = [
 ];
 
 
+
+
 // --------- Estado ----------
 let cart = [];
 let currentProduct = null;
@@ -1136,6 +1138,10 @@ const hamburgerBtn = document.getElementById('hamburger-btn');
 const closeSidebar = document.getElementById('close-sidebar');
 const sidebarMenu = document.getElementById('sidebar-menu');
 const sidebarOverlay = document.getElementById('sidebar-overlay');
+// ✅ Botón MENÚ solo PC/Tablet abre el mismo sidebar
+const menuOpenDesktop = document.getElementById('menu-open-desktop');
+  if (menuOpenDesktop) menuOpenDesktop.addEventListener('click', openSidebar);
+
 
 function openSidebar() {
   if (sidebarMenu) sidebarMenu.style.transform = 'translateX(0)';
@@ -1161,6 +1167,8 @@ document.querySelectorAll('.sidebar-category').forEach(btn => {
     document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 });
+
+
 
 // View cart buttons
 
@@ -1309,6 +1317,45 @@ if (catbarNext && catbarScroll) {
   });
 }
 
+function buildSidebarGallery() {
+  const gallery = document.getElementById('sidebar-gallery');
+  if (!gallery) return;
+
+  const items = CATEGORY_ORDER.map(catKey => {
+    const list = products[catKey] || [];
+    const firstWithImage = list.find(p => p.image && p.image.trim().length > 0);
+    return { catKey, img: firstWithImage?.image || '' };
+  });
+
+  gallery.innerHTML = items.map(it => {
+    if (!it.img) {
+      return `
+        <button class="sidebar-gallery-item h-20 rounded-lg border border-gray-200 flex items-center justify-center text-2xl"
+                data-cat="${it.catKey}">
+          🍗
+        </button>
+      `;
+    }
+    return `
+      <button class="sidebar-gallery-item rounded-lg overflow-hidden border border-gray-200 hover:shadow transition"
+              data-cat="${it.catKey}">
+        <img src="${it.img}" class="w-full h-20 object-cover" alt="">
+      </button>
+    `;
+  }).join('');
+
+  // Click en miniaturas => ir a categoría
+  gallery.querySelectorAll('.sidebar-gallery-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat;
+      renderProductsSingle(cat);      // muestra la categoría
+      closeSidebarMenu();             // cierra sidebar
+      document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+
 
 // --------- Inicio ---------
 initOrdersBackend();   // inicializa Firebase + Firestore + suscripción en tiempo real
@@ -1316,6 +1363,8 @@ loadOrders();          // respaldo local en caso de que falle Firestore
 // renderProducts('ofertas-familiares');
 renderProductsAll();
 currentCategory = 'todo-el-menu';
+buildSidebarGallery();
+
 
 updateCartUI();
 if (chatbotMessagesEl) {

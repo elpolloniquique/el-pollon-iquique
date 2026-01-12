@@ -898,3 +898,145 @@ body {
     }
   }
 
+
+  /* ===================== SIDEBAR: CATEGORÍAS ESTILO LINK PRO ===================== */
+
+/* Contenedor del bloque categorías: quita look "tarjetas" */
+#sidebar-menu .space-y-3{
+  gap: 10px !important;
+}
+
+/* Título (Categorías / Galería) más moderno */
+#sidebar-menu .sidebar-title{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: rgba(17,24,39,.65);
+  margin: 14px 0 10px;
+}
+
+/* ✅ Estilo LINK para categorías */
+.sidebar-category{
+  /* quitar caja */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  /* aspecto texto moderno */
+  padding: 10px 6px !important;
+  border-radius: 0 !important;
+
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  color: rgba(17,24,39,.82) !important;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  position: relative;
+  transition: color .15s ease, transform .15s ease;
+}
+
+/* línea pro (solo aparece al hover/activo) */
+.sidebar-category::after{
+  content: "";
+  position: absolute;
+  left: 34px;       /* empieza después del icono */
+  right: 8px;
+  bottom: -2px;
+  height: 2px;
+  background: #dc2626;
+  border-radius: 999px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .18s ease;
+  opacity: .9;
+}
+
+/* hover moderno */
+.sidebar-category:hover{
+  color: #dc2626 !important;
+  transform: translateY(-1px);
+}
+.sidebar-category:hover::after{
+  transform: scaleX(1);
+}
+
+/* activo (cuando está seleccionada) */
+.sidebar-category.is-active{
+  color: #dc2626 !important;
+}
+.sidebar-category.is-active::after{
+  transform: scaleX(1);
+}
+
+/* iconos un poco más suaves */
+.sidebar-category{
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Opcional: separador suave entre links (muy pro) */
+.sidebar-category + .sidebar-category{
+  border-top: 1px solid rgba(17,24,39,.06);
+  padding-top: 12px !important;
+}
+
+/* ✅ Quitar el borde rojo que tú tenías en HTML (si existe) */
+.sidebar-category:hover{
+  border-color: transparent !important;
+}
+
+/* ===================== AJUSTE: BOTÓN VER MI PEDIDO (mantener pro) ===================== */
+#view-cart-mobile{
+  border-radius: 16px !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.12);
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+/* ===================== GALERÍA: también más limpia ===================== */
+#sidebar-gallery{
+  margin-top: 10px;
+}
+.sidebar-gallery-item{
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(17,24,39,.06);
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.sidebar-gallery-item:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.sidebar-gallery-item img{
+  width: 100%;
+  height: 82px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== TÍTULO "CATEGORÍAS" SUBRAYADO PRO CON BLUR ===== */
+/* ===== "CATEGORÍAS" CON LÍNEA IGUAL A "MENÚ" ===== */
+
+#sidebar-menu .sidebar-title{
+  position: relative;
+  padding-bottom: 10px;
+  font-weight: 800;
+}
+
+/* línea inferior estilo MENÚ */
+#sidebar-menu .sidebar-title::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  height: 1.5px;
+
+  background: rgba(220,38,38,0.55);
+}
+
