@@ -405,6 +405,10 @@ function updateCartUI() {
   if (ft) ft.textContent = money(total);
   if (mb) mb.textContent = c;
   if (db) db.textContent = c;
+
+  const ddBadge = document.getElementById('menu-dd-cart-badge');
+  if (ddBadge) ddBadge.textContent = c;
+
 }
 function renderCart() {
   const wrap = document.getElementById('cart-items');
@@ -1353,6 +1357,124 @@ function buildSidebarGallery() {
       document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   });
+}
+
+
+// ===== DROPDOWN MENÚ (tipo "Más") =====
+const menuDdBtn = document.getElementById('menu-dd-btn');
+const menuDdPanel = document.getElementById('menu-dd-panel');
+
+function openMenuDd(){
+  if (!menuDdPanel || !menuDdBtn) return;
+  menuDdPanel.classList.remove('hidden');
+  menuDdBtn.setAttribute('aria-expanded', 'true');
+}
+
+function closeMenuDd(){
+  if (!menuDdPanel || !menuDdBtn) return;
+  menuDdPanel.classList.add('hidden');
+  menuDdBtn.setAttribute('aria-expanded', 'false');
+}
+
+if (menuDdBtn && menuDdPanel){
+  menuDdBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !menuDdPanel.classList.contains('hidden');
+    if (isOpen) closeMenuDd();
+    else openMenuDd();
+  });
+
+  // Click en una categoría => render + cerrar + scroll
+  menuDdPanel.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-dd-item');
+    if (!item) return;
+
+    const cat = item.dataset.category;
+    if (!cat) return;
+
+    renderProductsSingle(cat);     // o renderProductsAll si quieres otra lógica
+    closeMenuDd();                 // ✅ cerrar instantáneo
+
+    requestAnimationFrame(() => {
+      document.getElementById('products-container')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Cerrar al hacer click afuera
+  document.addEventListener('click', () => closeMenuDd());
+
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenuDd();
+  });
+}
+
+
+// ===== DROPDOWN MENÚ (CELULAR) =====
+const menuDdBtnMobile = document.getElementById('menu-dd-btn-mobile');
+const menuDdPanelMobile = document.getElementById('menu-dd-panel-mobile');
+const menuDdCartMobile = document.getElementById('menu-dd-cart-mobile');
+const menuDdCartBadge = document.getElementById('menu-dd-cart-badge');
+
+function openMenuDdMobile(){
+  if (!menuDdPanelMobile || !menuDdBtnMobile) return;
+  menuDdPanelMobile.classList.remove('hidden');
+  menuDdBtnMobile.setAttribute('aria-expanded', 'true');
+}
+function closeMenuDdMobile(){
+  if (!menuDdPanelMobile || !menuDdBtnMobile) return;
+  menuDdPanelMobile.classList.add('hidden');
+  menuDdBtnMobile.setAttribute('aria-expanded', 'false');
+}
+
+if (menuDdBtnMobile && menuDdPanelMobile){
+  // abrir/cerrar
+  menuDdBtnMobile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !menuDdPanelMobile.classList.contains('hidden');
+    if (isOpen) closeMenuDdMobile();
+    else openMenuDdMobile();
+  });
+
+  // click afuera cierra
+  document.addEventListener('click', () => closeMenuDdMobile());
+
+  // ESC cierra
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenuDdMobile();
+  });
+
+  // click en categorías
+  menuDdPanelMobile.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-dd-item');
+    if (!item) return;
+
+    const cat = item.dataset.category;
+    if (!cat) return;
+
+    renderProductsSingle(cat);
+    closeMenuDdMobile();
+
+    requestAnimationFrame(() => {
+      document.getElementById('products-container')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // click en "Ver Mi Pedido"
+  if (menuDdCartMobile){
+    menuDdCartMobile.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      // abrir modal carrito (tu lógica actual)
+      renderCart();
+      const cm = document.getElementById('cart-modal');
+      if (cm) cm.classList.add('active');
+
+      closeMenuDdMobile();
+    });
+  }
 }
 
 

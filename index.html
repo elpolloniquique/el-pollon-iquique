@@ -15,7 +15,7 @@
   <meta name="description" content="Pollo a la brasa, comida peruana, combos familiares y atención de calidad en Iquique.">
   <meta property="og:title" content="Pollería El Pollón - Iquique - DELIVERY">
   <meta property="og:description" content="Delicioso pollo a la brasa en Iquique — ¡haz tu pedido online!">
-  <meta property="og:image" content="https://tuservidor.com/portada.jpg">
+  <meta property="og:image" content="https://tuservidoom/portada.jpg">
   <meta property="og:url" content="https://elpolloniquique.github.io/el-pollon-iquique/">
   <meta property="og:type" content="website">
 
@@ -81,11 +81,23 @@
 
         <div class="hidden lg:flex items-center gap-4">
 
-           <button id="menu-open-desktop"
-             class="hidden md:flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg hover:bg-white/10 transition">
-             <span class="text-[10px] uppercase tracking-widest opacity-90">Menú</span>
-              <span class="text-2xl leading-none">☰</span>
-           </button>
+          <div class="menu-dd-wrap hidden md:block relative">
+            <button id="menu-dd-btn" type="button" class="menu-dd-btn" aria-expanded="false">
+               <span class="menu-dd-top">MENÚ</span>
+               <span class="menu-dd-bottom">☰ <span class="menu-dd-caret">▾</span></span>
+            </button>
+
+           <div id="menu-dd-panel" class="menu-dd-panel hidden" role="menu">
+              <button class="menu-dd-item" data-category="ofertas-familiares" type="button">👨‍👩‍👧‍👦 Ofertas Familiares</button>
+              <button class="menu-dd-item" data-category="ofertas-dos" type="button">👫 Ofertas para Dos</button>
+              <button class="menu-dd-item" data-category="ofertas-personales" type="button">🧑 Ofertas Personales</button>
+              <button class="menu-dd-item" data-category="platos-extras" type="button">🍽️ Platos Extras</button>
+              <button class="menu-dd-item" data-category="agregados" type="button">➕ Agregados</button>
+              <button class="menu-dd-item" data-category="bebidas" type="button">🥤 Bebidas</button>
+              <button class="menu-dd-item" data-category="descartables" type="button">🍴 Descartables</button>
+           </div>
+         </div>
+
 
           <div class="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg">
             <span>📞</span>
@@ -103,13 +115,34 @@
         </div>
 
         <!-- Botón menú móvil -->
-        <button id="hamburger-btn"
-                class="lg:hidden text-white p-2 hover:bg-white/20 rounded-lg transition">
-          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-        </button>
+        <!-- ✅ MENÚ DROPDOWN (SOLO CELULAR) -->
+<div class="menu-dd-wrap md:hidden relative">
+  <button id="menu-dd-btn-mobile" type="button" class="menu-dd-btn" aria-expanded="false">
+    <span class="menu-dd-top">MENÚ</span>
+    <span class="menu-dd-bottom">☰ <span class="menu-dd-caret">▾</span></span>
+  </button>
+
+  <div id="menu-dd-panel-mobile" class="menu-dd-panel hidden" role="menu">
+
+    <!-- ✅ Ver Mi Pedido (primero) -->
+    <button id="menu-dd-cart-mobile" type="button" class="menu-dd-cart">
+      <span class="menu-dd-cart-left">🛒 <span>Ver Mi Pedido</span></span>
+      <span id="menu-dd-cart-badge" class="menu-dd-cart-badge">0</span>
+    </button>
+
+    <div class="menu-dd-divider"></div>
+
+    <!-- ✅ Categorías -->
+    <button class="menu-dd-item" data-category="ofertas-familiares" type="button">👨‍👩‍👧‍👦 Ofertas Familiares</button>
+    <button class="menu-dd-item" data-category="ofertas-dos" type="button">👫 Ofertas para Dos</button>
+    <button class="menu-dd-item" data-category="ofertas-personales" type="button">🧑 Ofertas Personales</button>
+    <button class="menu-dd-item" data-category="platos-extras" type="button">🍽️ Platos Extras</button>
+    <button class="menu-dd-item" data-category="agregados" type="button">➕ Agregados</button>
+    <button class="menu-dd-item" data-category="bebidas" type="button">🥤 Bebidas</button>
+    <button class="menu-dd-item" data-category="descartables" type="button">🍴 Descartables</button>
+  </div>
+</div>
+
       </div>
     </div>
   </header>

@@ -1190,3 +1190,153 @@ p, li, button, a{ font-size: clamp(12px, 1.3vw, 14px); }
   font-size: 12px !important;
 }
 
+/* ===== DROPDOWN MENÚ (estilo "Más") ===== */
+.menu-dd-btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: background .18s ease, transform .18s ease;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+}
+
+.menu-dd-btn:hover{
+  background: rgba(255,255,255,.14);
+  transform: translateY(-1px);
+}
+
+.menu-dd-top{
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  opacity: .92;
+  line-height: 1;
+}
+
+.menu-dd-bottom{
+  margin-top: 3px;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-dd-caret{
+  font-size: 16px;
+  transition: transform .18s ease;
+}
+
+.menu-dd-btn[aria-expanded="true"] .menu-dd-caret{
+  transform: rotate(180deg);
+}
+
+/* Panel (cuadro pequeño) */
+.menu-dd-panel{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.25);
+  padding: 10px;
+  z-index: 9999;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+/* Items */
+.menu-dd-item{
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 12px 12px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(17,24,39,.88);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .15s ease;
+}
+
+.menu-dd-item:hover{
+  background: rgba(220,38,38,.10);
+  color: #dc2626;
+  transform: translateX(2px);
+}
+
+/* Separador suave */
+.menu-dd-item + .menu-dd-item{
+  border-top: 1px solid rgba(17,24,39,.06);
+}
+
+/* En móvil (si decides usarlo también) */
+@media (max-width: 640px){
+  .menu-dd-panel{
+    width: min(88vw, 320px);
+    right: 0;
+  }
+}
+
+/* ===== Dropdown: botón "Ver mi pedido" dentro ===== */
+.menu-dd-cart{
+  width: 100%;
+  border: none;
+  background: #facc15; /* amarillo */
+  color: #7f1d1d;      /* rojo oscuro */
+  padding: 12px 12px;
+  border-radius: 14px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.menu-dd-cart:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.menu-dd-cart-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size: 14px;
+}
+
+.menu-dd-cart-badge{
+  background: #dc2626;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.menu-dd-divider{
+  height: 1px;
+  background: rgba(17,24,39,.08);
+  margin: 10px 0;
+}
+
+/* En celular: el panel no debe salirse */
+@media (max-width: 640px){
+  .menu-dd-panel{
+    width: min(88vw, 320px);
+    right: 0;
+  }
+}
