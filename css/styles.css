@@ -53,6 +53,64 @@ body {
 .pedido-link:hover::after{
   width: 100%;
 }
+.pedido-link.is-selected{
+  opacity: 1;
+}
+.pedido-link.is-selected::after{
+  width: 100%;
+}
+
+/* Favoritos */
+.favorite-btn{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.1);
+  background: rgba(255,255,255,.9);
+  color: #dc2626;
+  font-size: 18px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease, color .15s ease;
+  z-index: 2;
+}
+.favorite-btn:hover{
+  transform: scale(1.05);
+}
+.favorite-btn.is-favorite{
+  background: #dc2626;
+  color: #fff;
+  border-color: rgba(220,38,38,.4);
+}
+
+/* Admin tabs */
+.admin-tab{
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #374151;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+.admin-tab:hover{
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+.admin-tab-active{
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
 
 /* En celular: un poco más compacto para que no se baje */
 @media (max-width: 640px){
