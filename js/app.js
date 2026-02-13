@@ -631,7 +631,7 @@ function moneyTicket(v){
 function buildTicketText80mm(order){
   const W = 42;
   const sep = '='.repeat(W);
-  const sep2 = '-'.repeat(W);
+  const sep2 = '-'.repeat(W - 4);
 
   const { date, time } = formatDateTicket(order.createdAt);
   const pedido = pad3(order.ticketNumber || '001');
@@ -664,11 +664,9 @@ function buildTicketText80mm(order){
   order.items.forEach((it, idx)=>{
     const n = idx + 1;
     const nameLines = wrapText(it.name || '', 30).split('\n');
-    const qtyTxt = `x${it.qty || 1}`;
+    const qty = it.qty || 1;
 
-    const left = `${n}) ${nameLines[0] || ''}`;
-    const spaces = Math.max(1, W - left.length - qtyTxt.length);
-    t += `${left}${' '.repeat(spaces)}${qtyTxt}\n`;
+    t += `${n}) ${nameLines[0] || ''} ( X${qty} )\n`;
 
     for(let i=1;i<nameLines.length;i++){
       t += `   ${nameLines[i]}\n`;
