@@ -15,8 +15,27 @@ const CURRENCY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: '
 const BAG_PRICE = 200;
 const WHATSAPP_NUMBER = '56986925310';
 
+<<<<<<< HEAD
 const ORDERS_PATH = 'pollon_orders_v1';
 const ORDERS_KEY  = 'pollon_orders_local_v1';
+=======
+// ======================= FIREBASE CONFIGURACIÓN =========================
+// IMPORTANTE:
+// 1) Entra a https://console.firebase.google.com
+// 2) Crea un proyecto Web y activa "Cloud Firestore"
+// 3) Copia la configuración de tu app web y reemplaza los valores de abajo
+// 4) En Firestore crea una colección llamada: pollon_orders_v1
+// -----------------------------------------------------------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyAWv3zPEUU82YcLSwOxsv-MQZP2ZjcycOg",
+  authDomain: "elpollon01-307da.firebaseapp.com",
+  databaseURL: "https://elpollon01-307da-default-rtdb.firebaseio.com",
+  projectId: "elpollon01-307da",
+  storageBucket: "elpollon01-307da.firebasestorage.app",
+  messagingSenderId: "1024156951564",
+  appId: "1:1024156951564:web:946a9b6003d8dff1053a29"
+};
+>>>>>>> 12123e34891115e482a956a42be606f0b8176bc1
 
 // ✅ ticket secuencial (estable)
 const TICKET_SEQ_KEY = 'pollon_ticket_seq_v1';
