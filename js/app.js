@@ -189,7 +189,7 @@ const PRODUCTS = {
     { name:"1/4 combo", price:8100, img:"img/personal combo.png", desc:"1/4 pollo + papas personales + ensalada" },
     { name:"1/4 combo pura papa", price:8100, img:"img/personal combo pura papa.png", desc:"1/4 pollo + más papas" },
     { name:"Chaufa brasa", price:8200, img:"img/chaufa brasa.png", desc:"1/4 pollo + chaufa" },
-    { name:"Fideo al pesto con 1/4", price:8100, img:"img/fideo al pesto con 1-4.png", desc:"1/4 pollo + fideos al pesto" },
+    { name:"Fideo al pesto con 1/4", price:8100, img:"img/personal con fideo.png", desc:"1/4 pollo + fideos al pesto" },
     { name:"Chaufa brasa con papas", price:9200, img:"img/chaufa brasa con papas fritas.png", desc:"1/4 pollo + chaufa + papas" },
     { name:"1/4 pollo con fideo y papa", price:9300, img:"img/personal con papa y fideo.png", desc:"1/4 pollo + fideo + papas" },
   ],
