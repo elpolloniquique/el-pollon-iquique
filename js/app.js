@@ -1260,55 +1260,80 @@ function closeCheckout(){ closeModal('#checkout-modal'); }
 document.getElementById('cancel-checkout')?.addEventListener('click', closeCheckout);
 document.getElementById('cancel-checkout-2')?.addEventListener('click', closeCheckout);
 
-document.getElementById('checkout-form')?.addEventListener('submit', async (e)=>{
-  e.preventDefault();
+(function attachCheckoutSubmit(){
+  const form = document.getElementById('checkout-form');
+  if (!form) return;
 
-  if(cart.length === 0){
-    showToast('Tu carrito está vacío.');
-    closeCheckout();
-    return;
-  }
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
 
-  const name = wrapText(document.getElementById('cust-name')?.value ?? '', 25);
-  const address = wrapText(document.getElementById('cust-address')?.value ?? '', 25);
-  const phone = (document.getElementById('cust-phone')?.value ?? '').trim();
-  const comment = wrapText(document.getElementById('cust-comment')?.value ?? '', 25);
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-busy', 'true');
+    }
 
-  const ticketNumber = nextTicketNumber(); // ✅ FIX: ya no depende de orders.length
+    try {
+      if (cart.length === 0){
+        showToast('Tu carrito está vacío.');
+        closeCheckout();
+        return;
+      }
 
-  const order = {
-    id: 'P' + Date.now(),
-    createdAt: new Date().toISOString(),
-    ticketNumber,
-    customer: { name, address, phone, comment },
-    items: cart.map(it=>({
-      name: it.name,
-      qty: it.qty,
-      subtotal: it.subtotal,
-      drink: it.drink,
-      bagQty: it.bagQty
-    })),
-    total: cartSum(),
-    status: 'Pendiente'
-  };
+      const name = wrapText(document.getElementById('cust-name')?.value ?? '', 25);
+      const address = wrapText(document.getElementById('cust-address')?.value ?? '', 25);
+      const phone = (document.getElementById('cust-phone')?.value ?? '').trim();
+      const comment = wrapText(document.getElementById('cust-comment')?.value ?? '', 25);
 
-  // ✅ mantenemos array local para admin/local
-  orders.push(order);
+      const ticketNumber = nextTicketNumber();
+      const order = {
+        id: 'P' + Date.now(),
+        createdAt: new Date().toISOString(),
+        ticketNumber,
+        customer: { name, address, phone, comment },
+        items: cart.map(it=>({
+          name: it.name,
+          qty: it.qty,
+          subtotal: it.subtotal,
+          drink: it.drink,
+          bagQty: it.bagQty
+        })),
+        total: cartSum(),
+        status: 'Pendiente'
+      };
 
-  // ✅ FIX PRO: guardar solo este pedido en Firestore
-  await saveSingleOrder(order);
+      orders.push(order);
 
-  const text = buildWhatsappTextFromOrder(order);
-  const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
+      // 1) Guardar en base de datos (Firestore o localStorage)
+      try {
+        await saveSingleOrder(order);
+      } catch (err) {
+        console.warn('[Checkout] Error guardando en BD:', err);
+        try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); } catch (_) {}
+        showToast('Pedido guardado localmente. Abriendo WhatsApp…');
+      }
 
-  cart = [];
-  updateCartUI();
-  renderCart();
+      // 2) Abrir WhatsApp con el texto del pedido
+      const text = buildWhatsappTextFromOrder(order);
+      const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
+      window.open(url, '_blank');
 
-  closeCheckout();
-  showToast('Pedido generado ✅ (abre WhatsApp)');
-});
+      cart = [];
+      updateCartUI();
+      renderCart();
+      closeCheckout();
+      showToast('Pedido generado ✅ (abre WhatsApp)');
+    } catch (err) {
+      console.error('[Checkout] Error:', err);
+      showToast('Error al procesar. Intenta de nuevo.');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute('aria-busy');
+      }
+    }
+  });
+})();
 
 /* Chatbot */
 chatbotToggle?.addEventListener('click', ()=>{
