@@ -16,15 +16,31 @@ const WHATSAPP_NUMBER = '56986925310';
 // 4) En Firestore crea una colección llamada: pollon_orders_v1
 // -----------------------------------------------------------------------
 const firebaseConfig = {
-  apiKey: "AIzaSyCks-YWsfvV8NTyebTLC3FHGeyEQiVEUj4",
-  authDomain: "pollon-db-2026.firebaseapp.com",
-  databaseURL: "https://pollon-db-2026-default-rtdb.firebaseio.com",
-  projectId: "pollon-db-2026",
-  storageBucket: "pollon-db-2026.firebasestorage.app",
-  messagingSenderId: "749646607216",
-  appId: "1:749646607216:web:6f26a11f138828eb8695b5",
-  measurementId: "G-XXXXXXXXXX"
+  apiKey: "AIzaSyDc4omnC9sxGUKEYjUVrJUxcG9RMiidkr4",
+  authDomain: "pollonpagina01.firebaseapp.com",
+  databaseURL: "https://pollonpagina01-default-rtdb.firebaseio.com",
+  projectId: "pollonpagina01",
+  storageBucket: "pollonpagina01.firebasestorage.app",
+  messagingSenderId: "211369350355",
+  appId: "1:211369350355:web:11d849533761780a5df026",
+  measurementId: "G-NE5XP5N3VS"
 };
+
+
+
+
+
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCks-YWsfvV8NTyebTLC3FHGeyEQiVEUj4",
+//   authDomain: "pollon-db-2026.firebaseapp.com",
+//   databaseURL: "https://pollon-db-2026-default-rtdb.firebaseio.com",
+//   projectId: "pollon-db-2026",
+//   storageBucket: "pollon-db-2026.firebasestorage.app",
+//   messagingSenderId: "749646607216",
+//   appId: "1:749646607216:web:6f26a11f138828eb8695b5",
+//   measurementId: "G-XXXXXXXXXX"
+// };
 
 let ordersRef = null; // referencia a la colección de Firestore
 let db = null;        // referencia a Firestore
