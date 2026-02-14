@@ -573,7 +573,7 @@
         <button class="modal-x" type="button" id="cancel-checkout">✕</button>
       </div>
 
-      <form id="checkout-form" class="modal-body space-y-3">
+      <form id="checkout-form" class="modal-body space-y-3" novalidate>
         <div>
           <label class="form-label" for="cust-name">Nombre</label>
           <textarea id="cust-name" class="form-input form-textarea" rows="2" placeholder="Ej: Juan Pérez" required></textarea>
@@ -599,7 +599,7 @@
 
         <div class="modal-foot !px-0">
           <button type="button" class="btn-secondary" id="cancel-checkout-2">Cancelar</button>
-          <button type="submit" class="btn-primary">Enviar</button>
+          <button type="submit" class="btn-primary" id="checkout-submit-btn">Enviar</button>
         </div>
       </form>
     </div>

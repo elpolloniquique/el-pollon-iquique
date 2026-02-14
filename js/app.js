@@ -1262,10 +1262,20 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
 
 (function attachCheckoutSubmit(){
   const form = document.getElementById('checkout-form');
+  const submitBtn = document.getElementById('checkout-submit-btn');
   if (!form) return;
+
+  // Respaldo: clic en Enviar fuerza el envío del formulario (por si el submit no se dispara en algún navegador)
+  if (submitBtn) {
+    submitBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      form.requestSubmit();
+    });
+  }
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
+    e.stopPropagation();
 
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
@@ -1280,10 +1290,19 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
         return;
       }
 
-      const name = wrapText(document.getElementById('cust-name')?.value ?? '', 25);
-      const address = wrapText(document.getElementById('cust-address')?.value ?? '', 25);
+      const nameRaw = (document.getElementById('cust-name')?.value ?? '').trim();
+      const addressRaw = (document.getElementById('cust-address')?.value ?? '').trim();
       const phone = (document.getElementById('cust-phone')?.value ?? '').trim();
-      const comment = wrapText(document.getElementById('cust-comment')?.value ?? '', 25);
+      const commentRaw = (document.getElementById('cust-comment')?.value ?? '').trim();
+
+      if (!nameRaw || !addressRaw || !phone) {
+        showToast('Completa nombre, dirección y teléfono.');
+        return;
+      }
+
+      const name = wrapText(nameRaw, 25);
+      const address = wrapText(addressRaw, 25);
+      const comment = wrapText(commentRaw, 25);
 
       const ticketNumber = nextTicketNumber();
       const order = {
