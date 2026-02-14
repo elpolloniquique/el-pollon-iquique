@@ -40,6 +40,7 @@ const firebaseConfig = {
 //   messagingSenderId: "749646607216",
 //   appId: "1:749646607216:web:6f26a11f138828eb8695b5",
 //   measurementId: "G-XXXXXXXXXX"
+// en es correo usolibrettrabajo@gmail.com   --- pollonpagina001
 // };
 
 let ordersRef = null; // referencia a la colección de Firestore
