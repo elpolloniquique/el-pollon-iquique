@@ -1,250 +1,192 @@
-/* =========================================================
-   Pollería El Pollón - app.js (ACTUALIZADO PRO)
-   - Carousel fade pro
-   - Catbar con flechas izq/der en móvil
-   - Bolsa: familiares por unidad; otras categorías 1 bolsa por cada 3 unidades
-   - Checkout con comentario + salto automático 25 caracteres por línea
-   - Ticket WhatsApp + ticket impresión 80mm
-   - Firestore listener + timbre SOLO si admin está abierto
-   - FIX: ticketNumber estable (no depende de orders.length)
-   - FIX: snapshot guarda doc.id
-   - FIX: guarda SOLO el pedido nuevo en Firestore (no re-subir todo)
-========================================================= */
+// --------- Config ----------
 
-const CURRENCY = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
-const BAG_PRICE = 200;
+const CURRENCY = new Intl.NumberFormat('es-CL', {
+  style: 'currency',
+  currency: 'CLP',
+  maximumFractionDigits: 0
+});
+const BAG_PRICE = 200; // CLP
 const WHATSAPP_NUMBER = '56986925310';
 
-const ORDERS_PATH = 'pollon_orders_v1';
-const ORDERS_KEY  = 'pollon_orders_local_v1';
+// ======================= FIREBASE CONFIGURACIÓN =========================
+// IMPORTANTE:
+// 1) Entra a https://console.firebase.google.com
+// 2) Crea un proyecto Web y activa "Cloud Firestore"
+// 3) Copia la configuración de tu app web y reemplaza los valores de abajo
+// 4) En Firestore crea una colección llamada: pollon_orders_v1
+// -----------------------------------------------------------------------
+const firebaseConfig = {
+  apiKey: "AIzaSyCks-YWsfvV8NTyebTLC3FHGeyEQiVEUj4",
+  authDomain: "pollon-db-2026.firebaseapp.com",
+  databaseURL: "https://pollon-db-2026-default-rtdb.firebaseio.com",
+  projectId: "pollon-db-2026",
+  storageBucket: "pollon-db-2026.firebasestorage.app",
+  messagingSenderId: "749646607216",
+  appId: "1:749646607216:web:6f26a11f138828eb8695b5",
+  measurementId: "G-XXXXXXXXXX"
+};
 
-// ✅ ticket secuencial (estable)
-const TICKET_SEQ_KEY = 'pollon_ticket_seq_v1';
+let ordersRef = null; // referencia a la colección de Firestore
+let db = null;        // referencia a Firestore
+const ORDERS_PATH = 'pollon_orders_v1'; // nombre de la colección en Firestore
 
-let db = null;
-let ordersRef = null;
-let firestoreReady = false;
-
-// ✅ listener flag global (NO adentro de funciones)
-let ordersListenerReady = false;
-
-/* ✅ fallback seguro (evita crash si Firestore llama antes que admin.js) */
-function isAdminOpen(){
-  return document.getElementById('admin-panel-modal')?.classList.contains('active');
-}
-window.isAdminOpen = window.isAdminOpen || isAdminOpen;
-
-/* Orders storage */
+// Base de datos de pedidos (en memoria, sincronizada con Firestore)
 let orders = [];
+const ORDERS_KEY = 'pollon_orders_v1'; // respaldo local
 
-// =========================
-// Ticket number estable
-// =========================
-function pad3(n){
-  const s = String(n);
-  return s.length >= 3 ? s : ('000' + s).slice(-3);
-}
-
-function nextTicketNumber(){
-  let seq = 0;
-  try{
-    seq = Number(localStorage.getItem(TICKET_SEQ_KEY) || '0') || 0;
-  }catch{
-    seq = 0;
-  }
-  seq += 1;
-  try{
-    localStorage.setItem(TICKET_SEQ_KEY, String(seq));
-  }catch{}
-  return pad3(seq);
-}
-
-// =========================
-// Firestore init + listener
-// =========================
-function initOrdersBackend(){
-  try{
-   const firebaseConfig = {
-    apiKey: "AIzaSyAWv3zPEUU82YcLSwOxsv-MQZP2ZjcycOg",
-    authDomain: "elpollon01-307da.firebaseapp.com",
-    databaseURL: "https://elpollon01-307da-default-rtdb.firebaseio.com",
-    projectId: "elpollon01-307da",
-    storageBucket: "elpollon01-307da.firebasestorage.app",
-    messagingSenderId: "1024156951564",
-    appId: "1:1024156951564:web:946a9b6003d8dff1053a29"
-  };
-
-    const looksPlaceholder = Object.values(firebaseConfig).some(v => String(v).includes("REEMPLAZA"));
-    if(looksPlaceholder){
-      console.warn('[Firebase] Config placeholder: usando localStorage.');
-      firestoreReady = false;
-      return;
-    }
-
-    // ✅ evita error de doble init
-    if(!firebase.apps || !firebase.apps.length){
+// Inicializa Firestore y suscripción en tiempo real
+function initOrdersBackend() {
+  try {
+    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
+    if (typeof firebase !== 'undefined') {
+      db = firebase.firestore();
+      ordersRef = db.collection(ORDERS_PATH);
 
-    db = firebase.firestore();
-    ordersRef = db.collection(ORDERS_PATH);
-    firestoreReady = true;
-
-    // ✅ Listener tiempo real: lista y panel se actualizan solos; timbre en cada pedido nuevo (siempre)
-    ordersRef.orderBy('createdAt', 'asc').onSnapshot((snap)=>{
-      try {
-        const prevCount = orders.length;
-
-        // ✅ Sincronizar lista local con Firestore (doc.id para poder actualizar estado)
-        orders = [];
-        snap.forEach(doc => orders.push({ id: doc.id, ...doc.data() }));
-
-        // ✅ Ordenar por fecha
+      // Suscripción en tiempo real a la colección (ordenada por fecha)
+      ordersRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
+        const list = [];
+        snapshot.forEach(doc => {
+          const data = doc.data() || {};
+          list.push({
+            id: doc.id,
+            ...data
+          });
+        });
+        orders = list;
+        // Aseguramos orden por fecha por si acaso
         orders.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-
-        // ✅ Pedido nuevo = ya teníamos datos (no es carga inicial) y ahora hay más pedidos → timbre siempre
-        const hasNew = prevCount > 0 && orders.length > prevCount;
-        ordersListenerReady = true;
-
-        // ✅ Si el panel admin está abierto: actualizar tabla y, si llegó al menos un pedido nuevo, sonar timbre
-        if (typeof window.isAdminOpen === 'function' && window.isAdminOpen()) {
-          if (typeof window.renderAdmin === 'function') window.renderAdmin();
-          if (hasNew && typeof window.onNewOrderArrived === 'function') {
-            window.onNewOrderArrived();
-          }
+        const adminVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
+        if (adminVisible) {
+          renderAdminPanel();
         }
-      } catch (err) {
-        console.warn('[Firebase] Error en listener:', err);
-      }
-    });
-
-  }catch(err){
-    console.warn('[Firebase] Falló init, usando localStorage:', err);
-    firestoreReady = false;
+      });
+    }
+  } catch (e) {
+    console.warn('No se pudo inicializar Firebase/Firestore. Se usará solo almacenamiento local.', e);
   }
 }
 
-// =========================
-// Storage (local / fallback)
-// =========================
-function saveOrders(){
-  if(firestoreReady && ordersRef && db){
+// Guarda el array completo de pedidos (Firestore + respaldo local)
+function saveOrders() {
+  if (ordersRef && db) {
     const batch = db.batch();
-    orders.forEach(o=>{
+    orders.forEach(o => {
+      if (!o.id) {
+        o.id = 'P' + Date.now();
+      }
       const docRef = ordersRef.doc(o.id);
-      batch.set(docRef, o, { merge:true });
+      batch.set(docRef, o, { merge: true });
     });
-    batch.commit().catch(e=>{
-      console.warn('[Firebase] batch commit error, fallback local:', e);
-      try{ localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); }catch{}
+    batch.commit().catch(err => {
+      console.error('Error guardando pedidos en Firestore', err);
     });
-  }else{
-    try{ localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); }catch{}
+  } else {
+    try {
+      localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
+    } catch (e) {
+      console.error('Error guardando pedidos en localStorage', e);
+    }
   }
 }
 
-function loadOrders(){
-  // ✅ si Firestore está activo, el listener se encarga
-  if(firestoreReady) return;
-  try{
-    const raw = localStorage.getItem(ORDERS_KEY);
-    orders = raw ? JSON.parse(raw) : [];
-  }catch{
-    orders = [];
+// Cargar pedidos (si no hay Firestore, usamos respaldo local)
+function loadOrders() {
+  if (ordersRef && db) {
+    return;
+  } else {
+    try {
+      const raw = localStorage.getItem(ORDERS_KEY);
+      orders = raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      orders = [];
+    }
   }
 }
 
-// ✅ guarda SOLO 1 pedido (PRO)
-function saveSingleOrder(order){
-  if(firestoreReady && ordersRef){
-    return ordersRef.doc(order.id).set(order, { merge:true }).catch((e)=>{
-      console.warn('[Firebase] set(order) falló, fallback local:', e);
-      saveOrders();
-    });
-  }
-  saveOrders();
-  return Promise.resolve();
-}
 
-/* =========================
-   Productos
-========================= */
-const PRODUCTS = {
-  "ofertas-familiares":[
-    { name:"Ofertón más chaufa", price:24500, img:"img/oferton mas chaufa.png", desc:"Pollo entero, papas fritas, arroz chaufa, ensalada y bebidas 1.5lt." },
-    { name:"Ofertón más fideo", price:24500, img:"img/oferton mas fideo.png", desc:"Pollo entero, papas fritas, fideos al pesto, ensalada y bebidas 1.5lt." },
-    { name:"Ofertón más chaufa pura papa", price:24500, img:"img/oferton mas chaufa pura papa.png", desc:"Pollo entero, papas, extra papa, chaufa y bebidas 1.5lt." },
-    { name:"Ofertón con fideo", price:23500, img:"img/oferton con fideo.png", desc:"Pollo entero, papas, fideos al pesto, ensalada y bebidas 1.5lt" },
-    { name:"Ofertón sin ensalada", price:23500, img:"img/oferton sin ensalada.png", desc:"Pollo entero, papas, chaufa y bebidas 1.5lt" },
-    { name:"Ofertón pura papa", price:23500, img:"img/oferton pura papa.png", desc:"Pollo entero, papas + 1/2 porción papa y bebidas" },
-    { name:"Ofertón familiar", price:22500, img:"img/oferton familiar.png", desc:"Pollo entero, papas, ensalada y bebidas 1.5lt" },
-    { name:"Mega Familiar", price:22500, img:"img/oferton familiar.png", desc:"Pollo entero, papas, ensalada y bebidas 1.5lt" },
+// ===================== FIN CONFIG FIREBASE / BACKEND ====================
+
+const products = {
+  "ofertas-familiares": [
+    { name: "Oferton mas chaufa", description: "Pollo entero, papas fritas, arroz chaufa, ensalada y bebidas 1.5lt.", price: 24500, image: "img/oferton mas chaufa.png" },
+    { name: "Oferton mas fideo", description: "Pollo entero, papas fritas, fideos al pesto, ensalada y bebidas 1.5lt.", price: 24500, image: "img/oferton mas fideo.png" },
+    { name: "Oferton mas chaufa pura papa", description: "Pollo entero, papas fritas, extra papa frita, arroz chaufa y bebidas 1.5lt.", price: 24500, image: "img/oferton mas chaufa pura papa.png" },
+    { name: "Oferton con fideo", description: "Pollo entero, papas fritas, fideos al pesto y bebidas 1.5lt", price: 23500, image:"img/oferton con fideo.png" },
+    { name: "Oferton sin ensalada", description: "Pollo entero, papas fritas, arroz chaufa y bebidas 1.5lt", price: 23500, image: "img/oferton sin ensalada.png" },
+    { name: "Oferton pura papa", description: "Pollo entero, papas fritas, 1/2 porcion de papa frita y bebidas 1.5lt", price: 23500, image: "img/oferton pura papa.png" },
+    { name: "oferton familiar", description: "Pollo entero, papas fritas, ensalada y bebidas 1.5lt", price: 22500, image: "img/oferton familiar.png" },
+    { name: "Mega Familiar", description: "Pollo entero, papas fritas, ensalada y bebidas 1.5lt", price: 22500, image:"img/oferton familiar.png" }
   ],
-  "ofertas-dos":[
-    { name:"1/2 combo chaufa", price:15600, img:"img/medio combo chaufa.png", desc:"Medio pollo + papas + chaufa" },
-    { name:"1/2 combo", price:15100, img:"img/medio combo.png", desc:"Medio pollo + papas + ensalada personal" },
-    { name:"1/2 combo pura papa", price:15100, img:"img/medio combo pura papa.png", desc:"Medio pollo + más papas" },
+  "ofertas-dos": [
+    { name: "1/2 combo chaufa", description: "Medio pollo, papas fritas, arroz chaufa", price: 15600, image: "img/medio combo chaufa.png" },
+    { name: "1/2 combo", description: "Medio pollo, papas fritas, ensalada personal", price: 15100, image: "img/medio combo.png" },
+    { name: "1/2 combo pura papa", description: "Medio pollo, papas fritas mas cantidad,", price: 15100, image: "img/medio combo pura papa.png" }
   ],
-  "ofertas-personales":[
-    { name:"1/4 combo", price:8100, img:"img/personal combo.png", desc:"1/4 pollo + papas personales + ensalada" },
-    { name:"1/4 combo pura papa", price:8100, img:"img/personal combo pura papa.png", desc:"1/4 pollo + más papas" },
-    { name:"Chaufa brasa", price:8200, img:"img/chaufa brasa.png", desc:"1/4 pollo + chaufa" },
-    { name:"Fideo al pesto con 1/4", price:8100, img:"img/personal con fideo.png", desc:"1/4 pollo + fideos al pesto" },
-    { name:"Chaufa brasa con papas", price:9200, img:"img/chaufa brasa con papas fritas.png", desc:"1/4 pollo + chaufa + papas" },
-    { name:"1/4 pollo con fideo y papa", price:9300, img:"img/personal con papa y fideo.png", desc:"1/4 pollo + fideo + papas" },
+  "ofertas-personales": [
+    { name: "1/4 combo", description: "1/4 pollo, papas fritas personales, ensalada personal", price: 8100, image: "img/personal combo.png" },
+    { name: "1/4 combo pura papa", description: "1/4 pollo, papas fritas personales mas cantidad.", price: 8100, image: "img/personal pura papa.png" },
+    { name: "Chaufa brasa", description: "1/4 pollo, arroz chaufa", price: 8200, image: "img/chaufa brasa.png" },
+    { name: "Fideo al pesto con 1/4 de pollo", description: "1/4 pollo, fideos al pesto", price: 8100, image: "img/personal pesto con pollo.png" },
+    { name: "Chaufa brasa con papas fritas", description: "1/4 pollo, papas fritas personal, arroz chaufa", price: 9200, image: "img/chaufa brasa con papas fritas.png" },
+    { name: "1/4 de pollo con fideo y papa", description: "1/4 pollo, papas fritas, fideos al pesto", price: 9300, image: "img/personal con papa y fideo 01.png" }
   ],
-  "platos-extras":[
-    { name:"Lomo saltado de carne con chaufa", price:12200, img:"img/lomo saltado con arroz chaufa.png", desc:"Plato extra con chaufa" },
-    { name:"Lomo saltado de carne con arroz blanco", price:11700, img:"img/lomo saltado de carne con arroz blanco.png", desc:"Plato extra con arroz blanco" },
-    { name:"Lomo saltado de pollo con arroz blanco", price:11700, img:"img/lomo saltado de pollo con arroz blanco.png", desc:"Plato extra con arroz blanco" },
-    { name:"Tallarín saltado", price:11700, img:"img/tallarin saltado de carne.png", desc:"Tallarín saltado de carne" },
-    { name:"Bistec a lo pobre", price:10700, img:"img/bistec a lo pobre.png", desc:"Bistec a lo pobre" },
-    { name:"Bistec con fideos al pesto", price:10700, img:"img/bistec con fideos al pesto.png", desc:"Bistec + fideos al pesto" },
-    { name:"Chuleta de cerdo", price:10700, img:"img/chuleta de cerdo.png", desc:"Chuleta de cerdo" },
-    { name:"Pechuga a la plancha", price:10200, img:"img/pechuga a la plancha.png", desc:"Pechuga a la plancha" },
-    { name:"Combo nuggets", price:6700, img:"img/combo nuggets.png", desc:"Combo nuggets" },
-    { name:"Salchipapas", price:6700, img:"img/salchipapas.png", desc:"Salchipapas" },
+  "platos-extras": [
+    { name: "Lomo saltado de carnecon chaufa", description: "", price: 12200, image: "img/lomo saltado con arroz chaufa.png" },
+    { name: "Lomo saltado de carne con arroz blanco ", description: "", price: 11700, image: "img/lomo saltado de carne con arroz blanco.png" },
+    { name: "Lomo saltado de pollo con arroz blanco", description: "", price: 11700, image: "img/lomo saltado de pollo con arroz blanco.png" },
+    { name: "Tallarin saltado", description: "", price: 11700, image: "img/tallarin saltado de carne 01.png" },
+    { name: "Bistec a lo pobre", description: "", price: 10700, image: "img/bistec a lo pobre.png" },
+    { name: "Bistec con fideos al pesto", description: "", price: 10700, image: "" },
+    { name: "Chuleta de cerdo", description: "", price: 10700, image: "img/chuleta de cerdo.png" },
+    { name: "Pechuga a la plancha", description: "", price: 10200, image: "img/pechuga a la plancha.png" },
+    { name: "Combo nuggets", description: "", price: 6700, image: "img/nugget.png" },
+    { name: "Salchipapas", description: "", price: 6700, image: "img/salchipapa.png" }
   ],
-  "agregados":[
-    { name:"1 Pollo entero solo", price:15000, img:"img/1 pollo solo.png", desc:"Solo pollo" },
-    { name:"1/2 Pollo solo", price:9900, img:"img/medio pollo solo.png", desc:"Medio pollo" },
-    { name:"1/4 pollo solo", price:5800, img:"img/cuarto pollo solo.png", desc:"Cuarto de pollo" },
-    { name:"Porción papas familiar", price:9000, img:"img/porcion de papa.png", desc:"Porción de papas familiar" },
-    { name:"1/2 porción papas", price:6100, img:"img/1-2 porcion papas.png", desc:"Media porción papas" },
-    { name:"Porción arroz chaufa", price:5300, img:"img/porcion arroz chaufa.png", desc:"Porción de arroz chaufa" },
-    { name:"Porción fideos al pesto", price:5300, img:"img/porcion de fideo.png", desc:"Porción de fideos al pesto" },
-    { name:"Ensalada familiar", price:5400, img:"img/ensalada familiar.png", desc:"Ensalada familiar" },
-    { name:"Ensalada personal", price:3700, img:"img/ensalada personal.png", desc:"Ensalada personal" },
+  "agregados": [
+    { name: "1 Pollo entero solo", description: "1 pollo entero", price: 15000, image: "img/pollo solo.png" },
+    { name: "1/2 Pollo solo", description: " 1/2 pollo  -  parte truto y pechuga", price: 9900, image: "img/medio pollo solo.png" },
+    { name: "1/4 pollo solo", description: "1/4 de polo -- truto o pechuga ---segun el stock", price: 5800, image: "" },
+    { name: "Porcion de papas fritas familiar", description: "Porción grande de papas crujientes", price: 9000, image: "img/porcion de papa.png" },
+    { name: "1/2 porcion de papas fritas", description: "Media Porción  de papas crujientes", price: 6100, image: "img/media porcion papa.png" },
+    { name: "Porcion de arroz chaufa", description: "1 Porción de arroz chaufa", price: 5300, image: "img/porcion arroz chaufa.png" },
+    { name: "Porcion de fideos al pesto", description: "1 Porción de fideos al pesto", price: 5300, image: "img/porcion de fideo.png" },
+    { name: "Porcion de ensalada familiar", description: "Ensalada surtida - familiar ", price: 5400, image: "img/ensalada familiar.png" },
+    { name: "Porcion de ensalada personal", description: "Ensalada surtida - personal", price: 3700, image: "img/ensalada personal.png" }
   ],
-  "bebidas":[
-    { name:"Coca Cola 1.5L", price:3800, img:"img/coca cola.png", desc:"Bebida 1.5L" },
-    { name:"Coca Cola Cero", price:3800, img:"img/coca cola cero.png", desc:"Bebida 1.5L" },
-    { name:"Inca Kola", price:3800, img:"img/inca kola.png", desc:"Bebida 1.5L" },
-    { name:"Fanta", price:3800, img:"img/fanta.png", desc:"Bebida 1.5L" },
-    { name:"Sprite", price:3800, img:"img/sprite.png", desc:"Bebida 1.5L" },
-    { name:"Sprite Cero", price:3800, img:"img/sprite cero.png", desc:"Bebida 1.5L" },
-    { name:"Agua sin gas 500ml", price:1200, img:"img/agua sin gas.png", desc:"Agua 500ml" },
-    { name:"Agua con gas 500ml", price:1200, img:"img/agua con gas.png", desc:"Agua 500ml" },
+    
+  "bebidas": [
+    { name: "Coca Cola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/coca cola.png" },
+    { name: "Coca Cola Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/coca cola cero.png" },
+    { name: "Inca Kola", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/inca kola.png" },
+    { name: "Fanta", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/fanta.png" },
+    { name: "Sprite", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/sprite.png" },
+    { name: "Sprite Cero", description: "Bebida 1.5L (según stock).", price: 3800, image: "img/sprite cero.png" },
+    { name: "Agua Sin Gas", description: "Benedictino de 500 ml. (según stock).", price: 1200, image: "img/agua sin gas.png" },
+    { name: "Agua Con Gas", description: "Benedictino de 500 ml. (según stock).", price: 1200, image: "img/agua con gas.png" }
   ],
-  "descartables":[
-    { name:"Aluza CT5", price:300, img:"img/aluza ct5.png", desc:"Envase descartable Aluza CT5" },
-    { name:"Aluza CT3", price:400, img:"img/aluza ct3.png", desc:"Envase descartable Aluza CT3" },
-    { name:"Tenedor descartable", price:200, img:"img/servicio descartable.png", desc:"Tenedor y cuchillo plástico descartable." },
-    { name:"Bolsa ecológica", price:200, img:"img/bolsa ecologica.png", desc:"Bolsa ecológica" },
-    { name:"Vaso descartable", price:50, img:"img/vaso.png", desc:"Descartable" },
+
+  "descartables": [
+    { name: "Aluza CT5", description: "Envase descartable Aluza CT5.", price: 300, image: "img/aluza ct5.png" },
+    { name: "Aluza CT3", description: "Envase descartable Aluza CT3.", price: 400, image: "img/aluza ct3.png" },
+    { name: "Tenedor descartable", description: "Tenedor y cuchillo plástico descartable.", price: 200, image: "img/servicio descartable.png" },
+    { name: "Bolsa ecológica", description: "Bolsa ecológica (unidad).", price: 200, image: "img/bolsa ecologica.png" },
+    { name: "Vaso descartable", description: "vaso de 10 oz (unidad).", price: 50, image: "img/vaso.png" }
   ]
+
+};
+const CATEGORY_META = {
+  "ofertas-familiares": { title: "👨‍👩‍👧‍👦 Ofertas Familiares" },
+  "ofertas-dos":        { title: "👫 Ofertas para Dos" },
+  "ofertas-personales": { title: "🧑 Ofertas Personales" },
+  "platos-extras":      { title: "🍽️ Platos Extras" },
+  "agregados":          { title: "➕ Agregados" },
+  "bebidas":           { title: "🥤 Bebidas" },
+  "descartables":      { title: "🍴 Descartables" }
+
 };
 
-const CATEGORY_META = {
-  "todo-el-menu":"📋 Todo el Menú",
-  "ofertas-familiares":"👨‍👩‍👧‍👦 Ofertas Familiares",
-  "ofertas-dos":"👫 Ofertas para Dos",
-  "ofertas-personales":"🍗 Ofertas Personales",
-  "platos-extras":"🍽️ Platos Extras",
-  "agregados":"➕ Agregados",
-  "bebidas":"🥤 Bebidas",
-  "descartables":"🧾 Descartables",
-};
 const CATEGORY_ORDER = [
   "ofertas-familiares",
   "ofertas-dos",
@@ -253,1362 +195,1302 @@ const CATEGORY_ORDER = [
   "agregados",
   "bebidas",
   "descartables"
+
 ];
 
-/* =========================
-   Estado Carrito
-========================= */
+
+
+
+// --------- Estado ----------
 let cart = [];
 let currentProduct = null;
-let currentCategory = 'todo-el-menu';
+let currentCategory = "ofertas-familiares";
 let selectedDrink = null;
 let productQuantity = 1;
-let bagChoice = null; // 'add' | 'none'
-let currentRealCategory = null;
+let bagChoice = null;
 
-/* Helpers */
-function money(v){ return CURRENCY.format(v || 0); }
+// Admin
+let isAdminAuthenticated = false;
+let adminFilters = { from: '', to: '', status: 'todos', search: '' };
 
-function showToast(msg){
+// --------- Util ----------
+function money(v) {
+  return CURRENCY.format(v);
+}
+function showToast(msg) {
   const t = document.createElement('div');
   t.className = 'toast';
   t.textContent = msg;
   document.body.appendChild(t);
-  setTimeout(()=> t.remove(), 3000);
+  setTimeout(() => t.remove(), 3000);
 }
 
-/* =========================
-   ❤ Burst de corazones (animación)
-========================= */
-function burstHearts(btn){
-  if(!btn) return;
+// ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
+   // ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
+function buildWhatsappTextFromOrder(order) {
+  const { customer, items, total } = order;
 
-  btn.querySelectorAll('.pheart-burst').forEach(n => n.remove());
+  // Formato de fecha y hora en base a createdAt
+  const fechaBase = order.createdAt ? new Date(order.createdAt) : new Date();
+  const dd = String(fechaBase.getDate()).padStart(2, "0");
+  const mm = String(fechaBase.getMonth() + 1).padStart(2, "0");
+  const yyyy = fechaBase.getFullYear();
+  const hh = String(fechaBase.getHours()).padStart(2, "0");
+  const min = String(fechaBase.getMinutes()).padStart(2, "0");
 
-  const wrap = document.createElement('div');
-  wrap.className = 'pheart-burst';
-  btn.appendChild(wrap);
+  const fechaStr = `${dd}-${mm}-${yyyy}`;
+  const horaStr = `${hh}:${min}`;
 
-  const COUNT = 11;
-  const RADIUS = 26;
-  const STEP_DELAY = 40;
+  // Número de ticket (ej: 001, 002, 010, etc.)
+  const ticket = (order.ticketNumber || "1").toString().padStart(3, "0");
 
-  const heartSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
-  for(let i=0;i<COUNT;i++){
-    const s = document.createElement('span');
-    s.className = 'pheart-float';
-    s.innerHTML = heartSvg;
+  let msg = "";
 
-    const angle = (Math.PI * 2) * (i / COUNT);
-    const dx = Math.cos(angle) * RADIUS;
-    const dy = Math.sin(angle) * RADIUS;
+  // CABECERA
+  msg += `◆ DELIVERY - POLLERÍA EL POLLÓN ◆\n\n`;
+  msg += `${ticket}    ${fechaStr}    ${horaStr}\n`;
+  msg += `────────────────────────────────\n`;
+  msg += `◆ DATOS DEL CLIENTE\n`;
+  msg += `────────────────────────────────\n\n`;
 
-    s.style.setProperty('--dx', `${dx}px`);
-    s.style.setProperty('--dy', `${dy}px`);
-    s.style.animationDelay = `${i * STEP_DELAY}ms`;
+  // DATOS CLIENTE
+  msg += `◆ Nombre:   ${customer.name}\n`;
+  msg += `◆ Teléfono: ${customer.phone}\n`;
+  msg += `◆ Dirección: ${customer.address}\n\n`;
 
-    s.addEventListener('animationend', ()=> s.remove());
-    wrap.appendChild(s);
-  }
+  // DETALLE PEDIDO
+  msg += `────────────────────────────────\n`;
+  msg += `◆ DETALLE DEL PEDIDO\n`;
+  msg += `────────────────────────────────\n\n`;
 
-  setTimeout(()=> wrap.remove(), 1600);
-}
-
-function openModal(sel){
-  const m = document.querySelector(sel);
-  if(m) m.classList.add('active');
-}
-function closeModal(sel){
-  const m = document.querySelector(sel);
-  if(m) m.classList.remove('active');
-}
-
-function scrollToMenu(){
-  const el = document.getElementById('ofertas');
-  if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-function safeImg(imgEl){
-  imgEl.onerror = () => { imgEl.style.display = 'none'; };
-}
-
-/* ✅ Wrap (25 chars) */
-function wrapWithCursorMap(text, limit){
-  const src = String(text || '').replace(/\r/g, '');
-
-  let out = '';
-  const map = new Array(src.length + 1);
-  let lineStartOut = 0;
-  let lineLen = 0;
-  let lastSpaceOutPos = -1;
-
-  for(let i=0; i<src.length; i++){
-    const ch = src[i];
-    map[i] = out.length;
-
-    if(ch === '\n'){
-      out += ch;
-      lineStartOut = out.length;
-      lineLen = 0;
-      lastSpaceOutPos = -1;
-      continue;
+  items.forEach((it, i) => {
+    msg += `${i + 1}. ${it.name} × ${it.qty}\n`;
+    msg += `— Subtotal: ${money(it.total)}\n`;
+    if (it.drink) {
+      msg += `— Bebida: ${it.drink}\n`;
     }
-
-    out += ch;
-    lineLen++;
-
-    if(ch === ' ') lastSpaceOutPos = out.length - 1;
-
-    if(lineLen > limit){
-      if(lastSpaceOutPos >= lineStartOut){
-        out = out.slice(0, lastSpaceOutPos) + '\n' + out.slice(lastSpaceOutPos + 1);
-        lineStartOut = lastSpaceOutPos + 1;
-        lineLen = out.length - lineStartOut;
-        lastSpaceOutPos = -1;
-      } else {
-        out = out.slice(0, out.length - 1) + '\n' + ch;
-        lineStartOut = out.length - 1;
-        lineLen = 1;
-        lastSpaceOutPos = -1;
-      }
+    if (it.bagQty > 0) {
+      msg += `— Bolsa: x ${it.bagQty} (+ ${money(BAG_PRICE)} /u)\n`;
     }
-  }
-
-  map[src.length] = out.length;
-  return { out, map };
-}
-
-function wrapText(text, limit = 25){
-  return wrapWithCursorMap(text, limit).out;
-}
-
-function enforceWrapLimit(el, limit = 30){
-  if(!el) return;
-
-  el.addEventListener('input', ()=>{
-    const original = String(el.value || '').replace(/\r/g,'');
-    const selStart = el.selectionStart ?? original.length;
-    const selEnd = el.selectionEnd ?? original.length;
-
-    const { out, map } = wrapWithCursorMap(original, limit);
-
-    if(out !== original){
-      el.value = out;
-      const newStart = map[Math.min(selStart, map.length - 1)] ?? out.length;
-      const newEnd   = map[Math.min(selEnd, map.length - 1)] ?? out.length;
-      el.setSelectionRange(newStart, newEnd);
-    }
+    msg += `\n`;
   });
+
+  // TOTAL
+  msg += `────────────────────────────────\n`;
+  msg += `◆ TOTAL A PAGAR: ${money(total)}\n`;
+  msg += `────────────────────────────────\n\n`;
+
+  // NOTA DELIVERY
+  msg += `◆ Delivery tiene costo adicional\n`;
+  msg += `◆ segun la distancia $2.500 a $4.000`;
+
+  return msg;
 }
 
-/* =========================
-   Render Products
-========================= */
-const productsContainer = document.getElementById('products-container');
-const catSliderEl = document.getElementById('cat-slider');
-const categoryTitleEl = document.getElementById('category-title');
 
-function productCard(p, category){
-  const card = document.createElement('div');
-  card.className = 'pcard';
 
-  const imgWrap = document.createElement('div');
-  imgWrap.className = 'pimg';
+// --------- Render products ----------
+document.querySelectorAll('.sidebar-category').forEach(btn => {
+  btn.addEventListener('click', () => {
+    renderProductsSingle(btn.dataset.category);
+    closeSidebarMenu();
+    document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
 
-  const img = document.createElement('img');
-  img.src = p.img || '';
-  img.alt = p.name;
-  safeImg(img);
 
-  const fallback = document.createElement('div');
-  fallback.textContent = '🍗';
-  fallback.style.display = 'none';
-  fallback.style.alignItems = 'center';
-  fallback.style.justifyContent = 'center';
-  fallback.style.width = '100%';
-  fallback.style.height = '100%';
+// Render normal: UNA categoría
+function renderProductsSingle(category) {
+  currentCategory = category;
 
-  imgWrap.appendChild(img);
-  imgWrap.appendChild(fallback);
+  const container = document.getElementById('products-container');
+  if (!container) return;
 
-  img.addEventListener('load', ()=> { fallback.style.display = 'none'; });
-  img.addEventListener('error', ()=> { fallback.style.display = 'flex'; });
+  container.innerHTML = '';
 
-  const body = document.createElement('div');
-  body.className = 'pbody';
+  (products[category] || []).forEach(p => {
+    // 🔥 Guardamos la categoría real dentro del producto:
+    const payload = { ...p, __category: category };
 
-  const title = document.createElement('div');
-  title.className = 'ptitle';
-  title.textContent = p.name;
+    const card = document.createElement('div');
+    card.className = 'product-card bg-white rounded-lg shadow-lg overflow-hidden';
+    card.innerHTML = `
+      <img src="${p.image}" alt="${p.name}" class="product-image"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+      <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 hidden items-center justify-center text-6xl">🍗</div>
+      <div class="p-4">
+        <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
+        <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
+        <div class="flex justify-between items-center">
+          <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
+          <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+                  style="background-color:#dc2626"
+                  data-product='${JSON.stringify(payload)}'>Agregar</button>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
 
-  const desc = document.createElement('div');
-  desc.className = 'pdesc';
-  desc.textContent = p.desc || '';
-
-  const row = document.createElement('div');
-  row.className = 'prow';
-
-  const price = document.createElement('div');
-  price.className = 'pprice';
-  price.textContent = money(p.price);
-
-  const heartBtn = document.createElement('button');
-  heartBtn.className = 'pheart';
-  heartBtn.type = 'button';
-  heartBtn.setAttribute('aria-label', 'Agregar a favoritos');
-  heartBtn.dataset.action = 'heart';
-  heartBtn.dataset.heartId = `${category}__${p.name}`;
-  heartBtn.innerHTML = `<span class="pheart-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span>`;
-
-  const btn = document.createElement('button');
-  btn.className = 'padd';
-  btn.type = 'button';
-  btn.textContent = 'Agregar';
-  btn.dataset.action = 'add';
-  btn.dataset.product = JSON.stringify({ ...p, __category: category });
-
-  row.appendChild(price);
-  row.appendChild(heartBtn);
-  row.appendChild(btn);
-
-  body.appendChild(title);
-  body.appendChild(desc);
-  body.appendChild(row);
-
-  card.appendChild(imgWrap);
-  card.appendChild(body);
-
-  return card;
+  setActiveCategoryButton(category);
 }
 
-function renderProductsSingle(category){
-  productsContainer.innerHTML = '';
-  const list = PRODUCTS[category] || [];
-  list.forEach(p => productsContainer.appendChild(productCard(p, category)));
-}
+// Render “TODO EL MENÚ”: todas las categorías con encabezados
+function renderProductsAll() {
+  currentCategory = "todo-el-menu";
 
-function renderProductsAll(){
-  productsContainer.innerHTML = '';
-  CATEGORY_ORDER.forEach(cat=>{
-    const head = document.createElement('div');
-    head.className = 'cat-header';
-    head.id = cat;
+  const container = document.getElementById('products-container');
+  if (!container) return;
 
-    const h = document.createElement('h3');
-    h.textContent = CATEGORY_META[cat] || cat;
+  container.innerHTML = '';
 
-    const line = document.createElement('div');
-    line.className = 'cat-line';
+  CATEGORY_ORDER.forEach(catKey => {
+    const list = products[catKey] || [];
+    if (!list.length) return;
 
-    head.appendChild(h);
-    head.appendChild(line);
-    productsContainer.appendChild(head);
+    // Encabezado por categoría (como tu foto)
+    const header = document.createElement('div');
+    header.className = 'col-span-full mt-4 mb-2';
+    header.innerHTML = `
+      <h3 class="text-1.8xl font-bold text-gray-900 flex items-center gap-2">
+        ${CATEGORY_META[catKey]?.title || catKey}
+      </h3>
+      <div class="h-[3px] w-70 bg-red-300 rounded-full mt-1"></div>
+    `;
+    container.appendChild(header);
 
-    (PRODUCTS[cat] || []).forEach(p=>{
-      productsContainer.appendChild(productCard(p, cat));
+    list.forEach(p => {
+      const payload = { ...p, __category: catKey };
+
+      const card = document.createElement('div');
+      card.className = 'product-card bg-white rounded-lg shadow-lg overflow-hidden';
+      card.innerHTML = `
+        <img src="${p.image}" alt="${p.name}" class="product-image"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="h-48 bg-gradient-to-br from-orange-400 to-red-500 hidden items-center justify-center text-6xl">🍗</div>
+        <div class="p-4">
+          <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
+          <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
+          <div class="flex justify-between items-center">
+            <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
+            <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+                    style="background-color:#dc2626"
+                    data-product='${JSON.stringify(payload)}'>Agregar</button>
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
     });
   });
+
+  setActiveCategoryButton("todo-el-menu");
 }
 
-/* =========================
-   Options modal logic
-========================= */
-const optName = document.getElementById('opt-product-name');
-const optDesc = document.getElementById('opt-product-desc');
-const optPrice = document.getElementById('opt-product-price');
-const qtyValue = document.getElementById('qty-value');
-const liveTotal = document.getElementById('live-total');
 
-const drinkSection = document.getElementById('drink-section');
-const bagSection = document.getElementById('bag-section');
-const bagOptions = document.getElementById('bag-options');
-const bagNote = document.getElementById('bag-note');
+// --------- Carrito UI ----------
+function updateCartUI() {
+  const c = cart.length;
+  const total = cart.reduce((s, i) => s + i.total, 0);
+  const fc = document.getElementById('floating-cart-count');
+  const fb = document.getElementById('floating-cart-badge');
+  const ft = document.getElementById('floating-cart-total');
+  const mb = document.getElementById('cart-badge-mobile');
+  const db = document.getElementById('cart-badge-desktop');
+  if (fc) fc.textContent = c;
+  if (fb) {
+    fb.textContent = c;
+    fb.classList.add('cart-badge');
+    setTimeout(() => fb.classList.remove('cart-badge'), 500);
+  }
+  if (ft) ft.textContent = money(total);
+  if (mb) mb.textContent = c;
+  if (db) db.textContent = c;
 
-function setDrinkVisible(visible){
-  drinkSection.classList.toggle('hidden', !visible);
+  const ddBadge = document.getElementById('menu-dd-cart-badge');
+  if (ddBadge) ddBadge.textContent = c;
+
+}
+function renderCart() {
+  const wrap = document.getElementById('cart-items');
+  const t = document.getElementById('cart-total');
+  if (!wrap || !t) return;
+  if (cart.length === 0) {
+    wrap.innerHTML = '<p class="text-center text-gray-500 py-8">Tu carrito está vacío</p>';
+    t.textContent = money(0);
+    return;
+  }
+  let total = 0;
+  wrap.innerHTML = cart.map((it, i) => {
+    total += it.total;
+    const bagLine = it.bagQty > 0 ? `♻️ Bolsa Ecológica: x ${it.bagQty} (+ ${money(BAG_PRICE)} c/u)` : '';
+    const drinkLine = it.drink ? `🥤 Bebida: ${it.drink}` : '';
+    return `
+      <div class="flex justify-between items-center mb-4 pb-4 border-b">
+        <div class="flex-1">
+          <h4 class="font-bold text-gray-800">${it.name} × ${it.qty}</h4>
+          <p class="text-sm text-gray-600">${drinkLine}</p>
+          <p class="text-sm text-green-600">${bagLine}</p>
+        </div>
+        <div class="text-right">
+          <p class="font-bold text-lg text-red-700">${money(it.total)}</p>
+          <button class="remove-item text-red-600 text-sm hover:underline" data-index="${i}">Eliminar</button>
+        </div>
+      </div>`;
+  }).join('');
+  t.textContent = money(total);
 }
 
-/* ✅ Bolsas */
-function bagQtyRule(qty){
-  const q = Math.max(1, Number(qty) || 1);
-
-  if(currentRealCategory === 'bebidas' || currentRealCategory === 'descartables'){
-    return 0;
-  }
-  if(bagChoice !== 'add') return 0;
-
-  if(currentRealCategory === 'ofertas-familiares'){
-    return q; // por unidad
-  }
-
-  if(
-    currentRealCategory === 'ofertas-dos' ||
-    currentRealCategory === 'ofertas-personales' ||
-    currentRealCategory === 'platos-extras' ||
-    currentRealCategory === 'agregados'
-  ){
-    return Math.ceil(q / 3);
-  }
-
-  return 1;
+// --------- Modal helpers ----------
+function setDrinkVisible(visible) {
+  const s = document.getElementById('drink-section');
+  if (s) s.classList.toggle('hidden', !visible);
 }
+function paintBagOptions() {
+  const badge = document.getElementById('bag-badge');
+  const opts = document.getElementById('bag-options');
+  const note = document.getElementById('bag-note');
+  if (!badge || !opts || !note) return;
 
-function paintBagOptions(){
-  bagOptions.innerHTML = '';
-  bagNote.textContent = '';
-
-  if(currentRealCategory === 'bebidas' || currentRealCategory === 'descartables'){
-    bagSection.classList.add('hidden');
+    // ✅ En Bebidas y Descartables NO se usa bolsa
+  const bagSection = document.getElementById('bag-section');
+  if (currentCategory === 'bebidas' || currentCategory === 'descartables') {
     bagChoice = 'none';
+    if (bagSection) bagSection.classList.add('hidden');
     return;
-  }
-  bagSection.classList.remove('hidden');
-
-  const mk = (val, label, disabled=false) => {
-    const l = document.createElement('label');
-    l.className = 'opt-radio';
-    l.innerHTML = `<input type="radio" name="bag" value="${val}" ${disabled ? 'disabled' : ''}> ${label}`;
-    if(disabled) l.style.opacity = '0.55';
-    return l;
-  };
-
-  const bagRequired =
-    currentRealCategory === 'ofertas-familiares' ||
-    currentRealCategory === 'ofertas-dos' ||
-    currentRealCategory === 'ofertas-personales' ||
-    currentRealCategory === 'platos-extras';
-
-  if(bagRequired){
-    bagOptions.appendChild(mk('add', 'Agregar bolsa'));
-  }else{
-    bagOptions.appendChild(mk('add', 'Agregar bolsa (opcional)'));
-    bagOptions.appendChild(mk('none', 'No, gracias'));
-  }
-
-  if(currentRealCategory === 'ofertas-familiares'){
-    bagNote.textContent = 'Familiares: bolsa obligatoria y se cobra por unidad (según cantidad).';
-  } else if(
-    currentRealCategory === 'ofertas-dos' ||
-    currentRealCategory === 'ofertas-personales' ||
-    currentRealCategory === 'platos-extras'
-  ){
-    bagNote.textContent = 'En esta categoría: bolsa obligatoria (1 bolsa por cada 3 unidades).';
-  } else if(currentRealCategory === 'agregados'){
-    bagNote.textContent = 'Agregados: bolsa opcional (si eliges bolsa, se agrega 1 por cada 3 unidades).';
   } else {
-    bagNote.textContent = 'Bolsa ecológica según reglas de la categoría.';
-  }
-}
-
-function computeLiveTotal(){
-  if(!currentProduct) return { total:0, bagQty:0, base:0 };
-
-  const base = (currentProduct.price || 0) * productQuantity;
-  const bagQty = bagQtyRule(productQuantity);
-  const total = base + (bagQty * BAG_PRICE);
-
-  liveTotal.textContent = money(total);
-  return { total, bagQty, base };
-}
-
-/* =========================
-   Ticket (WhatsApp + 80mm)
-========================= */
-function formatDateTicket(iso){
-  const d = new Date(iso);
-  const dd = String(d.getDate()).padStart(2,'0');
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const yyyy = d.getFullYear();
-  const hh = String(d.getHours()).padStart(2,'0');
-  const min = String(d.getMinutes()).padStart(2,'0');
-  return { date: `${dd}-${mm}-${yyyy}`, time: `${hh}:${min}` };
-}
-
-function moneyTicket(v){
-  return money(v).replace(/\s/g,'');
-}
-
-function buildTicketText80mm(order){
-  const W = 42;
-  const sep = '='.repeat(W);
-  const sep2 = '-'.repeat(W - 4);
-
-  const { date, time } = formatDateTicket(order.createdAt);
-  const pedido = pad3(order.ticketNumber || '001');
-
-  // En ticket: nombre, fono, comentario y productos en mayúsculas (solo para impresión)
-  const cliente = wrapText((order.customer?.name || '').toUpperCase(), 25).split('\n');
-  const direccion = wrapText(order.customer?.address || '', 25).split('\n');
-  const comentario = wrapText((order.customer?.comment || '').toUpperCase(), 25).split('\n').filter(Boolean);
-  const fono = (order.customer?.phone || '').trim().toUpperCase();
-
-  let t = '';
-  t += `POLLERÍA EL POLLÓN   - DELIVERY\n`;
-  t += `Pedido : ${pedido}     ${date}  ${time}\n`;
-  t += `${sep}\n\n`;
-
-  t += `Cliente   : ${cliente[0] || ''}\n`;
-  for(let i=1;i<cliente.length;i++) t += `           ${cliente[i]}\n`;
-
-  t += `Fono      : ${fono}\n`;
-
-  t += `Dirección : ${direccion[0] || ''}\n`;
-  for(let i=1;i<direccion.length;i++) t += `           ${direccion[i]}\n`;
-
-  if(comentario.length){
-    t += `\nComentario: ${comentario[0] || ''}\n`;
-    for(let i=1;i<comentario.length;i++) t += `           ${comentario[i]}\n`;
+    if (bagSection) bagSection.classList.remove('hidden');
   }
 
-  t += `\n${sep}\n`;
 
-  order.items.forEach((it, idx)=>{
-    const n = idx + 1;
-    const nameLines = wrapText((it.name || '').toUpperCase(), 30).split('\n');
-    const qty = it.qty || 1;
+  opts.innerHTML = '';
+  note.textContent = '';
+  bagChoice = null;
 
-    t += `${n}) ${nameLines[0] || ''} ( X${qty} )\n`;
+  const isFamiliares = currentCategory === 'ofertas-familiares';
+  const isOtherMandatory = ['ofertas-dos', 'ofertas-personales', 'platos-extras'].includes(currentCategory);
+  const isAgregados = currentCategory === 'agregados';
 
-    for(let i=1;i<nameLines.length;i++){
-      t += `   ${nameLines[i]}\n`;
-    }
-
-    if(it.drink){
-      t += `   Bebida   : ${(it.drink || '').toUpperCase()}\n`;
-    }
-
-    if(it.bagQty && it.bagQty > 0){
-      t += `   Bolsa    : x${it.bagQty}\n`;
-    }
-
-    const sub = moneyTicket(it.subtotal || 0);
-    t += `   Subtotal: ${sub}\n`;
-    if (idx < order.items.length - 1) t += `${sep2}\n`;
-  });
-
-  t += `\n${sep}\n`;
-  t += `TOTAL A PAGAR  : ${moneyTicket(order.total || 0)}\n`;
-  t += `${sep}\n\n`;
-
-  t += `♦ Delivery tiene costo adicional\n`;
-  t += `♦ Según la distancia $2.500 a $4.000\n`;
-
-  return t;
-}
-
-function buildTicketHtml80mm(order){
-  const raw = buildTicketText80mm(order);
-
-  const esc = raw
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;');
-
-  let html = esc
-    .replace('POLLERÍA EL POLLÓN', '<b>POLLERÍA EL POLLÓN</b>')
-    .replace('TOTAL A PAGAR', '<b>TOTAL A PAGAR</b>');
-
-  // Número de celular: letras un poco más grandes
-  html = html.replace(/(Fono\s+:\s+)([^\n]+)(\n)/, '$1<span class="ticket-fono">$2</span>$3');
-  // Comentario: descripción con letras más gruesas
-  html = html.replace(/Comentario: ([\s\S]*?)(?=\n\n)/, (_, c) => `Comentario: <span class="ticket-comment">${c}</span>`);
-  // Nombres de productos: un poco más grandes y en negrita (líneas "n) Nombre ( Xqty )")
-  html = html.replace(/^(\d+\))\s+(.+?)(\s+\( X\d+ \)\s*)$/gm, '$1 <span class="ticket-product">$2</span>$3');
-  // Bebida (nombre de producto): mismo estilo
-  html = html.replace(/(   Bebida   : )(.+?)(\n)/g, '$1<span class="ticket-product">$2</span>$3');
-
-  return html;
-}
-
-function buildWhatsappTextFromOrder(order){
-  return buildTicketText80mm(order);
-}
-
-/* =========================
-   Cart UI
-========================= */
-const badgeDesktop = document.getElementById('cart-badge-desktop');
-const badgeDropdownMobile = document.getElementById('menu-dd-cart-badge');
-
-const floatingCartCount = document.getElementById('floating-cart-count');
-const floatingCartTotal = document.getElementById('floating-cart-total');
-
-function cartCount(){
-  return cart.reduce((acc,it)=> acc + (it.qty||0), 0);
-}
-function cartSum(){
-  return cart.reduce((acc,it)=> acc + (it.total||0), 0);
-}
-
-function updateCartUI(){
-  const c = cartCount();
-  const t = cartSum();
-
-  if(badgeDesktop) badgeDesktop.textContent = String(c);
-  if(badgeDropdownMobile) badgeDropdownMobile.textContent = String(c);
-
-  if(floatingCartCount) floatingCartCount.textContent = String(c);
-  if(floatingCartTotal) floatingCartTotal.textContent = money(t);
-
-  const fcBtn = document.getElementById('floating-cart');
-  if(fcBtn) fcBtn.classList.toggle('is-empty', c === 0);
-}
-
-const cartItemsEl = document.getElementById('cart-items');
-const cartTotalEl = document.getElementById('cart-total');
-
-function renderCart(){
-  cartItemsEl.innerHTML = '';
-  if(cart.length === 0){
-    cartItemsEl.innerHTML = `<div class="p-4 rounded-2xl bg-gray-50 border text-gray-700 font-bold">Tu carrito está vacío.</div>`;
-    cartTotalEl.textContent = money(0);
-    updateCartUI();
-    return;
-  }
-
-  cart.forEach((it, idx)=>{
-    const row = document.createElement('div');
-    row.className = 'p-3 rounded-2xl bg-white border flex flex-col md:flex-row md:items-center md:justify-between gap-2';
-
-    const left = document.createElement('div');
-    left.innerHTML = `
-      <div class="font-extrabold">${it.name} <span class="text-gray-500 font-bold">x${it.qty}</span></div>
-      ${it.drink ? `<div class="text-sm text-gray-600">🥤 ${it.drink}</div>` : ''}
-      ${it.bagQty ? `<div class="text-sm text-gray-600">🛍️ Bolsa: ${it.bagQty} x ${money(BAG_PRICE)}</div>` : ''}
+  if (isFamiliares || isOtherMandatory) {
+    badge.textContent = 'Obligatorio';
+    badge.className = 'text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full font-semibold';
+    opts.innerHTML = `
+      <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
+        <input type="radio" name="bag" value="add" class="bag-radio">
+        <span class="font-semibold text-gray-800">Agregar bolsa (+ ${money(BAG_PRICE)})</span>
+      </label>
     `;
+    note.innerHTML = isFamiliares
+      ? `* Esta categoría requiere agregar bolsa. Costo por bolsa: <strong>${money(BAG_PRICE)}</strong>. Se agregará <strong>1 bolsa por cada unidad</strong>.`
+      : `* Esta categoría requiere agregar bolsa. Costo por bolsa: <strong>${money(BAG_PRICE)}</strong>. Se agregará <strong>1 bolsa por pedido</strong>.`;
+  } else if (isAgregados) {
+    badge.textContent = 'Opcional';
+    badge.className = 'text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded-full font-semibold';
+    opts.innerHTML = `
+      <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
+        <input type="radio" name="bag" value="add" class="bag-radio">
+        <span class="font-semibold text-gray-800">Agregar bolsa (+ ${money(BAG_PRICE)})</span>
+      </label>
+      <label class="flex items-center gap-3 p-3 border-2 border-gray-300 rounded-lg hover:border-red-500 cursor-pointer bag-option">
+        <input type="radio" name="bag" value="none" class="bag-radio">
+        <span class="font-semibold text-gray-800">Sin bolsa</span>
+      </label>
+    `;
+    note.textContent = `* La bolsa es opcional en esta categoría.`;
+  }
+}
+function computeLiveTotal() {
+  if (!currentProduct) return { total: 0, bagQty: 0 };
+  const base = currentProduct.price * productQuantity;
+  let bagQty = 0;
+    // ✅ En bebidas y descartables no se suma bolsa
+  if (currentCategory === 'bebidas' || currentCategory === 'descartables') {
+    const total = base;
+    const lt = document.getElementById('live-total');
+    if (lt) lt.textContent = money(total);
+    return { total, bagQty: 0 };
+  }
 
-    const right = document.createElement('div');
-    right.className = 'flex items-center gap-2 justify-between md:justify-end';
+  if (currentCategory === 'ofertas-familiares') {
+    bagQty = (bagChoice === 'add') ? productQuantity : 0;
+  } else if (['ofertas-dos', 'ofertas-personales', 'platos-extras'].includes(currentCategory)) {
+    bagQty = (bagChoice === 'add') ? 1 : 0;
+  } else if (currentCategory === 'agregados') {
+    bagQty = (bagChoice === 'add') ? 1 : 0;
+  }
+  const total = base + (bagQty * BAG_PRICE);
+  const lt = document.getElementById('live-total');
+  if (lt) lt.textContent = money(total);
+  return { total, bagQty };
+}
 
-    const price = document.createElement('div');
-    price.className = 'font-extrabold text-red-700';
-    price.textContent = money(it.total);
+// --------- ADMIN helpers ----------
+function getTodayString() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
 
-    const del = document.createElement('button');
-    del.className = 'btn-secondary';
-    del.type = 'button';
-    del.textContent = 'Eliminar';
-    del.dataset.action = 'remove';
-    del.dataset.index = String(idx);
-
-    right.appendChild(price);
-    right.appendChild(del);
-
-    row.appendChild(left);
-    row.appendChild(right);
-
-    cartItemsEl.appendChild(row);
+function filteredOrders() {
+  return orders.filter(o => {
+    const d = o.createdAt ? o.createdAt.substring(0, 10) : '';
+    if (adminFilters.from && d < adminFilters.from) return false;
+    if (adminFilters.to && d > adminFilters.to) return false;
+    if (adminFilters.status !== 'todos' && o.status !== adminFilters.status) return false;
+    if (adminFilters.search) {
+      const term = adminFilters.search.toLowerCase();
+      const inName = (o.customer.name || '').toLowerCase().includes(term);
+      const inPhone = (o.customer.phone || '').toLowerCase().includes(term);
+      if (!inName && !inPhone) return false;
+    }
+    return true;
   });
-
-  cartTotalEl.textContent = money(cartSum());
-  updateCartUI();
 }
 
-/* =========================
-   Chatbot
-========================= */
-const chatbotToggle = document.getElementById('chatbot-toggle');
-const chatbotPanel = document.getElementById('chatbot-panel');
-const chatbotClose = document.getElementById('chatbot-close');
-const chatbotMessages = document.getElementById('chatbot-messages');
+function computeAdminStats() {
+  const today = getTodayString();
+  const totalPedidos = orders.length;
+  const pedidosHoy = orders.filter(o => o.createdAt && o.createdAt.startsWith(today));
+  const ventasHoy = pedidosHoy.reduce((s, o) => s + o.total, 0);
+  const pendientes = orders.filter(o => o.status === 'Pendiente').length;
+  const entregados = orders.filter(o => o.status === 'Entregado');
+  const ventasTotales = orders.reduce((s, o) => s + o.total, 0);
+  const ticketPromedio = totalPedidos ? (ventasTotales / totalPedidos) : 0;
+  const entregadosConTiempo = entregados.filter(o => o.deliveredAt);
+  const promedioMinutos = entregadosConTiempo.length
+    ? entregadosConTiempo.reduce((s, o) => {
+        const diff = (new Date(o.deliveredAt) - new Date(o.createdAt)) / 60000;
+        return s + Math.max(diff, 0);
+      }, 0) / entregadosConTiempo.length
+    : 0;
+  const porcentajeEntregados = totalPedidos ? (entregados.length / totalPedidos * 100) : 0;
 
-function addChatMsg(text, who='bot'){
-  const d = document.createElement('div');
-  d.className = 'cb-msg ' + (who === 'user' ? 'cb-user' : 'cb-bot');
-  d.textContent = text;
-  chatbotMessages.appendChild(d);
-  chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+  const elTotal = document.getElementById('admin-stat-total');
+  const elHoy = document.getElementById('admin-stat-hoy');
+  const elVentas = document.getElementById('admin-stat-ventas-hoy');
+  const elPend = document.getElementById('admin-stat-pendientes');
+  const elPctEnt = document.getElementById('admin-stat-entregados-pct');
+  const elTicket = document.getElementById('admin-stat-ticket-promedio');
+  const elTiempo = document.getElementById('admin-stat-tiempo-prom');
+
+  if (elTotal) elTotal.textContent = totalPedidos;
+  if (elHoy) elHoy.textContent = pedidosHoy.length;
+  if (elVentas) elVentas.textContent = money(ventasHoy);
+  if (elPend) elPend.textContent = pendientes;
+  if (elPctEnt) elPctEnt.textContent = `${porcentajeEntregados.toFixed(0)}%`;
+  if (elTicket) elTicket.textContent = money(ticketPromedio);
+  if (elTiempo) elTiempo.textContent = `${promedioMinutos.toFixed(1)} min`;
 }
 
-function chatbotWelcome(){
-  chatbotMessages.innerHTML = '';
-  addChatMsg('¡Hola! Soy tu asistente. Elige una opción para ayudarte 😊', 'bot');
+function statusBadgeClass(status) {
+  if (status === 'Pendiente') return 'admin-badge admin-badge-pendiente';
+  if (status === 'En preparación') return 'admin-badge admin-badge-preparacion';
+  if (status === 'Entregado') return 'admin-badge admin-badge-entregado';
+  if (status === 'Cancelado') return 'admin-badge admin-badge-cancelado';
+  return 'admin-badge';
 }
 
-function setActiveCatBtn(cat){
-  document.querySelectorAll('.cat-card__btn.category-btn').forEach(b=>{
-    b.classList.toggle('is-active', b.dataset.cat === cat);
-  });
+function nextStatus(current) {
+  const order = ['Pendiente', 'En preparación', 'Entregado', 'Cancelado'];
+  const idx = order.indexOf(current);
+  return order[(idx + 1) % order.length];
 }
 
-function updateCategoryTitle(cat){
-  if(!categoryTitleEl) return;
-
-  if(cat === 'todo-el-menu'){
-    categoryTitleEl.classList.add('is-hidden');
-    categoryTitleEl.textContent = '';
+function renderAdminPanel() {
+  computeAdminStats();
+  const tbody = document.getElementById('admin-orders-body');
+  const countEl = document.getElementById('admin-filter-count');
+  if (!tbody) return;
+  const list = filteredOrders();
+  if (countEl) countEl.textContent = list.length;
+  if (list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-3 py-4 text-center text-gray-500 text-sm">No hay pedidos con los filtros actuales.</td></tr>`;
     return;
   }
-
-  categoryTitleEl.classList.remove('is-hidden');
-  categoryTitleEl.textContent = CATEGORY_META[cat] || cat;
+  tbody.innerHTML = list.map(o => {
+    const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
+    return `
+      <tr>
+        <td class="px-3 py-2 text-xs font-mono text-gray-700">${o.id}</td>
+        <td class="px-3 py-2 text-xs text-gray-800">${o.customer.name || '-'}</td>
+        <td class="px-3 py-2 text-xs text-gray-700">${o.customer.phone || '-'}</td>
+        <td class="px-3 py-2 text-xs font-semibold text-gray-900">${money(o.total)}</td>
+        <td class="px-3 py-2 text-xs">
+          <span class="${statusBadgeClass(o.status)}">${o.status}</span>
+        </td>
+        <td class="px-3 py-2 text-xs text-gray-600">${dateStr}</td>
+        <td class="px-3 py-2 text-xs">
+          <div class="flex flex-wrap gap-1">
+            <button class="px-2 py-1 bg-gray-100 text-gray-800 rounded hover:bg-gray-200 admin-view"
+                    data-id="${o.id}">Ver</button>
+            <button class="px-2 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200 admin-status"
+                    data-id="${o.id}">Estado</button>
+            <button class="px-2 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200 admin-wa"
+                    data-id="${o.id}">WhatsApp</button>
+            <button class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200 admin-print"
+                    data-id="${o.id}">🖨️ Imprimir</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
-function toggleCatSlider(cat){
-  if(!catSliderEl) return;
-
-  // ✅ El slider siempre se mantiene visible (estático)
-  catSliderEl.classList.remove('is-hidden');
-}
-
-function toggleHeroCarousel(show){
-  const heroSection = document.querySelector('.hero');
-  if(!heroSection) return;
-  
-  if(show){
-    heroSection.classList.remove('is-hidden');
-    // Reiniciar el carrusel cuando se muestra
-    startCarousel();
-  }else{
-    heroSection.classList.add('is-hidden');
-    // Detener el carrusel cuando se oculta
-    if(carouselTimer) clearInterval(carouselTimer);
+function openAdminPanelModal() {
+  const modal = document.getElementById('admin-panel-modal');
+  if (modal) {
+    const today = getTodayString();
+    if (!adminFilters.from && !adminFilters.to) {
+      adminFilters.from = today;
+      adminFilters.to = today;
+    }
+    const fromInput = document.getElementById('admin-filter-from');
+    const toInput = document.getElementById('admin-filter-to');
+    if (fromInput) fromInput.value = adminFilters.from;
+    if (toInput) toInput.value = adminFilters.to;
+    renderAdminPanel();
+    modal.classList.add('active');
   }
 }
+function closeAdminPanelModal() {
+  const modal = document.getElementById('admin-panel-modal');
+  if (modal) modal.classList.remove('active');
+}
 
-function setCategory(cat){
-  currentCategory = cat;
-  setActiveCatBtn(cat);
-  updateCategoryTitle(cat);
-  toggleCatSlider(cat);
+// ======== IMPRESIÓN TÉRMICA: MISMO TEXTO QUE WHATSAPP ========
+function printOrderTicket(order) {
+  const contenido = buildWhatsappTextFromOrder(order);
 
-  // ✅ Mostrar el carrusel cuando se selecciona una categoría específica
-  if(cat === 'todo-el-menu'){
-    toggleHeroCarousel(true);
+  const win = window.open('', '_blank', 'width=400,height=600');
+  if (!win) return;
+  win.document.write(`
+    <html>
+      <head>
+        <title>Ticket ${order.id}</title>
+        <style>
+          body{
+            font-family:monospace;
+            font-size:12px;
+            padding:10px;
+            white-space:pre;
+          }
+          @page{
+            margin:0;
+          }
+          @media print{
+            body{margin:0;padding:4px;}
+          }
+        </style>
+      </head>
+      <body>${contenido}</body>
+    </html>
+  `);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
+// --------- Eventos globales ----------
+document.addEventListener('click', (e) => {
+  // cambiar categoría
+  if (e.target.classList.contains('category-btn') || (e.target.closest && e.target.closest('.category-btn'))) {
+  const btn = e.target.closest('.category-btn');
+  const cat = btn.dataset.category;
+
+  if (cat === 'todo-el-menu') {
     renderProductsAll();
-  }else{
-    toggleHeroCarousel(true);
+  } else {
     renderProductsSingle(cat);
   }
 }
 
-function jumpToCategory(cat){
-  if(cat === 'todo-el-menu'){
-    setCategory('todo-el-menu');
-    scrollToMenu();
-    return;
+
+  // abrir modal opciones
+  if (e.target.classList.contains('add-to-cart')) {
+  const parsed = JSON.parse(e.target.dataset.product);
+
+  // ✅ clave: si viene desde "Todo el menú", toma su categoría real
+  currentCategory = parsed.__category || currentCategory;
+
+  currentProduct = parsed;
+
+  selectedDrink = null;
+  productQuantity = 1;
+  bagChoice = null;
+
+  const qEl = document.getElementById('product-quantity');
+  if (qEl) qEl.textContent = '1';
+  document.querySelectorAll('.drink-radio').forEach(r => r.checked = false);
+
+  setDrinkVisible(currentCategory === 'ofertas-familiares');
+  paintBagOptions();
+  computeLiveTotal();
+
+  const om = document.getElementById('options-modal');
+  if (om) om.classList.add('active');
+}
+
+
+  // seleccionar bebida
+  if (e.target.classList.contains('drink-radio')) {
+    selectedDrink = e.target.value;
   }
-  // ✅ Cuando se hace clic en una categoría desde otro lugar, mostrar carrusel
-  setCategory(cat);
-  scrollToMenu();
-}
 
-// ✅ Función para resetear al inicio (mostrar carrusel y todo el menú)
-function resetToHome(){
-  setCategory('todo-el-menu');
-  toggleHeroCarousel(true);
-  scrollToMenu();
-  // Scroll al top suave
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // seleccionar bolsa
+  if (e.target.classList.contains('bag-radio')) {
+    bagChoice = e.target.value;
+    computeLiveTotal();
+  }
 
-function handleChatbotAction(action){
-  addChatMsg(action, 'user');
+  // qty +
+  if (e.target.id === 'increase-quantity') {
+    productQuantity++;
+    const qEl = document.getElementById('product-quantity');
+    if (qEl) qEl.textContent = productQuantity;
+    computeLiveTotal();
+  }
+  // qty -
+  if (e.target.id === 'decrease-quantity') {
+    if (productQuantity > 1) {
+      productQuantity--;
+      const qEl = document.getElementById('product-quantity');
+      if (qEl) qEl.textContent = productQuantity;
+      computeLiveTotal();
+    }
+  }
 
-  if(action === 'familiares'){
-    addChatMsg('Los combos familiares más pedidos están en “Familiares”. Te llevo ahí ✅', 'bot');
-    jumpToCategory('ofertas-familiares');
-    scrollToMenu();
-  } else if(action === 'masvendidos'){
-    addChatMsg('🔥 Platos más vendidos: Ofertón más Chaufa, Ofertón más Fideo, Chaufa Brasa, Lomo Saltado. ¿Te llevo al menú? ✅', 'bot');
-    scrollToMenu();
-  } else if(action === 'horarios'){
-    addChatMsg('📍 Calle Vivar 1086, Iquique.\n🕒 Horario: 12:00 – 23:30', 'bot');
-  } else if(action === 'delivery'){
-    addChatMsg('🚚 Delivery aprox. $2.500–$4.000 según zona.\nPara pedir: agrega productos → abre carrito → WhatsApp.', 'bot');
-    openModal('#modal-delivery');
-  } else if(action === 'pedido'){
-    addChatMsg('Para hacer pedido: agrega productos → abre carrito → “Realizar pedido por WhatsApp” ✅', 'bot');
-  } else if(action === 'pagos'){
-    addChatMsg('Métodos de pago: En el local efectivo y tarjeta. En delivery solo efectivo.', 'bot');
-  } else if(action === 'redes'){
-    addChatMsg('Síguenos en Facebook / Instagram / TikTok (botones en el footer).', 'bot');
+  // cancelar opciones
+  if (e.target.id === 'cancel-options') {
+    const om = document.getElementById('options-modal');
+    if (om) om.classList.remove('active');
+    currentProduct = null;
+  }
+
+  // confirmar agregar
+  if (e.target.id === 'confirm-add') {
+    if (currentCategory === 'ofertas-familiares' && !selectedDrink) {
+      showToast('⚠️ Debes seleccionar un sabor de bebida.');
+      return;
+    }
+    
+    // ✅ En bebidas y descartables NO se pide bolsa
+ const noBagCategories = ['bebidas', 'descartables'];
+
+  if (!noBagCategories.includes(currentCategory)) {
+    const mustBag = currentCategory !== 'agregados';
+    if (mustBag && bagChoice !== 'add') {
+      showToast('⚠️ Debes agregar la bolsa (obligatorio).');
+      return;
+    }
+    if (currentCategory === 'agregados' && !bagChoice) { bagChoice = 'none'; }
   } else {
-    addChatMsg('Listo 😊', 'bot');
+     bagChoice = 'none';
+  }
+
+    
+    
+
+    const { total, bagQty } = computeLiveTotal();
+
+    cart.push({
+      name: currentProduct.name,
+      price: currentProduct.price,
+      qty: productQuantity,
+      drink: currentCategory === 'ofertas-familiares' ? selectedDrink : null,
+      bagQty,
+      total
+    });
+
+    updateCartUI();
+    showToast('¡Producto agregado al carrito!');
+    const om = document.getElementById('options-modal');
+    if (om) om.classList.remove('active');
+    selectedDrink = null;
+    productQuantity = 1;
+    bagChoice = null;
+    currentProduct = null;
+  }
+
+        // ===== HEADER: ¿Cómo desea hacer su pedido? =====
+
+      // Abrir modal DELIVERY
+      if (e.target.id === 'btn-delivery') {
+        const m = document.getElementById('modal-delivery');
+        if (m) m.classList.add('active');
+      }
+
+      // Abrir modal RESERVAS
+      if (e.target.id === 'btn-reservas') {
+        const m = document.getElementById('modal-reservas');
+        if (m) m.classList.add('active');
+      }
+
+      // Abrir modal RETIROS
+      if (e.target.id === 'btn-retiros') {
+        const m = document.getElementById('modal-retiros');
+        if (m) m.classList.add('active');
+      }
+
+      // Cerrar modales con la X
+      if (e.target.id === 'modal-delivery-close') {
+        const m = document.getElementById('modal-delivery');
+        if (m) m.classList.remove('active');
+      }
+      if (e.target.id === 'modal-reservas-close') {
+        const m = document.getElementById('modal-reservas');
+        if (m) m.classList.remove('active');
+      }
+      if (e.target.id === 'modal-retiros-close') {
+        const m = document.getElementById('modal-retiros');
+        if (m) m.classList.remove('active');
+      }
+
+      // Botón "Realizar mi reserva" -> otra página web
+      if (e.target.id === 'modal-reserva-go') {
+        // ⛔ IMPORTANTE: cambia esta URL por la página real de reservas
+        const urlReservas = 'https://pollon543.github.io/reservas-online-pollon-de-iquique/';
+        window.open(urlReservas, '_blank', 'noopener,noreferrer');
+      }
+
+      // Botón "Solicitar con retiro" -> WhatsApp con mensaje predefinido
+      if (e.target.id === 'modal-retiro-go') {
+        const msg = 'Solicito realizar mi pedido con retiro y confirmo que el monto mínimo de mi compra será igual o mayor a $100.000.';
+        const url = 'https://wa.me/51900979202?text=' + encodeURIComponent(msg);
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+
+
+
+
+  // abrir carrito
+  if (e.target.id === 'floating-cart' || (e.target.closest && e.target.closest('#floating-cart'))) {
+    renderCart();
+    const cm = document.getElementById('cart-modal');
+    if (cm) cm.classList.add('active');
+  }
+  if (e.target.id === 'close-cart') {
+    const cm = document.getElementById('cart-modal');
+    if (cm) cm.classList.remove('active');
+  }
+
+  // eliminar item
+  if (e.target.classList.contains('remove-item')) {
+    const idx = parseInt(e.target.dataset.index);
+    cart.splice(idx, 1);
+    updateCartUI();
+    renderCart();
+    showToast('Producto eliminado del carrito');
+  }
+
+  // checkout
+  if (e.target.id === 'checkout-btn') {
+    if (cart.length === 0) {
+      showToast('Tu carrito está vacío');
+      return;
+    }
+    const cm = document.getElementById('cart-modal');
+    const chm = document.getElementById('checkout-modal');
+    if (cm) cm.classList.remove('active');
+    if (chm) chm.classList.add('active');
+  }
+  if (e.target.id === 'cancel-checkout') {
+    const chm = document.getElementById('checkout-modal');
+    if (chm) chm.classList.remove('active');
+  }
+
+  // ADMIN open btn
+  if (e.target.id === 'admin-open-btn' || (e.target.closest && e.target.closest('#admin-open-btn'))) {
+    if (!isAdminAuthenticated) {
+      const lm = document.getElementById('admin-login-modal');
+      if (lm) lm.classList.add('active');
+      const err = document.getElementById('admin-login-error');
+      if (err) err.classList.add('hidden');
+    } else {
+      openAdminPanelModal();
+    }
+  }
+
+  // ADMIN login
+  if (e.target.id === 'admin-login-cancel') {
+    const lm = document.getElementById('admin-login-modal');
+    if (lm) lm.classList.remove('active');
+  }
+  if (e.target.id === 'admin-login-submit') {
+    const passInput = document.getElementById('admin-password');
+    const err = document.getElementById('admin-login-error');
+    const val = (passInput.value || '').trim();
+    if (val === 'HUILLCA123') {
+      isAdminAuthenticated = true;
+      if (err) err.classList.add('hidden');
+      const lm = document.getElementById('admin-login-modal');
+      if (lm) lm.classList.remove('active');
+      showToast('✅ Acceso concedido al panel de administración.');
+      openAdminPanelModal();
+    } else {
+      if (err) err.classList.remove('hidden');
+    }
+  }
+
+  // ADMIN close panel
+  if (e.target.id === 'admin-close') {
+    closeAdminPanelModal();
+  }
+
+  // ADMIN limpiar filtros
+  if (e.target.id === 'admin-filter-clear') {
+    const ff = document.getElementById('admin-filter-from');
+    const ft = document.getElementById('admin-filter-to');
+    const fs = document.getElementById('admin-filter-status');
+    const fsearch = document.getElementById('admin-filter-search');
+    if (ff) ff.value = '';
+    if (ft) ft.value = '';
+    if (fs) fs.value = 'todos';
+    if (fsearch) fsearch.value = '';
+    adminFilters = { from: '', to: '', status: 'todos', search: '' };
+    renderAdminPanel();
+  }
+
+  // ADMIN copiar pedidos
+  if (e.target.id === 'admin-copy') {
+    const list = filteredOrders();
+    if (list.length === 0) {
+      showToast('No hay pedidos en el rango seleccionado.');
+      return;
+    }
+    let lines = 'ID\tFecha\tNombre\tTeléfono\tDirección\tTotal\tEstado\n';
+    list.forEach(o => {
+      const fecha = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
+      const dir = (o.customer.address || '').replace(/\s+/g, ' ');
+      lines += `${o.id}\t${fecha}\t${o.customer.name || ''}\t${o.customer.phone || ''}\t${dir}\t${o.total}\t${o.status}\n`;
+    });
+    const copiar = async () => {
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(lines);
+        } else {
+          throw new Error('no-clipboard');
+        }
+        showToast('Pedidos copiados. Puedes pegarlos en Excel.');
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = lines;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast('Pedidos copiados. Puedes pegarlos en Excel.');
+      }
+    };
+    copiar();
+  }
+
+  // ADMIN refresh
+  if (e.target.id === 'admin-refresh') {
+    loadOrders();
+    renderAdminPanel();
+    showToast('Panel actualizado (datos en tiempo real).');
+  }
+
+  // ADMIN tabla acciones
+  if (e.target.classList.contains('admin-view')) {
+    const id = e.target.dataset.id;
+    const order = orders.find(o => o.id === id);
+    if (order) {
+      const txt = buildWhatsappTextFromOrder(order);
+      alert(txt);
+    }
+  }
+
+  if (e.target.classList.contains('admin-status')) {
+    const id = e.target.dataset.id;
+    const order = orders.find(o => o.id === id);
+    if (order) {
+      const nuevo = nextStatus(order.status);
+      order.status = nuevo;
+      if (nuevo === 'Entregado' && !order.deliveredAt) {
+        order.deliveredAt = new Date().toISOString();
+      }
+      saveOrders();
+      renderAdminPanel();
+      showToast(`Estado actualizado a: ${nuevo}`);
+    }
+  }
+
+  if (e.target.classList.contains('admin-wa')) {
+    const id = e.target.dataset.id;
+    const order = orders.find(o => o.id === id);
+    if (order) {
+      const phoneRaw = (order.customer.phone || '').replace(/\D/g, '');
+      const to = phoneRaw || WHATSAPP_NUMBER;
+      let msg = `Hola ${order.customer.name || ''}, te escribimos de Pollería El Pollón respecto a tu pedido ${order.id} (${order.status}).`;
+      const url = `https://wa.me/${to}?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
+  if (e.target.classList.contains('admin-print')) {
+    const id = e.target.dataset.id;
+    const order = orders.find(o => o.id === id);
+    if (order) {
+      printOrderTicket(order);
+    }
+  }
+
+  // CHATBOT toggle
+  if (e.target.id === 'chatbot-toggle' || (e.target.closest && e.target.closest('#chatbot-toggle'))) {
+    const panel = document.getElementById('chatbot-panel');
+    if (panel) panel.classList.toggle('hidden');
+  }
+  if (e.target.id === 'chatbot-close') {
+    const panel = document.getElementById('chatbot-panel');
+    if (panel) panel.classList.add('hidden');
+  }
+
+  // CHATBOT chips
+  if (e.target.classList.contains('chatbot-chip')) {
+    const action = e.target.dataset.action;
+    handleChatbotAction(action);
+  }
+});
+
+// ADMIN filtros (input)
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'admin-filter-from') {
+    adminFilters.from = e.target.value || '';
+    renderAdminPanel();
+  }
+  if (e.target.id === 'admin-filter-to') {
+    adminFilters.to = e.target.value || '';
+    renderAdminPanel();
+  }
+  if (e.target.id === 'admin-filter-status') {
+    adminFilters.status = e.target.value || 'todos';
+    renderAdminPanel();
+  }
+  if (e.target.id === 'admin-filter-search') {
+    adminFilters.search = e.target.value || '';
+    renderAdminPanel();
+  }
+});
+
+// enviar pedido (checkout)
+      // enviar pedido (checkout)
+const checkoutForm = document.getElementById('checkout-form');
+if (checkoutForm) {
+  checkoutForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const name = document.getElementById('customer-name').value.trim();
+    const address = document.getElementById('customer-address').value.trim();
+    const phone = document.getElementById('customer-phone').value.trim();
+
+    let total = 0;
+    const itemsForOrder = [];
+
+    cart.forEach((it) => {
+      total += it.total;
+      itemsForOrder.push({
+        name: it.name,
+        qty: it.qty,
+        drink: it.drink,
+        bagQty: it.bagQty,
+        total: it.total
+      });
+    });
+
+    // 🔢 NUEVO: número correlativo de ticket (001, 002, 003, ...)
+    const ticketNumber = String(orders.length + 1).padStart(3, "0");
+
+    const order = {
+      id: 'P' + Date.now(),
+      createdAt: new Date().toISOString(),
+      ticketNumber, // 👈 guardamos el número de ticket
+      customer: { name, address, phone },
+      items: itemsForOrder,
+      total,
+      status: 'Pendiente',
+      deliveredAt: null
+    };
+
+
+
+//-------------------
+
+    orders.push(order);
+    saveOrders();
+//----------------------
+    const rawMsg = buildWhatsappTextFromOrder(order);
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+
+    const adminPanelVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
+    if (adminPanelVisible) {
+      renderAdminPanel();
+    }
+
+    cart = [];
+    updateCartUI();
+    const chm = document.getElementById('checkout-modal');
+    if (chm) chm.classList.remove('active');
+    e.target.reset();
+    showToast('✅ ¡Pedido enviado a WhatsApp y registrado en Firestore!');
+  });
+}
+
+// Sidebar
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const closeSidebar = document.getElementById('close-sidebar');
+const sidebarMenu = document.getElementById('sidebar-menu');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+// ✅ Botón MENÚ solo PC/Tablet abre el mismo sidebar
+const menuOpenDesktop = document.getElementById('menu-open-desktop');
+  if (menuOpenDesktop) menuOpenDesktop.addEventListener('click', openSidebar);
+
+
+function openSidebar() {
+  if (sidebarMenu) sidebarMenu.style.transform = 'translateX(0)';
+  if (sidebarOverlay) sidebarOverlay.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebarMenu() {
+  if (sidebarMenu) sidebarMenu.style.transform = 'translateX(-100%)';
+  if (sidebarOverlay) sidebarOverlay.classList.add('hidden');
+  document.body.style.overflow = 'auto';
+}
+if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+if (closeSidebar) closeSidebar.addEventListener('click', closeSidebarMenu);
+if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebarMenu);
+
+document.querySelectorAll('.sidebar-category').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const cat = btn.dataset.category;
+    if (cat === 'todo-el-menu') renderProductsAll();
+    else renderProductsSingle(cat);
+
+    closeSidebarMenu();
+    document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+
+
+// View cart buttons
+
+const viewCartMobile = document.getElementById('view-cart-mobile');
+const viewCartDesktop = document.getElementById('view-cart-desktop');
+if (viewCartMobile) {
+  viewCartMobile.addEventListener('click', () => {
+    renderCart();
+    const cm = document.getElementById('cart-modal');
+    if (cm) cm.classList.add('active');
+    closeSidebarMenu();
+  });
+}
+if (viewCartDesktop) {
+  viewCartDesktop.addEventListener('click', () => {
+    renderCart();
+    const cm = document.getElementById('cart-modal');
+    if (cm) cm.classList.add('active');
+  });
+}
+
+// Carrusel auto
+let currentSlide = 0;
+const totalSlides = 10;
+const carouselContainer = document.getElementById('carousel-container');
+function updateCarousel() {
+  if (carouselContainer) carouselContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+}
+setInterval(() => {
+  currentSlide = (currentSlide + 1) % totalSlides;
+  updateCarousel();
+}, 2000);
+updateCarousel();
+
+// --------- CHATBOT LÓGICA ----------
+const chatbotMessagesEl = document.getElementById('chatbot-messages');
+
+function appendChatbotMessage(text, from = 'bot') {
+  if (!chatbotMessagesEl) return;
+  const div = document.createElement('div');
+  div.className = 'chatbot-msg ' + (from === 'bot' ? 'chatbot-msg-bot' : 'chatbot-msg-user');
+  div.innerHTML = text;
+  chatbotMessagesEl.appendChild(div);
+  chatbotMessagesEl.scrollTop = chatbotMessagesEl.scrollHeight;
+}
+
+function chatbotWelcome() {
+  appendChatbotMessage(`
+    👋 ¡Bienvenido a <strong>Pollería El Pollón</strong> en Iquique!<br><br>
+    Soy tu asistente virtual tipo <strong>WhatsApp</strong> 💬.<br><br>
+    Te puedo ayudar con:<br>
+    • Ver combos familiares, para dos y personales 🍗<br>
+    • Ubicación, horarios y delivery 🚚<br>
+    • Método de pago y redes sociales 💳📲<br>
+    • Dejar tu pedido listo para WhatsApp ✅<br><br>
+    Elige una opción de abajo y te llevo directo donde necesitas.
+  `, 'bot');
+}
+
+function handleChatbotAction(action) {
+  if (action === 'familiares') {
+    appendChatbotMessage('Quiero ver los combos familiares más pedidos.', 'user');
+    appendChatbotMessage(`
+      Excelente elección 🙌<br><br>
+      Nuestros <strong>Combos Familiares</strong> son los más vendidos del local:<br><br>
+      ⭐ <strong>Ofertón más chaufa</strong>: pollo entero + papas + chaufa + ensalada + bebida 1.5L.<br>
+      ⭐ <strong>Ofertón pura papa</strong>: ideal para los que aman las papas fritas 🤤<br>
+      ⭐ <strong>Mega Familiar</strong>: pensado para grupos grandes.<br><br>
+      👉 Te llevo directo a la sección de <strong>Ofertas Familiares</strong> para que agregues tu combo al carrito.
+    `, 'bot');
+    const sectionBtn = document.querySelector('.category-btn[data-category="ofertas-familiares"]');
+    if (sectionBtn) sectionBtn.click();
+    document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  if (action === 'horarios') {
+    appendChatbotMessage('Quiero saber los horarios y la dirección.', 'user');
+    appendChatbotMessage(`
+      Perfecto 🕐<br><br>
+      📍 <strong>Dirección:</strong><br>
+      Calle Vivar 1086, Iquique, Chile.<br><br>
+      🕐 <strong>Horario de atención:</strong><br>
+      Lunes a Domingo de <strong>11:30 a 23:00 hrs</strong>.<br><br>
+      Puedes venir al local, retirar para llevar o pedir delivery.
+    `, 'bot');
+  }
+
+  if (action === 'delivery') {
+    appendChatbotMessage('Quiero información del delivery.', 'user');
+    appendChatbotMessage(`
+      Te explico el delivery 🚚<br><br>
+      • Repartimos dentro de Iquique 🏙️<br>
+      • Costo de envío según la zona:<br>
+      &nbsp;&nbsp;👉 Entre <strong>$2.500 y $4.000</strong> aprox.<br><br>
+      El valor exacto se confirma por WhatsApp según tu dirección.<br><br>
+      Sugerencia: arma tu pedido en la carta y al final lo enviamos directo a WhatsApp ✅
+    `, 'bot');
+  }
+
+  if (action === 'pedido') {
+    appendChatbotMessage('Quiero dejar mi pedido listo por WhatsApp.', 'user');
+    appendChatbotMessage(`
+      Vamos a dejar tu pedido listo 😋<br><br>
+      1️⃣ Agrega tus combos y platos al carrito.<br>
+      2️⃣ Presiona <strong>"Realizar Pedido por WhatsApp"</strong>.<br>
+      3️⃣ Completa tus datos y confirma.<br><br>
+      También puedes escribirnos directo aquí 👇<br><br>
+      <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero hacer un pedido en Pollería El Pollón. ¿Me pueden ayudar con las opciones de combos familiares?')}"
+         target="_blank"
+         class="inline-block bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">
+        💬 Abrir WhatsApp
+      </a>
+    `, 'bot');
+  }
+
+  if (action === 'pagos') {
+    appendChatbotMessage('Quiero saber los métodos de pago.', 'user');
+    appendChatbotMessage(`
+      💳 <strong>Método de pago actual</strong><br><br>
+      • Aceptamos <strong>solo efectivo</strong> en este momento.<br>
+      • El pago se realiza <strong>contra entrega</strong> en el local o al recibir tu pedido a domicilio.<br><br>
+      Cualquier cambio futuro en métodos de pago lo informaremos por nuestras redes sociales.
+    `, 'bot');
+  }
+
+  if (action === 'redes') {
+    appendChatbotMessage('Quiero ver las redes sociales.', 'user');
+    appendChatbotMessage(`
+      📲 <strong>Nuestras redes sociales</strong><br><br>
+      • WhatsApp: <a href="https://wa.me/56968788613" target="_blank" class="text-green-600 font-semibold">+56 9 6878 8613</a><br>
+      • Facebook: <span class="font-semibold">Pollería El Pollón (Iquique)</span><br>
+      • Instagram y TikTok: contenido de promociones, combos y novedades 🔥<br><br>
+      Al final de la página tienes los botones directos a todas las redes.
+    `, 'bot');   
   }
 }
 
-/* =========================
-   Dropdowns
-========================= */
+
+// ===== Flecha para deslizar categorías (móvil) =====
+const catbarScroll = document.getElementById('catbar-scroll');
+const catbarNext = document.getElementById('catbar-next');
+
+if (catbarNext && catbarScroll) {
+  catbarNext.addEventListener('click', () => {
+    catbarScroll.scrollBy({ left: 260, behavior: 'smooth' });
+  });
+}
+
+function buildSidebarGallery() {
+  const gallery = document.getElementById('sidebar-gallery');
+  if (!gallery) return;
+
+  const items = CATEGORY_ORDER.map(catKey => {
+    const list = products[catKey] || [];
+    const firstWithImage = list.find(p => p.image && p.image.trim().length > 0);
+    return { catKey, img: firstWithImage?.image || '' };
+  });
+
+  gallery.innerHTML = items.map(it => {
+    if (!it.img) {
+      return `
+        <button class="sidebar-gallery-item h-20 rounded-lg border border-gray-200 flex items-center justify-center text-2xl"
+                data-cat="${it.catKey}">
+          🍗
+        </button>
+      `;
+    }
+    return `
+      <button class="sidebar-gallery-item rounded-lg overflow-hidden border border-gray-200 hover:shadow transition"
+              data-cat="${it.catKey}">
+        <img src="${it.img}" class="w-full h-20 object-cover" alt="">
+      </button>
+    `;
+  }).join('');
+
+  // Click en miniaturas => ir a categoría
+  gallery.querySelectorAll('.sidebar-gallery-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cat = btn.dataset.cat;
+      renderProductsSingle(cat);      // muestra la categoría
+      closeSidebarMenu();             // cierra sidebar
+      document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+}
+
+
+// ===== DROPDOWN MENÚ (tipo "Más") =====
 const menuDdBtn = document.getElementById('menu-dd-btn');
 const menuDdPanel = document.getElementById('menu-dd-panel');
 
-function togglePanel(panel){
-  if(!panel) return;
-  const isHidden = panel.classList.contains('hidden');
-  panel.classList.toggle('hidden', !isHidden);
-}
-function closePanels(){
-  if(menuDdPanel) menuDdPanel.classList.add('hidden');
+function openMenuDd(){
+  if (!menuDdPanel || !menuDdBtn) return;
+  menuDdPanel.classList.remove('hidden');
+  menuDdBtn.setAttribute('aria-expanded', 'true');
 }
 
-/* =========================
-   Carousel fade PRO (10 fotos, autoplay 1s infinito, 10 puntos, Ver Menú)
-========================= */
-let carouselIndex = 0;
-let carouselTimer = null;
-let carouselImgs = [];
-let carouselDots = [];
+function closeMenuDd(){
+  if (!menuDdPanel || !menuDdBtn) return;
+  menuDdPanel.classList.add('hidden');
+  menuDdBtn.setAttribute('aria-expanded', 'false');
+}
 
-function updateCarouselDots(){
-  carouselDots.forEach((dot, i) => {
-    dot.classList.toggle('is-active', i === carouselIndex);
-    dot.setAttribute('aria-selected', i === carouselIndex ? 'true' : 'false');
+if (menuDdBtn && menuDdPanel){
+  menuDdBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !menuDdPanel.classList.contains('hidden');
+    if (isOpen) closeMenuDd();
+    else openMenuDd();
+  });
+
+  // Click en una categoría => render + cerrar + scroll
+  menuDdPanel.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-dd-item');
+    if (!item) return;
+
+    const cat = item.dataset.category;
+    if (!cat) return;
+
+    renderProductsSingle(cat);     // o renderProductsAll si quieres otra lógica
+    closeMenuDd();                 // ✅ cerrar instantáneo
+
+    requestAnimationFrame(() => {
+      document.getElementById('products-container')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Cerrar al hacer click afuera
+  document.addEventListener('click', () => closeMenuDd());
+
+  // Cerrar con ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenuDd();
   });
 }
 
-function startCarousel(){
-  const container = document.getElementById('carousel-container');
-  const dotsContainer = document.getElementById('carousel-dots');
-  if(!container) return;
 
-  const imgs = Array.from(container.querySelectorAll('img'))
-    .filter(img => img.style.display !== 'none');
+// ===== DROPDOWN MENÚ (CELULAR) =====
+const menuDdBtnMobile = document.getElementById('menu-dd-btn-mobile');
+const menuDdPanelMobile = document.getElementById('menu-dd-panel-mobile');
+const menuDdCartMobile = document.getElementById('menu-dd-cart-mobile');
+const menuDdCartBadge = document.getElementById('menu-dd-cart-badge');
 
-  if(!imgs.length) return;
+function openMenuDdMobile(){
+  if (!menuDdPanelMobile || !menuDdBtnMobile) return;
+  menuDdPanelMobile.classList.remove('hidden');
+  menuDdBtnMobile.setAttribute('aria-expanded', 'true');
+}
+function closeMenuDdMobile(){
+  if (!menuDdPanelMobile || !menuDdBtnMobile) return;
+  menuDdPanelMobile.classList.add('hidden');
+  menuDdBtnMobile.setAttribute('aria-expanded', 'false');
+}
 
-  carouselImgs = imgs;
-  imgs.forEach(img => img.classList.remove('is-active'));
-  carouselIndex = 0;
-  imgs[0].classList.add('is-active');
+if (menuDdBtnMobile && menuDdPanelMobile){
+  // abrir/cerrar
+  menuDdBtnMobile.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = !menuDdPanelMobile.classList.contains('hidden');
+    if (isOpen) closeMenuDdMobile();
+    else openMenuDdMobile();
+  });
 
-  // Crear o actualizar 10 puntitos redondos (según cantidad de imágenes visibles)
-  if(dotsContainer){
-    dotsContainer.innerHTML = '';
-    carouselDots = imgs.map((_, i) => {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
-      dot.setAttribute('role', 'tab');
-      dot.setAttribute('aria-label', `Diapositiva ${i + 1}`);
-      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-      dot.dataset.index = String(i);
-      dot.addEventListener('click', () => {
-        imgs[carouselIndex].classList.remove('is-active');
-        carouselIndex = i;
-        imgs[carouselIndex].classList.add('is-active');
-        updateCarouselDots();
-      });
-      dotsContainer.appendChild(dot);
-      return dot;
+  // click afuera cierra
+  document.addEventListener('click', () => closeMenuDdMobile());
+
+  // ESC cierra
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenuDdMobile();
+  });
+
+  // click en categorías
+  menuDdPanelMobile.addEventListener('click', (e) => {
+    const item = e.target.closest('.menu-dd-item');
+    if (!item) return;
+
+    const cat = item.dataset.category;
+    if (!cat) return;
+
+    renderProductsSingle(cat);
+    closeMenuDdMobile();
+
+    requestAnimationFrame(() => {
+      document.getElementById('products-container')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // click en "Ver Mi Pedido"
+  if (menuDdCartMobile){
+    menuDdCartMobile.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      // abrir modal carrito (tu lógica actual)
+      renderCart();
+      const cm = document.getElementById('cart-modal');
+      if (cm) cm.classList.add('active');
+
+      closeMenuDdMobile();
     });
   }
-
-  if(carouselTimer) clearInterval(carouselTimer);
-  // Autoplay infinito cada 1 segundo
-  carouselTimer = setInterval(()=>{
-    imgs[carouselIndex].classList.remove('is-active');
-    carouselIndex = (carouselIndex + 1) % imgs.length;
-    imgs[carouselIndex].classList.add('is-active');
-    updateCarouselDots();
-  }, 1000);
 }
 
-// Botón "Ver Menú" del carrusel: ir al menú completo
-function initCarouselVerMenu(){
-  const btn = document.getElementById('carousel-ver-menu-btn');
-  if(!btn) return;
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    setCategory('todo-el-menu');
-    scrollToMenu();
-  });
-}
 
-/* =========================
-   Global click handler
-========================= */
-document.addEventListener('click', (e)=>{
-  const t = e.target;
 
-  const closeSel = t?.dataset?.close;
-  if(closeSel){
-    closeModal(closeSel);
-    return;
-  }
+// --------- Inicio ---------
+initOrdersBackend();   // inicializa Firebase + Firestore + suscripción en tiempo real
+loadOrders();          // respaldo local en caso de que falle Firestore
+// renderProducts('ofertas-familiares');
+renderProductsAll();
+currentCategory = 'todo-el-menu';
+buildSidebarGallery();
 
-  // ✅ Handler para el logo y nombre - resetear al inicio
-  const headerLeft = document.querySelector('.header-left');
-  if(headerLeft && headerLeft.contains(t)){
-    // Buscar el enlace más cercano dentro del header-left
-    const logoLink = t.closest('a[href="#"]');
-    if(logoLink && headerLeft.contains(logoLink)){
-      e.preventDefault();
-      e.stopPropagation();
-      resetToHome();
-      return;
-    }
-  }
 
-  if(t?.classList?.contains('category-btn') || t?.closest?.('.category-btn')){
-    const btn = t.classList.contains('category-btn') ? t : t.closest('.category-btn');
-    const cat = btn?.dataset?.cat;
-    if(!cat) return;
-    setCategory(cat);
-    scrollToMenu();
-    return;
-  }
-
-  const heartBtn = t?.closest?.('[data-action="heart"]');
-  if(heartBtn){
-    heartBtn.classList.toggle('is-on');
-    burstHearts(heartBtn);
-    return;
-  }
-
-  if(t?.dataset?.action === 'add'){
-    try{
-      const p = JSON.parse(t.dataset.product);
-      currentProduct = p;
-      currentRealCategory = p.__category;
-      selectedDrink = null;
-      productQuantity = 1;
-      bagChoice = null;
-
-      optName.textContent = p.name;
-      optDesc.textContent = p.desc || '';
-      optPrice.textContent = money(p.price);
-      qtyValue.textContent = String(productQuantity);
-
-      setDrinkVisible(currentRealCategory === 'ofertas-familiares');
-
-      document.querySelectorAll('input[name="drink"]').forEach(r=> r.checked = false);
-
-      paintBagOptions();
-      document.querySelectorAll('input[name="bag"]').forEach(r=> r.checked = false);
-
-      computeLiveTotal();
-      openModal('#options-modal');
-    }catch(err){
-      console.warn(err);
-    }
-    return;
-  }
-
-  if(t?.dataset?.action === 'remove'){
-    const idx = Number(t.dataset.index);
-    if(Number.isFinite(idx)){
-      cart.splice(idx, 1);
-      renderCart();
-    }
-    return;
-  }
-
-  if(t?.classList?.contains('menu-dd-item')){
-    const cat = t.dataset.scrollcat;
-    closePanels();
-    if(!cat) return;
-
-    if(cat === 'todo-el-menu'){
-      setCategory('todo-el-menu');
-      scrollToMenu();
-      return;
-    }
-
-    setCategory(cat);
-    scrollToMenu();
-    return;
-  }
-
-  if(t?.classList?.contains('combo-btn')){
-    const cat = t.dataset.scrollcat;
-    if(cat) { jumpToCategory(cat); scrollToMenu(); }
-    return;
-  }
-
-  if(menuDdPanel && !menuDdPanel.classList.contains('hidden')){
-    const inside = menuDdPanel.contains(t) || menuDdBtn.contains(t);
-    if(!inside) menuDdPanel.classList.add('hidden');
-  }
-});
-
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){
-    closePanels();
-    document.querySelectorAll('.modal.active').forEach(m => m.classList.remove('active'));
-  }
-});
-
-/* =========================
-   Specific buttons
-========================= */
-document.getElementById('btn-delivery')?.addEventListener('click', ()=> openModal('#modal-delivery'));
-document.getElementById('btn-reservas')?.addEventListener('click', ()=> openModal('#modal-reservas'));
-document.getElementById('btn-retiros')?.addEventListener('click', ()=> openModal('#modal-retiros'));
-
-document.getElementById('open-delivery-from-footer')?.addEventListener('click', ()=> openModal('#modal-delivery'));
-
-document.getElementById('modal-reserva-go')?.addEventListener('click', ()=>{
-  window.open('https://pollon543.github.io/reservas-online/', '_blank');
-});
-
-document.getElementById('modal-retiro-go')?.addEventListener('click', ()=>{
-  const msg = encodeURIComponent('Hola, deseo coordinar un retiro. Mi pedido será para retiro (mínimo $100.000), gracias.');
-  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
-});
-
-document.getElementById('menu-dd-btn')?.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  togglePanel(menuDdPanel);
-});
-
-document.getElementById('menu-dd-view-cart')?.addEventListener('click', ()=>{
-  closePanels();
-  openModal('#cart-modal');
-  renderCart();
-});
-
-document.getElementById('view-cart-desktop')?.addEventListener('click', ()=>{
-  openModal('#cart-modal');
-  renderCart();
-});
-
-document.getElementById('floating-cart')?.addEventListener('click', ()=>{
-  openModal('#cart-modal');
-  renderCart();
-});
-
-document.getElementById('close-cart')?.addEventListener('click', ()=> closeModal('#cart-modal'));
-document.getElementById('close-cart-2')?.addEventListener('click', ()=> closeModal('#cart-modal'));
-
-/* Options modal quantity */
-document.getElementById('qty-minus')?.addEventListener('click', ()=>{
-  productQuantity = Math.max(1, productQuantity - 1);
-  qtyValue.textContent = String(productQuantity);
-  computeLiveTotal();
-});
-document.getElementById('qty-plus')?.addEventListener('click', ()=>{
-  productQuantity = Math.min(50, productQuantity + 1);
-  qtyValue.textContent = String(productQuantity);
-  computeLiveTotal();
-});
-
-/* Options modal cancel */
-function closeOptions(){ closeModal('#options-modal'); }
-document.getElementById('cancel-options')?.addEventListener('click', closeOptions);
-document.getElementById('cancel-options-2')?.addEventListener('click', closeOptions);
-
-/* Drink selection */
-document.querySelectorAll('input[name="drink"]').forEach(r=>{
-  r.addEventListener('change', ()=>{ selectedDrink = r.value; });
-});
-
-/* Bag choice selection */
-document.addEventListener('change', (e)=>{
-  const t = e.target;
-  if(t && t.name === 'bag'){
-    bagChoice = t.value;
-    computeLiveTotal();
-  }
-});
-
-/* Confirm add */
-document.getElementById('confirm-add')?.addEventListener('click', ()=>{
-  if(!currentProduct) return;
-
-  if(currentRealCategory === 'ofertas-familiares' && !selectedDrink){
-    showToast('En familiares debes elegir una bebida.');
-    return;
-  }
-
-  const bagRequired =
-    currentRealCategory === 'ofertas-familiares' ||
-    currentRealCategory === 'ofertas-dos' ||
-    currentRealCategory === 'ofertas-personales' ||
-    currentRealCategory === 'platos-extras';
-
-  if(bagRequired && bagChoice !== 'add'){
-    showToast('En esta categoría la bolsa es obligatoria.');
-    return;
-  }
-
-  if(currentRealCategory === 'bebidas' || currentRealCategory === 'descartables'){
-    bagChoice = 'none';
-  }
-
-  const { total, bagQty, base } = computeLiveTotal();
-  const bagTotal = (bagQty || 0) * BAG_PRICE;
-
-  const item = {
-    name: currentProduct.name,
-    price: currentProduct.price,
-    qty: productQuantity,
-    drink: (currentRealCategory === 'ofertas-familiares') ? selectedDrink : null,
-    bagQty: bagQty || 0,
-    subtotal: base + bagTotal,
-    total: total
-  };
-
-  cart.push(item);
-  updateCartUI();
-  showToast('Agregado al carrito ✅');
-  closeOptions();
-});
-
-/* Checkout */
-document.getElementById('checkout-btn')?.addEventListener('click', ()=>{
-  if(cart.length === 0){
-    showToast('Tu carrito está vacío.');
-    return;
-  }
-  closeModal('#cart-modal');
-  openModal('#checkout-modal');
-});
-
-function closeCheckout(){ closeModal('#checkout-modal'); }
-document.getElementById('cancel-checkout')?.addEventListener('click', closeCheckout);
-document.getElementById('cancel-checkout-2')?.addEventListener('click', closeCheckout);
-
-/* Botón Enviar: toda la lógica en el clic del botón (sin depender del submit del form) */
-(function attachCheckoutSubmit(){
-  const form = document.getElementById('checkout-form');
-  const submitBtn = document.getElementById('checkout-submit-btn');
-  if (!form || !submitBtn) return;
-
-  let enviando = false;
-
-  async function enviarPedido(){
-    if (enviando) return;
-    enviando = true;
-    submitBtn.disabled = true;
-    submitBtn.setAttribute('aria-busy', 'true');
-
-    try {
-      if (cart.length === 0){
-        showToast('Tu carrito está vacío.');
-        closeCheckout();
-        return;
-      }
-
-      const nameRaw = (document.getElementById('cust-name')?.value ?? '').trim();
-      const addressRaw = (document.getElementById('cust-address')?.value ?? '').trim();
-      const phone = (document.getElementById('cust-phone')?.value ?? '').trim();
-      const commentRaw = (document.getElementById('cust-comment')?.value ?? '').trim();
-
-      if (!nameRaw || !addressRaw || !phone) {
-        showToast('Completa nombre, dirección y teléfono.');
-        return;
-      }
-
-      const name = wrapText(nameRaw, 25);
-      const address = wrapText(addressRaw, 25);
-      const comment = wrapText(commentRaw, 25);
-
-      const ticketNumber = nextTicketNumber();
-      const order = {
-        id: 'P' + Date.now(),
-        createdAt: new Date().toISOString(),
-        ticketNumber,
-        customer: { name, address, phone, comment },
-        items: cart.map(it=>({
-          name: it.name,
-          qty: it.qty,
-          subtotal: it.subtotal,
-          drink: it.drink,
-          bagQty: it.bagQty
-        })),
-        total: cartSum(),
-        status: 'Pendiente'
-      };
-
-      orders.push(order);
-
-      /* 1) Guardar en base de datos en tiempo real (Firestore) */
-      showToast('Guardando pedido en base de datos…');
-      try {
-        await saveSingleOrder(order);
-      } catch (err) {
-        console.warn('[Checkout] Error guardando en BD:', err);
-        try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); } catch (_) {}
-      }
-      showToast('Pedido guardado ✅ Abriendo WhatsApp…');
-
-      /* 2) Abrir WhatsApp con el formulario del ticket de impresión (mismo texto exacto) */
-      const textoTicket = buildTicketText80mm(order);
-      const urlWhatsApp = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(textoTicket);
-      const ventanaWa = window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
-      if (!ventanaWa) showToast('Permite ventanas emergentes para abrir WhatsApp.');
-
-      cart = [];
-      updateCartUI();
-      renderCart();
-      closeCheckout();
-      showToast('Listo ✅ Pedido en BD y WhatsApp abierto');
-    } catch (err) {
-      console.error('[Checkout] Error:', err);
-      showToast('Error al procesar. Intenta de nuevo.');
-    } finally {
-      enviando = false;
-      submitBtn.disabled = false;
-      submitBtn.removeAttribute('aria-busy');
-    }
-  }
-
-  submitBtn.addEventListener('click', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    enviarPedido();
-  });
-
-  form.addEventListener('submit', function(e){
-    e.preventDefault();
-    e.stopPropagation();
-    enviarPedido();
-  });
-})();
-
-/* Chatbot */
-chatbotToggle?.addEventListener('click', ()=>{
-  chatbotPanel.classList.toggle('hidden');
-  if(!chatbotPanel.classList.contains('hidden')) chatbotWelcome();
-});
-chatbotClose?.addEventListener('click', ()=> chatbotPanel.classList.add('hidden'));
-document.querySelectorAll('.chip').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    handleChatbotAction(btn.dataset.chat);
-  });
-});
-
-/* Year */
-const yearEl = document.getElementById('year');
-if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-/* ✅ Enforce wrap */
-enforceWrapLimit(document.getElementById('cust-name'), 25);
-enforceWrapLimit(document.getElementById('cust-address'), 25);
-enforceWrapLimit(document.getElementById('cust-comment'), 25);
-
-/* Init */
-function init(){
-  initOrdersBackend();
-  loadOrders();
-  // ✅ Asegurar que el carrusel se muestre al inicio
-  toggleHeroCarousel(true);
-  setCategory('todo-el-menu');
-  updateCartUI();
-  renderCart();
+updateCartUI();
+if (chatbotMessagesEl) {
   chatbotWelcome();
-  startCarousel();
-  initCarouselVerMenu();
 }
-init();
 
-/* Expose for admin.js */
-window.__POLLON__ = {
-  money,
-  orders: () => orders,
-  setOrders: (arr)=>{ orders = arr; saveOrders(); },
-  saveOrders,
-  loadOrders,
-  buildWhatsappTextFromOrder,
-  buildTicketText80mm,
-  buildTicketHtml80mm,
-  WHATSAPP_NUMBER
-};
 
-// ===== CATEGORÍAS SLIDER (8 dots + flechas abajo + swipe) =====
-(() => {
-  const track = document.getElementById("cat-track");
-  const btnPrev = document.getElementById("cat-prev");
-  const btnNext = document.getElementById("cat-next");
-  const dotsWrap = document.getElementById("cat-dots");
-  const scrollBar = document.getElementById("cat-scrollbar");
-  const scrollThumb = document.getElementById("cat-scrollbar-thumb");
-
-  // ✅ Si no existe el contenedor principal, no inicializar
-  if (!track) return;
-
-  function getGap(){
-    const style = getComputedStyle(track);
-    return parseFloat(style.columnGap || style.gap || "10") || 10;
-  }
-
-  function getStep(){
-    const first = track.querySelector(".cat-card");
-    if(!first) return 240;
-    return first.getBoundingClientRect().width + getGap();
-  }
-
-  function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
-
-  function buildDots(){
-    if (!dotsWrap) return;
-    const cards = track.querySelectorAll(".cat-card");
-    dotsWrap.innerHTML = "";
-    cards.forEach((_, i) => {
-      const dot = document.createElement("span");
-      dot.className = "cat-dot" + (i === 0 ? " is-active" : "");
-      dot.addEventListener("click", () => {
-        track.scrollTo({ left: i * getStep(), behavior: "smooth" });
-      });
-      dotsWrap.appendChild(dot);
-    });
-  }
-
-  function setActiveDot(index){
-    if (!dotsWrap) return;
-    const dots = dotsWrap.querySelectorAll(".cat-dot");
-    dots.forEach(d => d.classList.remove("is-active"));
-    if(dots[index]) dots[index].classList.add("is-active");
-  }
-
-  function updateScrollIndicator(){
-    if(!scrollBar || !scrollThumb) return;
-
-    const maxScroll = track.scrollWidth - track.clientWidth;
-    if(maxScroll <= 1){
-      scrollBar.style.display = 'none';
-      return;
-    }
-    scrollBar.style.display = '';
-
-    const barW = scrollBar.clientWidth || 1;
-    const ratio = track.clientWidth / track.scrollWidth;
-    const thumbW = Math.max(55, Math.floor(barW * ratio)); // mínimo “profesional” tipo imagen
-    const maxLeft = Math.max(0, barW - thumbW);
-    const left = maxLeft * (track.scrollLeft / maxScroll);
-
-    scrollThumb.style.width = `${thumbW}px`;
-    scrollThumb.style.transform = `translateX(${left}px)`;
-  }
-
-  function updateUI(){
-    const step = getStep();
-    const cards = track.querySelectorAll(".cat-card");
-    const maxIndex = Math.max(0, cards.length - 1);
-
-    const idx = clamp(Math.round(track.scrollLeft / step), 0, maxIndex);
-    setActiveDot(idx);
-
-    if (btnPrev) {
-      btnPrev.disabled = track.scrollLeft <= 2;
-    }
-    if (btnNext) {
-      btnNext.disabled = track.scrollLeft >= (track.scrollWidth - track.clientWidth - 2);
-    }
-
-    updateScrollIndicator();
-  }
-
-  function scrollByCard(dir){
-    track.scrollBy({ left: dir * getStep(), behavior: "smooth" });
-  }
-
-  // ✅ Flechas solo si existen en el DOM
-  if (btnPrev) btnPrev.addEventListener("click", () => scrollByCard(-1));
-  if (btnNext) btnNext.addEventListener("click", () => scrollByCard(1));
-
-  track.addEventListener("scroll", () => requestAnimationFrame(updateUI));
-
-  /* Arrastre con mouse o dedo desde cualquier parte (imagen, texto, card). Umbral para no bloquear clic en categoría. */
-  const DRAG_THRESHOLD = 8; // ✅ Umbral más bajo para detectar más temprano
-  const VERTICAL_THRESHOLD = 6; // ✅ Umbral específico para movimiento vertical
-  let isDown = false;
-  let dragMode = false;
-  let startX = 0;
-  let startY = 0;
-  let startScroll = 0;
-  let capturedPointerId = null;
-  let didDrag = false;
-  let isVerticalScroll = false; // ✅ Nueva variable para detectar scroll vertical
-
-  track.addEventListener("pointerdown", (e) => {
-    isDown = true;
-    dragMode = false;
-    isVerticalScroll = false;
-    startX = e.clientX;
-    startY = e.clientY;
-    startScroll = track.scrollLeft;
-    capturedPointerId = null;
-    didDrag = false;
-    track.classList.remove("cat-track--grabbing");
-  });
-
-  track.addEventListener("pointermove", (e) => {
-    if (!isDown) return;
-    
-    // ✅ Si ya detectamos scroll vertical, no interferir
-    if (isVerticalScroll) {
-      return;
-    }
-    
-    if (!dragMode) {
-      const dx = Math.abs(e.clientX - startX);
-      const dy = Math.abs(e.clientY - startY);
-      
-      // ✅ Detectar movimiento vertical PRIMERO (más temprano)
-      if (dy > VERTICAL_THRESHOLD && dy > dx) {
-        // ✅ Movimiento principalmente vertical - liberar control inmediatamente
-        isVerticalScroll = true;
-        isDown = false;
-        dragMode = false;
-        // ✅ Liberar cualquier captura de pointer
-        if (capturedPointerId != null) {
-          try { track.releasePointerCapture(capturedPointerId); } catch (_) {}
-          capturedPointerId = null;
-        }
-        track.classList.remove("cat-track--grabbing");
-        return; // ✅ Salir y permitir scroll vertical nativo
-      }
-      
-      // ✅ Si el movimiento supera el umbral horizontal, activar drag horizontal
-      if (dx > DRAG_THRESHOLD && dx >= dy) {
-        dragMode = true;
-        didDrag = true;
-        capturedPointerId = e.pointerId;
-        track.setPointerCapture(e.pointerId);
-        track.classList.add("cat-track--grabbing");
-        startX = e.clientX;
-        startScroll = track.scrollLeft;
-      }
-    }
-    if (dragMode) {
-      e.preventDefault();
-      const dx = e.clientX - startX;
-      track.scrollLeft = startScroll - dx;
-    }
-  }, { passive: false });
-
-  track.addEventListener("pointerup", (e) => {
-    if (dragMode && capturedPointerId != null) {
-      try { track.releasePointerCapture(capturedPointerId); } catch (_) {}
-      capturedPointerId = null;
-    }
-    isDown = false;
-    dragMode = false;
-    isVerticalScroll = false;
-    track.classList.remove("cat-track--grabbing");
-    updateUI();
-  });
-
-  track.addEventListener("pointercancel", (e) => {
-    if (dragMode && capturedPointerId != null) {
-      try { track.releasePointerCapture(capturedPointerId); } catch (_) {}
-      capturedPointerId = null;
-    }
-    isDown = false;
-    dragMode = false;
-    isVerticalScroll = false;
-    track.classList.remove("cat-track--grabbing");
-    updateUI();
-  });
-
-  /* Evitar que al soltar después de arrastrar se dispare el clic del botón de categoría */
-  track.addEventListener("click", (e) => {
-    if (didDrag || isVerticalScroll) {
-      e.preventDefault();
-      e.stopPropagation();
-      didDrag = false;
-      isVerticalScroll = false;
-    }
-  }, true);
-
-  buildDots();
-  updateUI();
-
-  window.addEventListener("resize", () => {
-    buildDots();
-    updateUI();
-  });
-})();

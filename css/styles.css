@@ -1,4524 +1,1342 @@
-/* Fuente profesional y legible (sin bloqueo de carga) */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+/* * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat";
+    font-size: 11px;
+} */
 
-:root{
-  --red1:#b30000;
-  --red2:#ff2d2d;
-  --dark:#0b0b0f;
-  --header-height: 76px;
-  --content-max: 1280px;
-  --content-pad: 16px;
-  --section-gap: 24px;
-  /* Tipografía profesional */
-  --font-main: "Inter", "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  --text-base: 15px;
-  --text-sm: 13px;
-  --text-xs: 12px;
-  --leading-tight: 1.25;
-  --leading-snug: 1.4;
-  --leading-normal: 1.5;
-  --leading-relaxed: 1.6;
-  --color-text: #111827;
-  --color-text-muted: #4b5563;
-  /* Tarjetas: diseño unificado profesional */
-  --card-radius: 16px;
-  --card-radius-sm: 12px;
-  --card-shadow: 0 2px 12px rgba(0,0,0,.06);
-  --card-shadow-hover: 0 12px 32px rgba(0,0,0,.1);
-  --card-border: 1px solid rgba(0,0,0,.06);
-  --card-gap: 16px;
-  --card-gap-sm: 12px;
-}
-@media (min-width: 640px){
-  :root{ --content-pad: 20px; }
-}
-@media (min-width: 1024px){
-  :root{ --content-pad: 24px; }
-}
 
-*{ box-sizing:border-box; }
-html, body{
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  min-height: 100%;
-  overflow-x: hidden;
-  font-family: var(--font-main);
-}
-body{
-  padding-bottom: 110px;
-  padding-top: var(--header-height);
-}
 
-/* Contenedor principal: alineación igual en todas las pantallas */
-main#ofertas,
-main.mx-auto{
-  max-width: var(--content-max);
-  margin-left: auto;
-  margin-right: auto;
-  padding-left: var(--content-pad);
-  padding-right: var(--content-pad);
+
+
+
+body {
   box-sizing: border-box;
-}
-
-/* header gradient aquiles */
-.header-gradient{
-  background: linear-gradient(135deg, rgba(140,0,0,1) 0%, rgb(206, 2, 2) 55%, rgb(211, 3, 3) 100%);
-}
-
-/* ✅ Cabecera fija: solo el header se queda arriba al deslizar; el resto de la página se mueve normal */
-body > header,
-body > header.header-gradient{
-  position: fixed !important;
-  top: 0 !important;
-  left: 0;
-  right: 0;
-  z-index: 50;
-  width: 100%;
-  min-height: var(--header-height);
-  box-shadow: 0 4px 20px rgba(0,0,0,.2);
-  isolation: isolate;
-}
-body > header .header-gradient{
-  min-height: var(--header-height);
-}
-@media (max-width: 639px){
-  :root{ --header-height: 84px; }
-}
-
-/* ✅ Header layout súper alineado */
-
-/* ✅ Header: SIEMPRE una sola fila */
-.header-grid{
-  display:grid;
-  grid-template-columns: auto 1fr auto; /* logo | centro | derecha */
-  gap: 10px;
-  align-items:center;
-}
-
-/* Izquierda */
-.header-left{ display:flex; align-items:center; gap:12px; }
-
-/* Centro */
-.header-center{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
-  align-items:center;
-  justify-content:center;
-}
-
-/* Derecha */
-.header-right{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:10px;
-}
-
-/* ✅ En móvil el botón MENÚ más compacto */
-@media (max-width: 420px){
-  .menu-dd-btn{
-    padding: 8px 10px;
-    border-radius: 14px;
-    font-size: 12px;
-  }
-
-}
-/* ✅ Botón MENÚ estilo "apilado" como tu imagen (MENÚ arriba / ☰ + ▾ abajo) */
-.menu-dd-btn--stack{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:4px;
-  padding:10px 14px;
-  min-width:74px;
-  line-height:1;
-  border-radius:14px;
-}
-
-/* Texto MENÚ arriba */
-.menu-dd-btn--stack .menu-dd-top{
-  font-weight:800;
-  font-size:12px;
-  letter-spacing:.6px;
-  text-transform:uppercase;
-}
-
-/* Fila de abajo: ☰ + ▾ */
-.menu-dd-btn--stack .menu-dd-bottom{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-/* ☰ */
-.menu-dd-btn--stack .menu-dd-burger{
-  font-size:18px;
-  font-weight:900;
-  line-height:1;
-}
-
-/* ▾ */
-.menu-dd-btn--stack .menu-dd-caret{
-  font-size:14px;
-  font-weight:900;
-  line-height:1;
-  opacity:.95;
-}
-
-
-
-
-/* Marca "Pollería El Pollón" – título principal del sitio */
-.brand{
-  font-family: var(--font-main);
-  text-decoration: none;
-  letter-spacing: .02em;
-}
-.brand div:first-child{
-  font-size: 1.125rem;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: .02em;
-  color: #fff !important;
-}
-.brand div:last-child{
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.25;
-  color: rgba(255,255,255,.9) !important;
-  letter-spacing: .03em;
-}
-
-.header-question{
-  color: rgba(255,255,255,.95);
-  font-weight: 700;
-  font-size: 14px;
-  text-align: center;
-  line-height: 1.3;
-  letter-spacing: .02em;
-  font-family: var(--font-main);
-}
-
-.header-actions{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  align-items:center;
-  justify-content:center;
-}
-
-
-.header-mobile-menu{ display:flex; justify-content:flex-end; }
-
-@media (min-width: 768px){
-  .header-grid{
-    grid-template-columns: 1.1fr 1.8fr 1.1fr;
-    gap: 12px;
-  }
-  .header-center{ align-items:center; }
-  .header-question{ text-align:center; font-size: 13px; }
-}
-@media (max-width: 420px){
-  .header-question{ font-size: 12px; }
-}
-
-/* Logo circular */
-.logo{
-  width:50px; height:50px;
-  border-radius:999px;
-  background:#fff;
-  border:2px solid rgba(255,255,255,.65);
-  box-shadow: 0 10px 25px rgba(0,0,0,.25);
-  overflow:hidden;
-  flex: 0 0 auto;
-}
-
-/* Header pedido links */
-.pedido-link{
-  color:#fff;
-  font-weight:900;
-  letter-spacing:.5px;
-  font-size: 12px;
-  padding: 8px 10px;
-  border-radius: 999px;
-  position: relative;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.18);
-  transition: transform .15s ease, background .15s ease;
-}
-.pedido-link:hover{ transform: translateY(-1px); background: rgba(255,255,255,.18); }
-.pedido-link::after{
-  content:"";
-  position:absolute;
-  left:12px; right:12px; bottom:6px;
-  height:2px; background: rgba(255,255,255,.9);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .2s ease;
-}
-.pedido-link:hover::after{ transform: scaleX(1); }
-
-@media (max-width: 420px){
-  .pedido-link{ padding:7px 8px; font-size:11px; }
-}
-
-/* Badges + pulse */
-.badge{
-  margin-left: 8px;
-  background: #ffdd00;
-  color:#111;
-  font-weight:900;
-  font-size: 12px;
-  padding: 2px 8px;
-  border-radius: 999px;
-  animation: pulse 1.6s infinite;
-}
-@keyframes pulse{
-  0%{ transform: scale(1); box-shadow: 0 0 0 0 rgba(255,221,0,.6); }
-  70%{ transform: scale(1.02); box-shadow: 0 0 0 10px rgba(255,221,0,0); }
-  100%{ transform: scale(1); box-shadow: 0 0 0 0 rgba(255,221,0,0); }
-}
-
-/* Dropdown menú */
-.menu-dd-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.25rem;
-  background: rgb(204, 1, 1);
-  border: 1px solid rgb(204, 1, 1);
-  color:#ffffff;
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-weight:900;
-  transition: transform .15s ease, background .15s ease;
-}
-.menu-dd-btn:hover{ transform: translateY(-1px); background: rgb(201, 1, 1); }
-
-.menu-dd-panel{
-  position:absolute;
-  top: calc(100% + 10px);
-  right:0;
-  background:#fff;
-  border-radius: 18px;
-  box-shadow: 0 25px 70px rgba(0,0,0,.25);
-  border: 1px solid rgba(0,0,0,.06);
-  padding: 10px;
-  min-width: 260px;
-  z-index: 60;
-}
-.menu-dd-item{
-  width:100%;
-  text-align:left;
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-family: var(--font-main);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: .02em;
-  color: var(--color-text);
-  transition: background .15s ease, color .15s ease, transform .15s ease;
-}
-.menu-dd-item:hover{
-  background: #ffe5e5;
-  color:#b30000;
-  transform: translateX(2px);
-}
-.menu-dd-cart{
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 12px;
-  border-radius: 16px;
-  font-weight: 900;
-  background: #ffdd00;
-  color:#111;
-}
-
-/* Buttons */
-.btn-cart{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  background:#ffdd00;
-  color:#111;
-  font-weight: 900;
-  padding: 10px 12px;
-  border-radius: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.2);
-  transition: transform .15s ease;
-}
-.btn-cart:hover{ transform: translateY(-1px); }
-
-.btn-primary{
-  background: linear-gradient(135deg, var(--red1), var(--red2));
-  color:#fff;
-  font-weight: 900;
-  padding: 10px 14px;
-  border-radius: 14px;
-  box-shadow: 0 18px 40px rgba(180,0,0,.25);
-  transition: transform .15s ease;
-}
-.btn-primary:hover{ transform: translateY(-1px); }
-
-.btn-secondary{
-  background:#fff;
-  border:1px solid rgba(0,0,0,.12);
-  color:#111;
-  font-weight: 900;
-  padding: 10px 14px;
-  border-radius: 14px;
-  transition: transform .15s ease, background .15s ease;
-}
-.btn-secondary:hover{ transform: translateY(-1px); background:#f6f6f6; }
-
-/* Hero + carousel fade PRO */
-/* Secciones del main: ancho consistente y autoajustable */
-main#ofertas > section{
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-.hero{
-  padding-top: 0;
-  margin-bottom: 0;
-  width: 100%;
-  max-width: 100%;
-}
-
-.hero-card{
-  border-radius: 24px;
-  overflow:hidden;
-  box-shadow: 0 25px 70px rgba(0,0,0,.18);
-  border: 1px solid rgba(0,0,0,.06);
-  background:#000;
-}
-
-/* ✅ HERO FULL WIDTH (canto a canto) */
-.hero--full{
-  padding-top: 0;           /* quita espacio arriba si quieres pegado */
-}
-
-.hero-card--full{
-  border-radius: 0;         /* quita esquinas redondas para que pegue full */
-  border: 0;                /* quita borde */
-  box-shadow: none;         /* quita sombra */
-}
-
-
-.carousel-fade{
-  position: relative;
-  width: 100%;
-  max-width: 100%;
-  height: clamp(200px, 35vw, 400px);
-  background: #111;
-  overflow: hidden;
-}
-.carousel-fade img{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit: cover;
-  opacity:0;
-  transition: opacity 0.9s ease;
-}
-.carousel-fade img.is-active{ opacity:1; }
-
-/* Overlay del carrusel: botón Ver Menú + 10 puntitos */
-.hero-card--carousel{ position: relative; }
-.carousel-overlay{
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  padding: 12px 16px 14px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: flex-end;
-  gap: 8px;
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(0,0,0,.5), transparent);
-}
-.carousel-overlay > *{ pointer-events: auto; }
-.carousel-ver-menu{
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 20px;
-  border-radius: 12px;
-  background: #facc15;
-  color: #000;
-  font-weight: 800;
-  font-size: 1rem;
-  text-decoration: none;
-  box-shadow: 0 4px 14px rgba(0,0,0,.25);
-  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
-}
-.carousel-ver-menu:hover{
-  background: #fde047;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.3);
-}
-.carousel-dots{
-  justify-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.carousel-dot{
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  border: none;
-  padding: 0;
-  background: rgba(255,255,255,.7);
-  cursor: pointer;
-  transition: background .25s ease, transform .2s ease;
-}
-.carousel-dot:hover{ background: rgba(255,255,255,.95); transform: scale(1.15); }
-.carousel-dot.is-active{
-  background: #dc2626;
-  transform: scale(1.2);
-}
-
-/* Aviso */
-.aviso{
-  margin-top: 0;          /* 🔥 clave: elimina espacio blanco */
-  background: linear-gradient(135deg, rgba(140,0,0,1), rgba(255,45,45,1));
-  color:#fff;
-  font-weight: 500;
-  text-align:center;
-  padding: 3px 3px;
-  letter-spacing:.4px;
-}
-
-/* Catbar */
-.catbar-wrap{
-  position: relative;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-.catbar{
-  display:flex;
-  gap:10px;
-  overflow-x:auto;
-  padding: 10px 6px;
-  scroll-behavior: smooth;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  flex:1;
-}
-.catbar::-webkit-scrollbar{ display:none; }
-
-.catbtn{
-  white-space: nowrap;
-  padding: 10px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.08);
-  background: #fff;
-  font-weight: 900;
-  color:#111;
-  box-shadow: 0 10px 25px rgba(0,0,0,.06);
-  transition: transform .15s ease, background .15s ease, color .15s ease;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-.catbtn:hover{ transform: translateY(-1px); background:#f8f8f8; }
-
-.catbtn.is-active{
-  background: linear-gradient(135deg, var(--red1), var(--red2));
-  color:#fff;
-  border-color: transparent;
-}
-
-.catimg{
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  overflow:hidden;
-  border: 1px solid rgba(0,0,0,.10);
-  background:#111;
-  flex: 0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.catimg img{
-  width:100%;
-  height:100%;
-  object-fit: cover;
-  display:block;
-}
-
-.catbar-prev, .catbar-next{
-  height: 44px;
-  width: 44px;
-  border-radius: 999px;
-  background:#fff;
-  border:1px solid rgba(0,0,0,.12);
-  box-shadow: 0 18px 40px rgba(0,0,0,.14);
-  font-size: 22px;
-  font-weight: 900;
-}
-
-/* ========== PRODUCTS GRID: alineación perfecta, diseño pro, 100% responsive ========== */
-.products-grid{
-  display: grid;
-  gap: var(--card-gap);
-  justify-items: stretch;
-  align-items: start;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  /* Columnas iguales que llenan el ancho; cantos alineados en la misma recta */
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
-}
-
-/* Tarjeta de producto: estilo profesional unificado */
-.pcard{
-  background: #fff;
-  border-radius: var(--card-radius);
-  overflow: hidden;
-  border: var(--card-border);
-  box-shadow: var(--card-shadow);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-}
-.pcard:hover{
-  transform: translateY(-3px);
-  box-shadow: var(--card-shadow-hover);
-  border-color: rgba(0,0,0,.08);
-}
-/* Imagen: proporción 4/3 en todas las pantallas */
-.pimg{
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  height: auto;
-  min-height: 0;
-  background: linear-gradient(145deg, #1a1a1a 0%, #2d2d2d 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,.4);
-  font-size: 2.5rem;
-  flex-shrink: 0;
-  overflow: hidden;
-}
-.pimg img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-.pbody{
-  padding: 14px 16px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-.ptitle{
-  font-family: var(--font-main);
-  font-weight: 800;
-  font-size: 1rem;
-  line-height: 1.3;
-  color: var(--color-text);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   margin: 0;
-  letter-spacing: .01em;
+  padding: 0;
+  padding-bottom: 100px;
 }
-.pdesc{
-  margin-top: 4px;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  min-height: 0;
-  line-height: 1.45;
-  font-family: var(--font-main);
-  letter-spacing: .01em;
-}
-.prow{
-  margin-top: 10px;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-.pprice{
-  font-family: var(--font-main);
-  font-weight: 800;
-  color: var(--red1);
-  font-size: 1rem;
-  letter-spacing: .02em;
-  line-height: 1.2;
-}
-.padd{
-  background: #111827;
-  color: #fff;
-  font-weight: 900;
-  padding: 10px 12px;
-  border-radius: 14px;
-  transition: transform .15s ease;
-  white-space: nowrap;
-  min-height: 42px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-}
-.padd:hover{ transform: translateY(-1px); }
-
-/* category headers in "Todo" */
-.cat-header{
-  grid-column: 1 / -1;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
+/* ================= HEADER LINKS tipo menú (DELIVERY / RESERVAS / RETIROS) ================= */
+.pedido-link{
+  background: transparent;
+  border: none;
   padding: 6px 2px;
-}
-.cat-header h3{
-  font-family: var(--font-main);
-  font-size: 1.125rem;
   font-weight: 800;
-  letter-spacing: .02em;
-  line-height: 1.25;
-  color: var(--color-text);
-}
-.cat-line{
-  flex:1;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgb(197, 1, 1), rgb(201, 1, 1));
-  opacity:.7;
-}
-
-
-/* ===== CATEGORÍAS SLIDER: centrado + scroll táctil izquierda/derecha ===== */
-.cat-slider{
-  margin-top: 20px;
-  margin-bottom: 10px;
-  width: 100%;
-  max-width: 100%;
-}
-
-.cat-slider__wrap{
+  font-size: 13px;
+  letter-spacing: .6px;
+  color: #ffffff; /* texto blanco para tu header rojo */
+  cursor: pointer;
   position: relative;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  width: 100%;
-  max-width: 100%;
-  overflow: hidden;
+  opacity: .95;
+  transition: opacity .15s ease, transform .15s ease;
 }
 
-/* Indicador tipo imagen (barra gris + avance rojo) */
-/* Indicador de categorías: barra oscura profesional */
-.cat-scrollbar{
-  height: 7px;
-  width: 100%;
-  max-width: 100%;
-  background: #bdb8b8;
+/* subrayado elegante al pasar */
+.pedido-link::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0%;
+  height: 3px;
+  background: rgba(255,255,255,.95);
   border-radius: 999px;
-  margin-top: 6px;
-  margin-bottom: 0;
-  overflow: hidden;
-}
-.cat-scrollbar__thumb{
-  height: 100%;
-  width: 40px;
-  background: #221a1abe;
-  border-radius: 999px;
-  transform: translateX(0);
-  will-change: transform, width;
-  box-shadow: 0 0 0 1px rgb(56, 1, 1);
+  transition: width .18s ease;
 }
 
-/* Carril: scroll horizontal; padding lateral 0 para que los cantos alineen con el contenido */
-.cat-track{
-  display: grid;
-  grid-auto-flow: column;
-  gap: var(--card-gap);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  padding: 10px 0;
+.pedido-link:hover{
+  opacity: 1;
+  transform: translateY(-1px);
+}
+.pedido-link:hover::after{
   width: 100%;
-  min-height: 0;
-  -webkit-overflow-scrolling: touch;
-  touch-action: pan-x pan-y;
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
+}
+
+/* En celular: un poco más compacto para que no se baje */
+@media (max-width: 640px){
+  .pedido-link{
+    font-size: 12px;
+    padding: 6px 1px;
+    letter-spacing: .3px;
+  }
+}
+/* =================== EFECTOS GLOBALES =================== */
+
+/* Botones de categoría */
+.category-btn {
+  transition: .3s;
+}
+.category-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Tarjetas de producto */
+.product-card {
+  transition: .3s;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(8, 8, 8, 0.15);
+}
+
+/* Scrollbar oculto para carrusel de categorías */
+.scrollbar-hide {
   -ms-overflow-style: none;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
+  scrollbar-width: none;
 }
-.cat-track:active{
-  cursor: grabbing;
-}
-.cat-track.cat-track--grabbing{
-  cursor: grabbing;
-  scroll-behavior: auto;
-}
-.cat-track::-webkit-scrollbar{
-  height: 0;
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-.cat-card{
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
-  background: #fff;
-  border-radius: var(--card-radius);
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  width: 100%;
-  box-shadow: var(--card-shadow);
-  border: var(--card-border);
-  transition: box-shadow .2s ease, border-color .2s ease;
+/* Badge del carrito */
+.cart-badge {
+  animation: pulse .5s ease;
 }
-.cat-card:hover{
-  box-shadow: var(--card-shadow-hover);
-  border-color: rgba(0,0,0,.08);
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
 }
 
-.cat-card__img{
-  width: 100%;
-  border-radius: var(--card-radius) var(--card-radius) 0 0;
-  background: linear-gradient(145deg, #f5f5f5, #eee);
-  overflow: hidden;
-  aspect-ratio: 1 / 1;
-  border: none;
-  padding: 0;
-  cursor: grab;
-  flex-shrink: 0;
-  touch-action: pan-x pan-y;
+/* Carrito flotante */
+.floating-cart {
+  position: fixed;
+  bottom: 70px;
+  right: 10px;
+  z-index: 999;
+  box-shadow: 0 10px 10px rgba(0,0,0,.3);
+  animation: float 1s ease-in-out infinite;
 }
-.cat-track--grabbing .cat-card__img{
-  cursor: grabbing;
+@media (max-width: 768px) {}
+  .floating-cart {
+    bottom: 50px;
+    right: 20px;
+    left: auto;
+    padding: 0 0;
+    transform: scale(0.90);
+  }
+  .floating-cart > div {
+    justify-content: flex-start;
+    gap: 1px;
+  }
+  .floating-cart .text-2xl {
+    font-size: 1.5rem;
+  }
+  .cart-total {
+    font-size: 1.1rem;
+  }
+  #floating-cart-count {
+    font-size: 0.9rem;
+    color: black;
+  }
+  #floating-cart-total {
+    font-size: 1rem;
+    color: black;
 }
-.cat-card__img img{
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Modales genéricos */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
+  background: rgba(0,0,0,.7);
+  z-index: 1000;
+  overflow-y: auto;
 }
-
-/* Botón de categoría bajo la imagen – nombre de categoría */
-.cat-card__btn{
-  width: 100%;
-  border: none;
-  border-top: var(--card-border);
-  border-radius: 0 0 var(--card-radius) var(--card-radius);
-  padding: 14px 12px;
-  background: #fff;
-  color: var(--color-text);
-  font-family: var(--font-main);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: .02em;
-  line-height: 1.3;
-  cursor: pointer;
-  transition: color .15s ease, background .15s ease;
-  flex-shrink: 0;
-  text-align: center;
-  touch-action: pan-x pan-y;
-}
-.cat-track--grabbing .cat-card__btn{
-  cursor: grabbing;
-}
-
-/* ✅ Efecto hover: texto rojo + línea abajo */
-.cat-card__btn:hover{
-  color: #ff0808;           /* ✅ rojo */
-}
-
-/* Línea abajo de la letra (subrayado pro) */
-.cat-card__btn:hover{
-  text-decoration: underline;
-  text-underline-offset: 6px;   /* distancia de la línea */
-  text-decoration-thickness: 2px;
-}
-
-/* ✅ Opcional: que se vea presionado */
-.cat-card__btn:active{
-  transform: scale(0.99);
-}
-
-/* ✅ Botón activo (cuando la categoría está seleccionada) */
-.cat-card__btn.is-active{
-  color: #d30909;
-  text-decoration: underline;
-  text-underline-offset: 6px;
-  text-decoration-thickness: 2px;
-}
-
-
-/* Móvil: tarjetas categorías con ancho fijo para scroll táctil; cantos alineados */
-@media (max-width: 639px){
-  .cat-track{
-    grid-auto-columns: 140px;
-    gap: var(--card-gap-sm);
-    padding: 10px 0;
-  }
-  .cat-card{
-    width: 140px;
-    min-width: 140px;
-    border-radius: var(--card-radius-sm);
-  }
-  .cat-card__img{ border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0; }
-  .cat-card__btn{ border-radius: 0 0 var(--card-radius-sm) var(--card-radius-sm); padding: 12px 10px; }
-}
-
-/* Tablet: 4 columnas visibles, centradas */
-@media (min-width: 640px){
-  .cat-track{
-    grid-auto-columns: calc((100% - 36px) / 4);
-  }
-}
-
-/* PC: 6 columnas visibles */
-@media (min-width: 1024px){
-  .cat-track{
-    grid-auto-columns: calc((100% - 70px) / 6);
-  }
-}
-
-/* Controles: puntitos y flechas centrados */
-.cat-controls{
+.modal.active {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 12px;
-  padding: 0 8px;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* Puntitos izquierda */
-.cat-dots{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-/* Flechas derecha */
-.cat-arrows{
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.cat-dot{
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: #111827;
-  opacity: .35;
-}
-.cat-dot.is-active{
-  opacity: 1;
-  background: #ef4444;
-}
-
-
-
-/* Floating Cart (palpita + flota) */
-/* =========================
-   Floating Cart (igual a foto + palpitar)
-========================= */
-
-@keyframes cartHeart {
-  0%   { transform: scale(1); }
-  12%  { transform: scale(1.08); }
-  24%  { transform: scale(1); }
-  40%  { transform: scale(1.06); }
-  55%  { transform: scale(1); }
-  100% { transform: scale(1); }
-}
-
-.floating-cart{
-  position: fixed;
-  right: 25px;
-  top: 800px;                 /* ✅ como tu foto (arriba) */
-  z-index: 80;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-
-  height: 50px;
-  padding: 0 16px;
-
-  border-radius: 999px;
-  border: 0;
-
-  background: #f3c51b;        /* ✅ amarillo foto */
-  color: #111;
-
-  font-weight: 900;
-  font-size: 14px;
-
-  box-shadow: 0 12px 26px rgba(0,0,0,.25);
-  cursor: pointer;
-
-  animation: cartHeart 1.25s infinite;
-}
-
-.floating-cart:hover{
-  filter: brightness(1.02);
-  box-shadow: 0 16px 34px rgba(0,0,0,.30);
-}
-
-.fc-icon{ font-size: 25px; line-height: 1; }
-
-.fc-count{
-  font-weight: 700;
-}
-
-.fc-text{
-  white-space: nowrap;
-}
-
-.fc-total{
-  color: #b90000;             /* ✅ rojo precio */
-  font-weight: 1000;
-}
-
-.floating-cart.is-empty{
-  animation: none;
-}
-
-
-
-
-
-
-/* Modal system */
-.modal{
-  display:none;
-  position: fixed;
-  inset:0;
-  z-index: 90;
-  background: rgba(0, 0, 0, 0.596);
-  padding: 18px;
   align-items: center;
   justify-content: center;
-}
-.modal.active{ display:flex; }
-
-.modal-card{
-  width: min(560px, 96vw);
-  background:rgb(255, 255, 255);
-  border-radius: 24px;
-  
-  overflow:hidden;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-}
-.modal-card-lg{ width: min(920px, 96vw); }
-.modal-card-xl{ width: min(1080px, 96vw); }
-
-.modal-head{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding: 14px 16px;
-  background: linear-gradient(135deg, #111, #222);
-  color:#fff;
-}
-.modal-title{ font-family: var(--font-main); font-weight: 800; font-size: 1.125rem; letter-spacing: .02em; }
-.modal-x{
-  background: rgba(255,255,255,.12);
-  border:1px solid rgba(255,255,255,.18);
-  color:#fff;
-  width: 40px; height: 40px;
-  border-radius: 14px;
-  font-weight: 900;
-}
-
-.modal-body{ padding: 14px 16px; }
-.modal-foot{
-  padding: 14px 16px;
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  background:#fafafa;
-  border-top: 1px solid rgba(0,0,0,.06);
-}
-
-/* Options blocks */
-.opt-block{
-  background:#fff;
-  border:1px solid rgba(0,0,0,.08);
-  border-radius: 18px;
-  padding: 12px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.06);
-}
-.opt-title{ font-family: var(--font-main); font-weight: 700; font-size: 1rem; margin-bottom: 10px; letter-spacing: .02em; }
-.opt-grid{
-  display:grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap:10px;
-}
-.opt-radio{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  padding: 10px;
-  border-radius: 14px;
-  border:1px solid rgba(0,0,0,.08);
-  background:#fafafa;
-  font-weight: 800;
-}
-.opt-radio input{ transform: scale(1.1); }
-
-.qty-row{ display:flex; align-items:center; justify-content:flex-start; gap:12px; }
-.qty-btn{
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  border: 1px solid rgba(0,0,0,.12);
-  background:#fff;
-  font-size: 22px;
-  font-weight: 1000;
-}
-.qty-value{
-  width: 50px;
-  text-align:center;
-  font-weight: 1000;
-  font-size: 18px;
 }
 
 /* Toast */
-.toast{
+.toast {
   position: fixed;
-  right: 16px;
-  bottom: 92px;
-  z-index: 120;
-  background: #16a34a;
-  color:#fff;
-  font-weight: 900;
-  padding: 12px 14px;
-  border-radius: 16px;
-  box-shadow: 0 25px 70px rgba(0,0,0,.28);
-  animation: toastIn .25s ease;
-}
-@keyframes toastIn{
-  from{ transform: translateX(20px); opacity:0; }
-  to{ transform: translateX(0); opacity:1; }
-}
-
-/* Forms */
-.form-label{ display:block; font-family: var(--font-main); font-weight: 700; font-size: var(--text-sm); color: var(--color-text); margin-bottom: 6px; }
-.form-input{
-  width:100%;
-  border-radius: 14px;
-  border: 1px solid rgba(0,0,0,.12);
-  padding: 12px;
-  outline:none;
-}
-.form-input:focus{ border-color: rgba(255,45,45,.6); box-shadow: 0 0 0 4px rgba(255,45,45,.12); }
-.form-textarea{ resize: vertical; white-space: pre-wrap; }
-.hint-25{ font-size: 11px; color:#6b7280; margin-top: 6px; }
-
-
-
-
-/* =========================================================
-   PROMO COMBOS: FIX PARA PC CHICO / TABLET (se ve gigante)
-   Objetivo: 1 columna + card horizontal compacta
-   ========================================================= */
-
-/* Combos: tablet y PC pequeño – 1 columna, card horizontal */
-@media (max-width: 900px){
-  .pollon-combos{
-    grid-template-columns: 1fr;
-    gap: var(--card-gap);
-  }
-  .pollon-combos .combo-card{
-    grid-template-columns: minmax(140px, 200px) 1fr;
-    align-items: stretch;
-  }
-
-  /* 3) Imagen controlada (aquí se arregla lo “gigante”) */
-  .pollon-combos .combo-media{
-    aspect-ratio: 1;
-    min-height: 140px;
-  }
-  .pollon-combos .combo-media img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  .pollon-combos .combo-body{ padding: 12px 14px; }
-  .pollon-combos .combo-title{ font-size: 1rem; }
-  .pollon-combos .combo-text{ -webkit-line-clamp: 2; line-clamp: 2; font-size: var(--text-sm); line-height: 1.45; }
-  .pollon-combos .combo-cta{ margin-top: auto; }
-}
-
-
-
-
-
-
-
-
-/* Combos cards */
-
-
-/* Combos: grid adaptable, mismo lenguaje visual que productos/categorías */
-.pollon-combos{
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
-  gap: var(--card-gap);
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-}
-
-/* Tablet y PC (641px+): 2 columnas, TODOS los cuadros misma altura y mismo ancho */
-@media (min-width: 641px){
-  .pollon-combos{
-    grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 300px;
-    gap: var(--card-gap);
-    align-items: stretch;
-    justify-items: stretch;
-    max-width: 100%;
-  }
-  .pollon-combos .combo-card{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: stretch;
-    min-height: 0;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-  }
-  .pollon-combos .combo-media{
-    aspect-ratio: auto;
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .pollon-combos .combo-body{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding: 16px 18px;
-    min-height: 0;
-    overflow: hidden;
-  }
-  .pollon-combos .combo-text{
-    -webkit-line-clamp: 3;
-    line-clamp: 3;
-    overflow: hidden;
-  }
-  .pollon-combos .combo-cta{
-    margin-top: auto;
-    flex-shrink: 0;
-  }
-}
-
-.combo-card{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: #fff;
-  border-radius: var(--card-radius);
-  overflow: hidden;
-  border: var(--card-border);
-  box-shadow: var(--card-shadow);
-  min-width: 0;
-  max-width: 100%;
-  transition: box-shadow .2s ease, border-color .2s ease;
-}
-.combo-card:hover{
-  box-shadow: var(--card-shadow-hover);
-  border-color: rgba(0,0,0,.08);
-}
-.combo-media{
-  background: linear-gradient(145deg, #5c1212, #721616);
-  aspect-ratio: 4 / 3;
-  min-height: 0;
-  overflow: hidden;
-}
-.combo-media img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-.combo-body{
-  padding: 16px 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  min-width: 0;
-}
-.combo-sticker{
-  display:inline-flex;
-  align-self:flex-start;
-  background: #ffdd00;
-  color:#111;
-  font-weight: 1000;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-}
-.combo-sticker.alt{ background:#000000; color:#fff; }
-.combo-title{
-  margin-top: 8px;
-  font-family: var(--font-main);
-  font-weight: 800;
-  font-size: 1.0625rem;
-  line-height: 1.3;
-  letter-spacing: .02em;
-  color: var(--color-text);
-}
-.combo-text{
-  margin-top: 4px;
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
-  line-height: 1.45;
-  font-family: var(--font-main);
-  letter-spacing: .01em;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-}
-.combo-btn{
-  margin-top: 12px;
-  display:inline-flex;
-
-
-
-  align-self:flex-start;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, var(--red1), var(--red2));
-  color:#fff;
-  font-weight: 1000;
-}
-
-/* ✅ Botón + iconos a la derecha (como la foto) */
-.combo-cta{
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between; /* botón izq / icono der */
-  gap: 12px;
-}
-
-/* =========================
-   ⭐ Estrellas “saltando”
-========================= */
-.combo-stars{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding-right: 6px;
-}
-
-.combo-stars .star{
-  font-size: 25px;
-  line-height: 1;
-  display: inline-block;
-  transform: translateY(0);
-  animation: starJump 1s infinite;
-}
-
-/* retrasos para que “salten” una por una */
-.combo-stars .s1{ animation-delay: 0s; }
-.combo-stars .s2{ animation-delay: .12s; }
-.combo-stars .s3{ animation-delay: .24s; }
-
-@keyframes starJump{
-  0%, 100%{ transform: translateY(0); }
-  40%{ transform: translateY(-6px); }
-  70%{ transform: translateY(0); }
-}
-
-/* =========================
-   ❤ Corazón “palpitando”
-========================= */
-.combo-heart{
-  font-size: 25px;
-  line-height: 1;
-  display: inline-block;
-  transform: scale(1);
-  animation: heartBeat 1.05s infinite;
-}
-
-@keyframes heartBeat{
-  0%{ transform: scale(1); }
-  18%{ transform: scale(1.15); }
-  35%{ transform: scale(1); }
-  55%{ transform: scale(1.10); }
-  70%{ transform: scale(1); }
-  100%{ transform: scale(1); }
-}
-
-
-
-
-/* Location Pro: mapa protagonista + cabecera sutil con dirección */
-.location-pro{
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-.location-card{
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0,0,0,.08);
-  border: 1px solid rgba(0,0,0,.06);
-  width: 100%;
-  min-width: 0;
-}
-/* Cabecera pequeña: solo la dirección */
-.location-address{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: #f8f9fa;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  font-family: var(--font-main);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: .03em;
-}
-.location-address-icon{
-  font-size: 1rem;
-  opacity: .9;
-}
-.location-address-text{
-  color: var(--color-text);
-  font-weight: 600;
-}
-/* Mapa ocupa la mayor parte del espacio */
-.location-map{
-  flex: 1;
-  min-height: 320px;
-  min-width: 0;
-}
-.location-map iframe{
-  width: 100%;
-  height: clamp(320px, 55vh, 480px);
-  border: 0;
-  display: block;
-}
-/* Mantener estilos .loc-* por si se usan en otros sitios */
-.loc-name{
-  font-family: var(--font-main);
-  font-weight: 800;
-  font-size: 1.25rem;
-  letter-spacing: .02em;
-  line-height: 1.25;
-}
-.loc-line{ margin-top: 8px; display:flex; gap:10px; align-items:flex-start; }
-.loc-link{ color:#fff; font-weight: 700; text-decoration: underline; }
-.loc-tags{ margin-top: 12px; display:flex; flex-wrap: wrap; gap:8px; }
-.tag{
-  background: rgba(255,255,255,.14);
-  border: 1px solid rgba(255,255,255,.2);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 12px;
-}
-
-/* Admin */
-.admin-open{
-  background:#fff;
-  border:1px solid rgba(0,0,0,.08);
-  border-radius: 24px;
-  padding: 14px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.08);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap: 10px;
-}
-.admin-open-btn{
-  background:#111;
-  color:#fff;
-  font-weight: 1000;
-  padding: 10px 14px;
-  border-radius: 14px;
-}
-.admin-stats{
-  display:grid;
-  grid-template-columns: repeat(7, minmax(0,1fr));
-  gap: 10px;
-}
-.stat{
-  background:#fff;
-  border:1px solid rgba(0,0,0,.08);
-  border-radius: 18px;
-  padding: 10px;
-}
-.stat .k{ font-size: 12px; color:#6b7280; font-weight: 900; }
-.stat .v{ font-weight: 1000; font-size: 18px; color:#111; margin-top: 4px; }
-
-.admin-filters{
-  display:grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 10px;
-  background:#fafafa;
-  border:1px solid rgba(0,0,0,.06);
-  border-radius: 22px;
-  padding: 12px;
-}
-.admin-table-wrap{
-  overflow:auto;
-  border-radius: 22px;
-  border:1px solid rgba(0,0,0,.08);
-  background:#fff;
-}
-.admin-table{
-  width:100%;
-  border-collapse: collapse;
-  min-width: 820px;
-}
-.admin-table th, .admin-table td{
-  padding: 10px 12px;
-  border-bottom: 1px solid rgba(0,0,0,.06);
-  text-align:left;
-  vertical-align: top;
-}
-.admin-table th{
-  background:#111;
-  color:#fff;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.admin-actions{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.admin-mini{
-  padding: 8px 10px;
-  border-radius: 12px;
-  font-weight: 1000;
-  border:1px solid rgba(0,0,0,.12);
-  background:#fff;
-}
-.admin-mini.primary{
-  background: linear-gradient(135deg, var(--red1), var(--red2));
-  color:#fff;
-  border-color: transparent;
-}
-.admin-mini.dark{
-  background:#111;
-  color:#fff;
-  border-color: transparent;
-}
-
-/* Chatbot */
-
-
-
-.pay-box{
-  margin-top: 10px;
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 18px;
-  padding: 12px;
-}
-.pay-title{ font-weight: 1000; margin-bottom: 10px; }
-.pay-pill{
-  display:inline-flex;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.12);
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 900;
-  margin-right: 8px;
-  margin-bottom: 8px;
-}
-
-.footer-bottom{
-  margin-top: 16px;
-  padding: 14px;
-  border-radius: 24px;
-  border: 1px solid rgba(255,255,255,.08);
-  background: rgba(255,255,255,.04);
-}
-.social-row{ display:flex; flex-wrap: wrap; gap:10px; margin-top: 10px; }
-.social-btn{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.10);
-  border: 1px solid rgba(255,255,255,.10);
-  font-weight: 1000;
-}
-.social-btn:hover{ background: rgba(255,45,45,.22); }
-
-/* Responsive: location, admin (combos ya tienen su media arriba) */
-@media (max-width: 980px){
-  .location-map iframe{ height: clamp(280px, 50vh, 420px); }
-  .admin-stats{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .admin-filters{ grid-template-columns: 1fr 1fr; }
-}
-/* Combos en celular: 1 por fila, cantos alineados con el contenido */
-@media (max-width: 640px){
-  .pollon-combos{
-    grid-template-columns: 1fr;
-    gap: var(--card-gap);
-    justify-items: stretch;
-    align-items: stretch;
-  }
-  .pollon-combos .combo-card{
-    grid-template-columns: 1fr;
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
-  }
-  .pollon-combos .combo-media{
-    aspect-ratio: 4 / 3;
-    min-height: 0;
-    width: 100%;
-  }
-  .pollon-combos .combo-media img{
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .pollon-combos .combo-body{
-    padding: 14px 16px;
-  }
-  .pollon-combos .combo-title{ font-size: 0.9375rem; }
-  .pollon-combos .combo-text{
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    font-size: var(--text-sm);
-    line-height: 1.45;
-  }
-  .pollon-combos .combo-cta{ margin-top: 12px; }
-}
-
-
-
-
-
-
-
-
- /* =====================================
-   TIPOGRAFÍA GLOBAL PROFESIONAL
-   ===================================== */
-
-/* Texto base: fácil de leer en todo el sitio */
-body{
-  font-size: var(--text-base);
-  line-height: var(--leading-normal);
-  color: var(--color-text);
-  font-family: var(--font-main);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-
-/* Descripciones: compactas, sin espacio excesivo entre líneas */
-.pdesc,
-.combo-text{
-  font-size: var(--text-sm);
-  line-height: 1.45;
-  color: var(--color-text-muted);
-  text-align: left;
-  margin-top: 4px;
-}
-
-/* Párrafos largos (footer, ubicación, etc.): justificados y legibles */
-p,
-.location-info,
-.loc-line,
-.pollon-footer__note{
-  font-size: 14px;
-  line-height: 1.55;
-  color: var(--color-text-muted);
-  text-align: justify;
-  text-justify: inter-word;
-}
-
-.pollon-footer__link,
-.form-label{
-  font-size: 14px;
-  line-height: 1.5;
-  color: var(--color-text);
-}
-
-.hint-25{ font-size: var(--text-xs); line-height: 1.4; color: var(--color-text-muted); }
-
-/* Títulos: jerarquía clara y legible */
-h1, h2, h3, h4,
-.category-title,
-.loc-name,
-.combo-title,
-.ptitle,
-.pollon-footer__title,
-.adminp-title-main,
-.modal-title{
-  font-family: var(--font-main);
-  font-weight: 800;
-  letter-spacing: .02em;
-  line-height: var(--leading-tight);
-  color: var(--color-text);
-}
-
-/* Textos pequeños de apoyo */
-.badge,
-.tag,
-.pay-pill,
-.adminp-muted,
-.pollon-footer__find{
-  font-size: var(--text-xs);
-  line-height: 1.4;
-  font-family: var(--font-main);
-}
-
- /*===== NUEVAS MODIFICACIONES ===== */
-
-
-/* ✅ Ocultar slider cuando se elige categoría desde el menú */
-.cat-slider.is-hidden{
-  display: none;
-}
-
-/* ✅ Ocultar hero/carrusel cuando sea necesario */
-.hero.is-hidden{
-  display: none;
-}
-
-
-/* ✅ Cabecera de sección (nombre de categoría en página) */
-.category-title{
-  margin-top: 16px;
-  margin-bottom: 12px;
-  font-family: var(--font-main);
-  font-weight: 800;
-  font-size: 1.125rem;
-  letter-spacing: .02em;
-  line-height: 1.25;
-  color: var(--color-text);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  max-width: 100%;
-}
-
-/* ✅ Cuando el slider se oculta, baja un poco la cabecera */
-.cat-slider.is-hidden + .category-title{
-  margin-top: 22px;
-}
-
-/* ✅ FIX HEADER SOLO MÓVIL: botones en 1 sola línea */
-@media (max-width: 520px){
-
-  /* 1) forzar una sola fila */
-  .header-actions{
-    flex-wrap: nowrap;         /* 🔥 clave: no baja a otra línea */
-    gap: 2px;
-    justify-content: center;
-  }
-
-  /* 2) hacer botones más compactos para que entren */
-  .pedido-link{
-    padding: 5px 6px;          /* menos alto/ancho */
-    font-size: 11px;           /* texto más pequeño */
-    letter-spacing: 0.2px;
-    white-space: nowrap;       /* no parte la palabra */
-  }
-
-  /* 3) opcional: si aún no entra, que el centro no tenga tanto espacio */
-  .header-center{
-    gap: 6px;
-  }
-
-  /* 4) opcional: pregunta un poquito más pequeña */
-  .header-question{
-    font-size: 12px;
-  }
-}
-
-
-
-
-/* ======nuevo footer estilo pollon ====== */
-
-/* ==============================
-   FOOTER NUEVO (estilo referencia)
-============================== */
-.pollon-footer{
-  background: linear-gradient(180deg, #1b1c1f 0%, #121316 100%);
-  color: rgba(255,255,255,.92);
-  padding:  0;
-}
-
-.pollon-footer__wrap{
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 22px 24px;
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 26px;
-}
-
-/* Títulos en mayúscula + línea abajo (como la foto) */
-.pollon-footer__title{
-  font-weight: 900;
-  letter-spacing: .5px;
-  font-size: 13px;
-  text-transform: uppercase;
-  padding-bottom: 10px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid rgba(255,255,255,.25);
-}
-
-.pollon-footer__link{
-  display: block;
-  font-size: 13px;
-  line-height: 1.9;
-  color: rgba(255,255,255,.80);
-  text-decoration: none;
-}
-
-.pollon-footer__link:hover{
-  color: #ffffff;
-  text-decoration: underline;
-}
-
-.pollon-footer__link--accent{
-  color: #7CFF7C; /* toque verde como la referencia */
-}
-
-.pollon-footer__book{
-  display: inline-block;
-  margin-top: 14px;
-  width: 170px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.pollon-footer__book img{
-  width: 100%;
-  display: block;
-}
-
-/* pagos */
-.pollon-footer__pay{
-  display: grid;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.pollon-footer__pay img{
-  height: 34px;
-  object-fit: contain;
-  filter: grayscale(1);
-  opacity: .85;
-}
-
-.pollon-footer__note{
-  margin-top: 12px;
-  font-size: 12px;
-  color: rgba(255,255,255,.70);
-}
-
-/* select */
-.pollon-footer__find{
-  margin-top: 12px;
-  font-size: 13px;
-  color: rgba(255,255,255,.85);
-}
-
-.pollon-footer__select{
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: rgba(0,0,0,.25);
-  border: 1px solid rgba(255,255,255,.18);
+  bottom: 100px;
+  right: 20px;
+  background: #067902;
+  color: #e9e6e6;
+  padding: 16px 24px;
   border-radius: 8px;
-  padding: 8px 10px;
-  width: fit-content;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  z-index: 2000;
+  animation: slideIn .3s ease;
+}
+@keyframes slideIn {
+  from { transform: translateX(400px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
-.pollon-footer__select select{
-  background: transparent;
-  border: 0;
-  outline: none;
-  color: #fff;
-  font-weight: 800;
-  letter-spacing: .3px;
-}
-
-.pollon-footer__pin{
-  opacity: .9;
-}
-
-/* redes */
-.pollon-footer__social{
-  margin-top: 14px;
-  display: flex;
-  gap: 12px;
-}
-
-.pollon-footer__social a{
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border-radius: 6px;
-  background: rgba(255,255,255,.08);
-  border: 1px solid rgba(255,255,255,.10);
-  color: rgba(255,255,255,.90);
-  text-decoration: none;
-  font-weight: 900;
-}
-
-.pollon-footer__social a:hover{
-  background: rgba(255,45,45,.18);
-  border-color: rgba(255,45,45,.25);
-}
-
-/* barra inferior */
-.pollon-footer__bottom{
-  text-align: center;
-  font-size: 12px;
-  color: rgba(255,255,255,.65);
-  padding: 18px 16px;
-  border-top: 1px solid rgba(255,255,255,.10);
-}
-
-/* Responsive */
-@media (max-width: 1100px){
-  .pollon-footer__wrap{
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-@media (max-width: 640px){
-  .pollon-footer__wrap{
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-  .pollon-footer__book{ width: 200px; }
-}
-
-
-
-
-/* ============================
-   FOOTER FULL WIDTH (CANTO A CANTO)
-============================ */
-
-/* 2. Footer pegado abajo y fondo full */
-.pollon-footer{
-  width: 100vw;                 /* ancho total pantalla */
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(180deg, #000000, #0b0b0f);
-  position: relative;
-  left: 50%;
-  right: 50%;
-  margin-left: -50vw;           /* truco PRO para romper contenedores */
-  margin-right: -50vw;
-}
-
-/* 3. Contenedor interno (solo ordena el contenido) */
-.pollon-footer__wrap{
-  max-width: 1200px;            /* ancho profesional */
-  margin: 0 auto;               /* centra contenido */
-  padding: 32px 16px;           /* SOLO padding interno */
-  box-sizing: border-box;
-}
-
-/* 4. Parte inferior (copyright + admin) */
-.pollon-footer__bottom{
-  width: 100%;
-  margin: 0;
-  padding: 14px 0;              /* sin padding lateral */
-  border-top: 1px solid rgba(255,255,255,.12);
-  background: #000;             /* negro sólido */
-}
-
-/* 5. Alineación interna del bottom */
-.pollon-footer__bottom-row{
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
+/* Logo circular */
+.logo-container {
+  width: 120px;
+  height: 120px;
+  background: #fff;
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  overflow: hidden;
 }
 
-/* 6. Texto copyright */
-.pollon-footer__copy{
-  font-size: 12px;
-  color: rgba(255,255,255,.75);
+/* Imagen de producto */
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+
 }
 
-/* 7. Botón admin pequeño */
-.pollon-footer__admin-btn{
-  padding: 4px 10px;
-  font-size: 11px;
-  font-weight: 900;
+
+
+/* Botón Admin (estático) */
+#admin-open-btn {
+  background: linear-gradient(135deg,#111827 0%,#4b5563 100%);
+  color: #f9fafb;
+  padding: 8px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.2);
-  background: rgba(255,255,255,.05);
-  color: #fff;
-  cursor: pointer;
-}
-
-.pollon-footer__admin-btn:hover{
-  border-color: #ff2d2d;
-  color: #ff2d2d;
-}
-
-
-
-
-
-
-
-
-/* ===== TOP PILL BUTTONS: tarjetitas superiores (Top vendidos / Favoritos) ===== */
-.topbar-wrap{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: var(--card-gap);
-  padding: 8px 0;
-  margin-top: 4px;
-  flex-wrap: nowrap;
-  white-space: nowrap;
-  width: 100%;
-  max-width: 100%;
-}
-
-.top-pill{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-width: 0;
-  flex: 1 1 0;
-  max-width: 360px;
-  padding: 12px 20px;
-  border-radius: var(--card-radius);
-  background: #fff;
-  border: var(--card-border);
-  box-shadow: var(--card-shadow);
-  font-weight: 800;
-  color: var(--color-text);
-  text-decoration: none;
-  overflow: hidden;
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
-}
-.top-pill:hover{
-  transform: translateY(-2px);
-  box-shadow: var(--card-shadow-hover);
-  border-color: rgba(0,0,0,.08);
-  background: #fff;
-}
-.top-pill:active{ transform: scale(.99); }
-
-/* Texto: alineado, misma tipografía en ambos botones */
-.pill-left{
-  flex: 0 0 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: clamp(13px, 2.6vw, 15px);
-  font-weight: 800;
-  color: #111;
-  line-height: 1.2;
-}
-
-/* ⭐ Estrellas: espaciado uniforme, centradas */
-.pill-stars{
+  font-size: 13px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  flex: 0 0 auto;
-  min-width: 0;
-}
-.pill-stars .star{
-  display: inline-block;
-  font-size: 1rem;
-  line-height: 1;
-  flex-shrink: 0;
-  animation: starHop 0.8s ease-in-out infinite;
-}
-.pill-stars .star:nth-child(2){ animation-delay: .15s; }
-.pill-stars .star:nth-child(3){ animation-delay: .3s; }
-
-@keyframes starHop{
-  0%,100%{ transform: translateY(0); }
-  50%{ transform: translateY(-3px); }
-}
-
-.pill-heart{
-  display: inline-block;
-  font-size: 18px;
-  line-height: 1;
-  animation: heartBeat 0.9s ease-in-out infinite;
-  flex: 0 0 auto;
-}
-@keyframes heartBeat{
-  0%,100%{ transform: scale(1); }
-  40%{ transform: scale(1.12); }
-  60%{ transform: scale(0.98); }
-}
-
-/* Favoritos: mismo centrado que Top vendidos, corazones rojo vino */
-.top-pill--favoritos{
-  justify-content: center;
-  background: #f3f4f6;
-}
-.top-pill--favoritos .pill-hearts{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: 0 0 auto;
-  min-width: 0;
-}
-.top-pill--favoritos .pill-heart{
-  font-size: 1.1rem;
-  line-height: 1;
-  color: #a0454d;
-  text-shadow: 0 1px 2px rgba(0,0,0,.2);
-  animation: heartBeat 0.9s ease-in-out infinite;
-}
-.top-pill--favoritos .pill-heart:nth-child(2){ animation-delay: .15s; }
-.top-pill--favoritos .pill-heart:nth-child(3){ animation-delay: .3s; }
-
-/* Celular: iconos más pequeños y menos gap para que no se salgan */
-@media (max-width: 480px){
-  .top-pill{
-    padding: 8px 12px;
-    gap: 6px;
-  }
-  .pill-left{
-    font-size: 12px;
-  }
-  .pill-stars .star{
-    font-size: 14px;
-  }
-  .pill-stars{ gap: 4px; }
-  .top-pill--favoritos .pill-hearts{ gap: 4px; }
-  .top-pill--favoritos .pill-heart{
-    font-size: 14px;
-  }
-  @keyframes starHop{
-    0%,100%{ transform: translateY(0); }
-    50%{ transform: translateY(-2px); }
-  }
-  @keyframes heartBeat{
-    0%,100%{ transform: scale(1); }
-    40%{ transform: scale(1.08); }
-    60%{ transform: scale(0.98); }
-  }
-}
-
-/* Tablet: tamaño intermedio */
-@media (min-width: 481px) and (max-width: 768px){
-  .top-pill{ padding: 9px 16px; gap: 8px; }
-  .pill-stars .star{ font-size: 15px; }
-  .pill-stars{ gap: 5px; }
-  .top-pill--favoritos .pill-heart{ font-size: 1rem; }
-  .top-pill--favoritos .pill-hearts{ gap: 5px; }
-}
-
-/* PC: ambos botones mismo ancho, bien alineados */
-@media (min-width: 1024px){
-  .topbar-wrap{ gap: 18px; }
-  .top-pill{
-    flex: 0 0 auto;
-    width: 200px;
-    min-width: 200px;
-  }
-}
-
-
-
-
-/* =========================
-   ❤ Corazón en cards (centrado)
-========================= */
-.pheart{
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.10);
-  background: #fff;
-  display: grid;
-  place-items: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,.3);
   cursor: pointer;
-  user-select: none;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-.pheart:hover{
-  transform: translateY(-1px);
-  border-color: rgba(239, 68, 68, .35);
-  box-shadow: 0 10px 25px rgba(0,0,0,.10);
-}
-.pheart:active{ transform: scale(.96); }
-
-.pheart-icon{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #a63d4b;
-  line-height: 1;
-}
-.pheart-icon svg{
-  width: 18px;
-  height: 18px;
-  display: block;
-}
-
-/* estado "activo" (si quieres que se quede marcado) */
-.pheart.is-on{
-  background: rgba(225, 29, 72, .08);
-  border-color: rgba(225, 29, 72, .35);
-}
-
-/* contenedor de partículas */
-.pheart-burst{
-  position:absolute;
-  inset:0;
-  pointer-events:none;
-}
-
-/* cada corazoncito que sale (mismo estilo outline) */
-.pheart-float{
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform: translate(-50%, -50%);
-  line-height: 1;
-  color: #a63d4b;
-  opacity: 0;
-  animation: heartOrbitBack 900ms ease-out forwards;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.pheart-float svg{
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-
-/* animación: sale, “gira” y vuelve al mismo centro */
-@keyframes heartOrbitBack{
-  0%{
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(.6);
-  }
-  10%{
-    opacity: 1;
-  }
-  55%{
-    opacity: 1;
-    transform:
-      translate(-50%, -50%)
-      translate(var(--dx), var(--dy))
-      rotate(180deg)
-      scale(1);
-  }
-  100%{
-    opacity: 0;
-    transform:
-      translate(-50%, -50%)
-      translate(0px, 0px)
-      rotate(360deg)
-      scale(.25);
-  }
-}
-
-
-
-
-
-
-/*  ===NUEVO DISEÑO DE PANERL DE ADMINISTRACIÓN=== */
-/* =========================
-   PANEL ADMIN (igual a la foto)
-========================= */
-.adminp-card{
-  width: min(1100px, 96vw);
-  background: #fff;
-  border-radius: 18px;
-  box-shadow: 0 30px 90px rgba(0,0,0,.35);
-  overflow: hidden;
-  border: 1px solid rgba(0,0,0,.08);
-}
-
-/* Header */
-.adminp-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:14px;
-  padding: 18px 18px 10px;
-}
-.adminp-title{
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-}
-.adminp-icon{
-  font-size: 22px;
-  margin-top: 2px;
-}
-.adminp-title-main{
-  font-weight: 1000;
-  font-size: 22px;
-  color:#111827;
-}
-.adminp-title-sub{
-  margin-top: 4px;
-  color:#6b7280;
-  font-size: 13px;
-}
-
-/* Chips estado */
-.adminp-chips{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-}
-.adminp-chip{
-  border: 1px solid rgba(0,0,0,.12);
-  background:#fff7ed;
-  color:#92400e;
-  font-weight: 900;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  cursor:pointer;
-}
-.adminp-chip-blue{ background:#eff6ff; color:#1d4ed8; }
-.adminp-chip-green{ background:#ecfdf5; color:#047857; }
-.adminp-chip-red{ background:#fef2f2; color:#b91c1c; }
-.adminp-chip.is-on{
-  box-shadow: 0 10px 25px rgba(0,0,0,.10);
-  border-color: rgba(0,0,0,.22);
-}
-
-/* Stats */
-.adminp-stats{
-  padding: 12px 18px 0;
-  display:grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-.adminp-stat{
-  background:#fff;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 14px;
-  padding: 12px;
-}
-.adminp-stat .k{
-  font-size: 11px;
-  font-weight: 900;
-  color:#6b7280;
-  letter-spacing:.4px;
-}
-.adminp-stat .v{
-  margin-top: 6px;
-  font-weight: 1000;
-  font-size: 20px;
-  color:#111827;
-}
-.adminp-stat-wide{
-  grid-column: span 1;
-}
-
-/* segunda fila: 3 cards más anchas */
-@media (min-width: 900px){
-  .adminp-stats{
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-  .adminp-stat-wide{
-    grid-column: span 1;
-  }
-}
-
-/* Filtros */
-.adminp-filters{
-  margin: 14px 18px 12px;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 14px;
-  padding: 12px;
-  background:#fafafa;
-  display:grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-.adminp-field{ min-width:0; }
-.adminp-field-search{ grid-column: span 2; }
-
-.adminp-label{
-  display:block;
-  font-size: 12px;
-  font-weight: 900;
-  color:#374151;
-  margin-bottom: 6px;
-}
-.adminp-input{
-  width:100%;
-  border: 1px solid rgba(0,0,0,.12);
-  border-radius: 10px;
-  padding: 10px 10px;
-  background:#fff;
-  outline:none;
-}
-.adminp-input:focus{
-  border-color: rgba(59,130,246,.55);
-  box-shadow: 0 0 0 4px rgba(59,130,246,.10);
-}
-
-/* Acciones */
-.adminp-actions{
-  grid-column: span 4;
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
-}
-.adminp-btn{
-  border-radius: 10px;
-  padding: 10px 12px;
-  font-weight: 900;
-  border: 1px solid rgba(0,0,0,.12);
-  background:#fff;
-  cursor:pointer;
-}
-.adminp-btn-soft{ background:#fff; }
-.adminp-btn-primary{
-  background:#2563eb;
-  border-color:#2563eb;
-  color:#fff;
-}
-.adminp-btn:active{ transform: scale(.99); }
-
-.adminp-range-note{
-  grid-column: span 4;
-  font-size: 12px;
-  color:#6b7280;
-  padding-top: 2px;
-}
-
-/* Tabla */
-.adminp-tablewrap{
-  margin: 0 18px 14px;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 14px;
-  overflow:auto;
-  max-height: 420px;
-  background:#fff;
-}
-.adminp-table{
-  width:100%;
-  border-collapse: collapse;
-  min-width: 900px;
-}
-
-/* filas tipo “lista” como foto */
-.adminp-row{
-  border-bottom: 1px solid rgba(0,0,0,.06);
-}
-.adminp-cell{
-  padding: 12px;
-  font-size: 13px;
-  vertical-align: middle;
-  color:#111827;
-}
-.adminp-muted{ color:#6b7280; font-size:12px; }
-.adminp-money{ font-weight: 1000; }
-
-.adminp-badge{
-  display:inline-flex;
-  align-items:center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 12px;
-  border: 1px solid rgba(0,0,0,.08);
-}
-.adminp-badge.pendiente{ background:#fff7ed; color:#92400e; }
-.adminp-badge.prep{ background:#eff6ff; color:#1d4ed8; }
-.adminp-badge.camino{ background:#f5f3ff; color:#6d28d9; }
-.adminp-badge.entregado{ background:#ecfdf5; color:#047857; }
-.adminp-badge.cancelado{ background:#fef2f2; color:#b91c1c; }
-
-.adminp-actions-mini{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.adminp-mini{
-  padding: 7px 10px;
-  border-radius: 10px;
-  font-weight: 900;
-  border: 1px solid rgba(0,0,0,.12);
-  background:#fff;
-  cursor:pointer;
-}
-.adminp-mini.primary{ background:#2563eb; color:#fff; border-color:#2563eb; }
-.adminp-mini.wa{ background:#10b9811a; border-color:#10b98155; }
-
-/* Footer */
-.adminp-foot{
-  padding: 12px 18px 16px;
-  display:flex;
-  justify-content:flex-end;
-}
-.adminp-close{
-  background:#111827;
-  color:#fff;
-  font-weight: 1000;
-  border:0;
-  border-radius: 12px;
-  padding: 10px 14px;
-  cursor:pointer;
-}
-
-/* Responsive */
-@media (max-width: 900px){
-  .adminp-stats{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .adminp-filters{ grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .adminp-field-search{ grid-column: span 2; }
-}
-
-
-
-/* =========================
-   PANEL ADMIN - MEJORAS MODERNAS + RESPONSIVE
-   (NO TOCA IDs ni JS)
-========================= */
-
-/* Fondo del modal más elegante */
-#admin-panel-modal.modal{
-  padding: 12px;
-  backdrop-filter: blur(10px);
-}
-
-/* Card más moderna (gradiente suave) */
-.adminp-card{
-  background: linear-gradient(180deg, #ffffff 0%, #fbfbff 100%);
-  border: 1px solid rgba(0,0,0,.08);
-}
-
-/* Header con separación mejor */
-.adminp-head{
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.adminp-title{
-  min-width: 240px;
-}
-
-/* Chips más modernos */
-.adminp-chip{
-  padding: 6px 10px;
-  font-size: 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0,0,0,.10);
-  box-shadow: 0 8px 18px rgba(0,0,0,.05);
-}
-.adminp-chip.is-on{
-  transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(0,0,0,.12);
-}
-
-/* Stats con colores para diferenciar */
-.adminp-stat{
-  position: relative;
-  overflow: hidden;
-}
-.adminp-stat::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  background: linear-gradient(135deg, rgba(37,99,235,.08), rgba(16,185,129,.06));
-  opacity: .7;
-  pointer-events:none;
-}
-.adminp-stat:nth-child(1)::before{ background: linear-gradient(135deg, rgba(99,102,241,.10), rgba(14,165,233,.06)); }
-.adminp-stat:nth-child(2)::before{ background: linear-gradient(135deg, rgba(16,185,129,.12), rgba(34,197,94,.06)); }
-.adminp-stat:nth-child(3)::before{ background: linear-gradient(135deg, rgba(245,158,11,.12), rgba(251,191,36,.06)); }
-.adminp-stat:nth-child(4)::before{ background: linear-gradient(135deg, rgba(239,68,68,.10), rgba(244,63,94,.06)); }
-
-.adminp-stat .k{ position: relative; }
-.adminp-stat .v{ position: relative; }
-
-/* Inputs más compactos */
-.adminp-input{
-  padding: 9px 10px;
-  font-size: 13px;
-}
-
-/* Botones MÁS PEQUEÑOS y compactos */
-.adminp-btn{
-  padding: 8px 10px;
-  font-size: 13px;
-  border-radius: 10px;
-}
-.adminp-actions{
-  gap: 8px;
-}
-
-/* Botones mini (tabla) más pequeños */
-.adminp-mini{
-  padding: 6px 9px;
-  font-size: 12px;
-  border-radius: 10px;
-}
-.adminp-actions-mini{
-  gap: 6px;
-}
-
-/* Tabla: más limpia */
-.adminp-tablewrap{
-  max-height: 460px;
-}
-.adminp-cell{
-  padding: 10px 10px;
-}
-
-/* =========================
-   RESPONSIVE REAL (móvil/tablet)
-========================= */
-
-/* Tablets y pantallas medianas */
-@media (max-width: 900px){
-  .adminp-stats{
-    grid-template-columns: repeat(2, minmax(0,1fr));
-  }
-  .adminp-filters{
-    grid-template-columns: repeat(2, minmax(0,1fr));
-  }
-  .adminp-actions{
-    grid-column: span 2;
-  }
-  .adminp-actions .adminp-btn{
-    flex: 1 1 auto;
-  }
-}
-
-/* Celulares: stats 1 columna, filtros 1 columna */
-@media (max-width: 560px){
-  .adminp-card{
-    width: 100%;
-    border-radius: 16px;
-  }
-
-  .adminp-head{
-    padding: 14px 14px 8px;
-  }
-
-  .adminp-title-main{ font-size: 18px; }
-  .adminp-title-sub{ font-size: 12px; }
-
-  .adminp-stats{
-    grid-template-columns: 1fr;
-    padding: 10px 14px 0;
-  }
-
-  .adminp-filters{
-    grid-template-columns: 1fr;
-    margin: 12px 14px 10px;
-  }
-  .adminp-field-search{ grid-column: span 1; }
-
-  .adminp-actions{
-    grid-column: span 1;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .adminp-actions .adminp-btn{
-    width: 100%;
-    padding: 8px 8px;
-    font-size: 12px;
-  }
-
-  /* Ocultamos tabla y la convertimos en tarjetas */
-  .adminp-table{
-    min-width: 0;
-  }
-  .adminp-tablewrap{
-    margin: 0 14px 12px;
-    max-height: none;
-  }
-
-  /* Cada fila se vuelve tarjeta */
-  .adminp-row{
-    display: block;
-    padding: 10px;
-  }
-
-  /* Las celdas se apilan */
-  .adminp-cell{
-    display: block;
-    padding: 6px 6px;
-    border: 0;
-  }
-
-  /* Acciones en grid para que no se desordenen */
-  .adminp-actions-mini{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    padding-top: 6px;
-  }
-  .adminp-mini{
-    width: 100%;
-    text-align: center;
-  }
-}
-
-
-
-/* =========================================================
-   TABLA PEDIDOS -> EN CELULAR SE VUELVE "TARJETA" (NO OCULTA)
-========================================================= */
-
-@media (max-width: 720px){
-
-  /* Oculta encabezado, pero NO datos */
-  .adminp-table thead,
-  .admin-table thead,
-  table.adminp-table thead{
-    display: none;
-  }
-
-  /* Cada fila como tarjeta */
-  .adminp-table tbody tr,
-  .admin-table tbody tr,
-  table.adminp-table tbody tr{
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 12px;
-    border-radius: 14px;
-    margin-bottom: 10px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(255,255,255,.04);
-  }
-
-  /* Celdas: layout etiqueta + valor */
-  .adminp-table tbody td,
-  .admin-table tbody td,
-  table.adminp-table tbody td{
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 10px;
-    align-items: start;
-    padding: 0;
-    border: 0;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    font-size: 12px;
-    font-weight: 400; /* texto más delgado */
-  }
-
-  /* Etiquetas automáticas por posición de columna (AJUSTA si tu orden es distinto) */
-  .adminp-table tbody td:nth-child(1)::before{ content: "ID:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(2)::before{ content: "Cliente:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(3)::before{ content: "Teléfono:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(4)::before{ content: "Total:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(5)::before{ content: "Estado:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(6)::before{ content: "Fecha:"; opacity:.75; }
-  .adminp-table tbody td:nth-child(7)::before{ content: "Acciones:"; opacity:.75; }
-
-  /* Nombre cliente: delgado y un pelín más chico */
-  .adminp-table tbody td:nth-child(2){
-    font-weight: 400 !important;
-    font-size: 12px !important;
-  }
-
-  /* Acciones (Ver / Estado / WhatsApp / Imprimir): que se acomoden como fila de botones */
-  .adminp-table tbody td:nth-child(7){
-    grid-template-columns: 140px 1fr;
-  }
-
-  .adminp-table tbody td:nth-child(7) > *{
-    justify-self: start;
-  }
-
-  /* Si tus botones tienen clases, esto los hace compactos igual */
-  .adminp-table button,
-  .admin-table button{
-    padding: 6px 9px;
-    border-radius: 10px;
-    font-size: 12px;
-  }
-}
-
-/* En celular muy pequeño, reduce etiqueta y deja más espacio al valor */
-@media (max-width: 420px){
-  .adminp-table tbody td,
-  .admin-table tbody td,
-  table.adminp-table tbody td{
-    grid-template-columns: 110px 1fr;
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================
-   OPTIONS MODAL (BEBIDA / BOLSA) - COMPACTO
-   ========================================= */
-
-#options-modal.modal{
-  position: fixed;
-  inset: 0;
-  display: none;              /* tu JS lo muestra */
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  z-index: 9999;
-}
-
-
-
-/* si tu JS usa otra clase, agrega aquí tu selector */
-#options-modal.modal.open,
-#options-modal.modal.show,
-#options-modal.modal.active{
-  display: flex;
-}
-
-/* Tarjeta más ajustada que el carrito */
-#options-modal .modal-card.modal-card-lg{
-  width: min(94vw, 760px);
-  max-height: min(88vh, 720px);
-  background: #fff;
-  border-radius: 20px;
-  overflow: hidden;            /* evita que crezca */
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 22px 60px rgba(0,0,0,.35);
-}
-
-/* Header tipo barra negra como la foto */
-#options-modal .modal-head{
-  flex: 0 0 auto;
-  padding: 10px 16px;
-  background: #111827;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-#options-modal .options-title{
-  flex: 1;
-  text-align: center;
-  font-weight: 800;
-  font-size: 0.95rem;
-  letter-spacing: .02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#options-modal .options-close{
-  background: transparent;
-  border-radius: 999px;
-  border: 0;
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 900;
-  font-size: 0.9rem;
-}
-
-#options-modal .options-close:hover{
-  background: rgba(255,255,255,.12);
-}
-
-/* Body: que no estire el modal */
-#options-modal .modal-body{
-  flex: 1 1 auto;
-  padding: 12px 16px 14px;
-  overflow: auto;              /* si es muy largo, scrollea aquí */
-  background: #f3f4f6;
-}
-
-/* Texto de descripción debajo del título */
-#options-modal #opt-product-name{
-  font-size: 0.95rem;
-}
-#options-modal #opt-product-desc{
-  font-size: .8rem;
-  line-height: 1.3;
-  color: #4b5563;
-  margin-bottom: 8px;
-}
-
-/* Fila superior: Precio base (izq) + Cantidad (der) */
-#options-modal .options-row-top{
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-#options-modal .options-price-box,
-#options-modal .options-qty-box{
-  flex: 1;
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 10px 12px;
-  border: 1px solid rgba(0,0,0,.06);
-}
-
-#options-modal .options-label{
-  font-size: 0.78rem;
   font-weight: 600;
+}
+
+/* Badges admin */
+.admin-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.admin-badge-pendiente {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-badge-preparacion {
+  background: #e0f2fe;
+  color: #1d4ed8;
+}
+
+.admin-badge-entregado {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-badge-cancelado {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Tarjetas de estadísticas admin */
+.admin-stat-card {
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.admin-stat-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
   color: #6b7280;
   margin-bottom: 4px;
 }
 
-#options-modal .options-label-right{
-  text-align: right;
-}
-
-#options-modal .options-price{
-  font-weight: 800;
-  font-size: 1rem;
-  color: #b91c1c;
-}
-
-/* Cantidad: botones compactos, alineados a la derecha como en la foto */
-#options-modal .qty-row{
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-#options-modal .qty-btn{
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-#options-modal .qty-value{
-  min-width: 32px;
-  text-align: center;
-  font-weight: 800;
-}
-
-/* Total en vivo: caja gris tipo botón + monto grande */
-#options-modal .options-total-box{
-  margin-bottom: 10px;
-  margin-top: 2px;
-  background: #e5e7eb;
-  border-radius: 14px;
-  padding: 8px 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid rgba(0,0,0,.08);
-}
-
-#options-modal .options-total-label{
-  border-radius: 999px;
-  border: 0;
-  background: #d1d5db;
-  padding: 6px 12px;
-  font-size: 0.78rem;
+.admin-stat-value {
+  font-size: 18px;
   font-weight: 700;
-  color: #374151;
-  cursor: default;
-}
-
-#options-modal .options-total-value{
-  font-size: 1.15rem;
-  font-weight: 900;
   color: #111827;
 }
 
-/* TITULOS de secciones */
-#options-modal .opt-title{
-  font-weight: 800;
-  font-size: .92rem;
-  line-height: 1.2;
-  margin-bottom: 8px;
-}
-
-/* ====== BOTONES DE BEBIDAS / BOLSA (opt-radio) ====== */
-
-/* El contenedor en forma de grilla compacta */
-#options-modal .opt-grid{
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)); /* 2 columnas */
-  gap: 8px;
-}
-
-/* Cada "botón" (label) pequeño y bonito */
-#options-modal .opt-radio{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  border: 1px solid rgba(0,0,0,.12);
-  background: #f8fafc;          /* claro */
-  border-radius: 12px;
-  font-size: .86rem;            /* más pequeño */
-  line-height: 1.15;
-  cursor: pointer;
-  user-select: none;
-  min-height: 38px;             /* compacto */
-  white-space: nowrap;          /* evita que se alargue en 2 líneas */
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Radio más pequeño */
-#options-modal .opt-radio input[type="radio"]{
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-}
-
-/* Hover suave */
-#options-modal .opt-radio:hover{
-  border-color: rgba(0,0,0,.20);
-  background: #f1f5f9;
-}
-
-/* Estado seleccionado (cuando el radio está checked) */
-#options-modal .opt-radio:has(input[type="radio"]:checked){
-  border-color: rgba(220,38,38,.45);   /* rojo suave */
-  background: rgba(220,38,38,.07);
-  font-weight: 800;
-}
-
-/* Sección bolsa: el grid igual de compacto */
-#options-modal #bag-section .opt-grid{
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-#options-modal .options-bag-price{
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: #6b7280;
-  margin-left: 4px;
-}
-
-#options-modal .options-bag-note{
-  margin-top: 4px;
-  font-size: 0.78rem;
-  color: #16a34a; /* verde como en la foto */
-}
-
-/* Acciones: botones bien visibles y alineados */
-#options-modal .modal-body .flex.gap-2.justify-end{
-  position: sticky;             /* siempre visible si hay scroll */
-  bottom: 0;
-  background: #fff;
-  padding-top: 10px;
-  margin-top: 10px;
-  z-index: 2;
-}
-
-#options-modal .options-actions{
-  margin-top: 14px;
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-#options-modal .btn-secondary,
-#options-modal .btn-primary{
-  padding: 10px 12px;
-  border-radius: 12px;
-  font-weight: 800;
-}
-
-/* =========================================
-   RESPONSIVE CELULAR
-   ========================================= */
-@media (max-width: 768px){
-  /* Tu clase md:grid-cols-2 pasa a 1 col en móvil, perfecto */
-  #options-modal .modal-card.modal-card-lg{
-    width: 96vw;
-    max-height: 90vh;
-    border-radius: 14px;
-  }
-
-  /* Bebidas en 2 columnas en móvil para no alargar */
-  #options-modal .opt-grid{
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  /* Si quieres aún más compacto en teléfonos pequeños */
-  #options-modal .opt-radio{
-    font-size: .82rem;
-    padding: 8px 9px;
-    min-height: 36px;
-  }
-}
-
-@media (max-width: 380px){
-  /* En celulares MUY chicos, 1 columna para que no se corte */
-  #options-modal .opt-grid{
-    grid-template-columns: 1fr;
-  }
-  #options-modal .opt-radio{
-    white-space: normal;  /* permite 2 líneas si es necesario */
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =========================================
-   ADMIN PANEL MODAL (adminp-*) - FULL UI
-   (igual a la foto + responsive + scroll)
-   ========================================= */
-
-/* Overlay modal: visible en todas las pantallas (PC, tablet, celular) */
-#admin-panel-modal.modal{
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 12px;
-  z-index: 9999;
-  background: rgba(0,0,0,.55);
-  backdrop-filter: blur(6px);
-  overflow-x: hidden;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-/* si tu JS usa otra clase, mantenemos opciones */
-#admin-panel-modal.modal.open,
-#admin-panel-modal.modal.show,
-#admin-panel-modal.modal.active{
-  display: flex;
-}
-
-/* Card principal: flex para que el botón Cerrar siempre quede visible */
-#admin-panel-modal .adminp-card{
-  width: min(1200px, 96vw);
-  max-width: 100%;
-  max-height: min(92vh, 900px);
-  background: #f8f8f8;
-  border-radius: 16px;
-  border: 1px solid rgba(0,0,0,.12);
-  box-shadow: 0 25px 60px rgba(0,0,0,.25);
-  overflow: hidden;
-  overflow-x: hidden;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-#admin-panel-modal .adminp-head,
-#admin-panel-modal .adminp-stats,
-#admin-panel-modal .adminp-filters-scroll,
-#admin-panel-modal .adminp-filters{
-  flex-shrink: 0;
-}
-#admin-panel-modal .adminp-tablewrap{
-  flex: 1 1 auto;
-  min-height: 120px;
-  min-width: 0;
-}
-#admin-panel-modal .adminp-foot{
-  flex-shrink: 0;
-}
-
-/* ================= HEADER ================= */
-#admin-panel-modal .adminp-head{
-  padding: 14px 18px 8px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-#admin-panel-modal .adminp-title{
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-#admin-panel-modal .adminp-icon{
-  font-size: 22px;
-  line-height: 1;
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  background: rgba(59, 131, 246, 0.637);
-  border: 1px solid rgba(59,130,246,.18);
-  border-radius: 12px;
-}
-
-#admin-panel-modal .adminp-title-main{
-  font-weight: 900;
-  font-size: 22px;
-  line-height: 1.1;
-  color: #111827;
-}
-
-#admin-panel-modal .adminp-title-sub{
-  margin-top: 4px;
-  font-size: 13px;
-  color: #6b7280;
-}
-
-/* Chips de estados (arriba derecha) */
-#admin-panel-modal .adminp-chips{
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-#admin-panel-modal .adminp-chip{
-  border: 1px solid rgba(0,0,0,.08);
-  background: #fff7ed;
-  color: #9a3412;
-  padding: 6px 10px;
-  font-weight: 800;
-  font-size: 12px;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-  box-shadow: 0 6px 16px rgba(0,0,0,.06);
-}
-#admin-panel-modal .adminp-chip:hover{
-  transform: translateY(-1px);
-  filter: brightness(.98);
-}
-
-#admin-panel-modal .adminp-chip-blue{
-  background: #eff6ff;
-  color: #1d4ed8;
-}
-#admin-panel-modal .adminp-chip-green{
-  background: #ecfdf5;
-  color: #047857;
-}
-#admin-panel-modal .adminp-chip-red{
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-/* ================= STATS: una sola línea (7 cuadros) para más espacio abajo ================= */
-#admin-panel-modal .adminp-stats{
-  padding: 0 18px 8px;
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 6px;
-  align-items: stretch;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  min-height: 0;
-}
-#admin-panel-modal .adminp-stats::-webkit-scrollbar{
-  height: 4px;
-}
-#admin-panel-modal .adminp-stats::-webkit-scrollbar-thumb{
-  background: rgba(0,0,0,.2);
-  border-radius: 4px;
-}
-
-#admin-panel-modal .adminp-stat{
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 8px;
-  padding: 6px 8px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,.04);
-  min-height: 48px;
-  min-width: 72px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-#admin-panel-modal .adminp-stat .k{
-  font-size: 9px;
-  letter-spacing: .02em;
-  text-transform: uppercase;
-  color: #6b7280;
-  font-weight: 800;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#admin-panel-modal .adminp-stat .v{
-  margin-top: 2px;
-  font-size: 13px;
-  font-weight: 900;
-  color: #111827;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#admin-panel-modal .adminp-stat-wide{
-  grid-column: span 1;
-}
-
-#admin-panel-modal #st-sales,
-#admin-panel-modal #st-rate,
-#admin-panel-modal #st-avg,
-#admin-panel-modal #st-eta{
-  color: #111827;
-}
-
-/* ================= FILTROS: una sola línea (Desde, Hasta, Estado, Buscar, Acciones) ================= */
-#admin-panel-modal .adminp-filters-scroll{
-  margin: 0 18px 8px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-#admin-panel-modal .adminp-filters-scroll::-webkit-scrollbar{ height: 4px; }
-#admin-panel-modal .adminp-filters-scroll::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 4px; }
-
-#admin-panel-modal .adminp-filters{
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 12px;
-  padding: 8px 12px;
-  background: #fff;
-  box-shadow: 0 6px 18px rgba(0,0,0,.04);
-  display: grid;
-  grid-template-columns: minmax(80px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(100px,1.2fr) minmax(240px,auto);
-  grid-template-rows: auto auto;
-  gap: 8px;
-  align-items: end;
-  min-width: 0;
-}
-#admin-panel-modal .adminp-field{
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-#admin-panel-modal .adminp-label{
-  font-size: 11px;
-  font-weight: 800;
-  color: #374151;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-#admin-panel-modal .adminp-input{
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid rgba(0,0,0,.14);
-  padding: 0 8px;
-  outline: none;
-  font-size: 12px;
-  background: #fff;
-  min-width: 0;
-}
-#admin-panel-modal .adminp-input:focus{
-  border-color: rgba(59,130,246,.55);
-  box-shadow: 0 0 0 3px rgba(59,130,246,.12);
-}
-
-#admin-panel-modal .adminp-field-search{
-  grid-column: span 1;
-}
-
-/* Acciones en la misma línea (quinto bloque); en pantallas pequeñas scroll horizontal */
-#admin-panel-modal .adminp-actions{
-  grid-column: span 1;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  justify-content: flex-end;
-  align-items: center;
-  min-width: 0;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-#admin-panel-modal .adminp-actions::-webkit-scrollbar{ height: 3px; }
-#admin-panel-modal .adminp-actions::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 3px; }
-
-#admin-panel-modal .adminp-btn{
-  height: 32px;
-  padding: 0 10px;
-  border-radius: 8px;
-  font-weight: 900;
-  font-size: 11px;
-  border: 1px solid rgba(0,0,0,.10);
-  cursor: pointer;
-  transition: transform .12s ease, filter .12s ease, box-shadow .12s ease;
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-width: max-content;
-}
-
-#admin-panel-modal .adminp-btn:hover{
-  transform: translateY(-1px);
-  filter: brightness(.99);
-  box-shadow: 0 10px 20px rgba(0,0,0,.08);
-}
-
-#admin-panel-modal .adminp-btn-soft{
-  background: #f3f4f6;
-  color: #111827;
-}
-
-#admin-panel-modal .adminp-btn-primary{
-  background: #3b82f6;
-  border-color: rgba(59,130,246,.70);
-  color: #fff;
-}
-
-/* Nota de rango (segunda fila, ancho completo) */
-#admin-panel-modal .adminp-range-note{
-  grid-column: 1 / -1;
-  font-size: 11px;
-  color: #6b7280;
-  padding-top: 4px;
-}
-
-/* ================= TABLA / LISTA CON SCROLL (el área que crece; footer siempre visible) ================= */
-#admin-panel-modal .adminp-tablewrap{
-  margin: 0 18px 10px;
-  border: 1px solid rgba(0,0,0,.08);
-  border-radius: 12px;
-  background: #fff;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  flex: 1 1 auto;
-  min-height: 100px;
-  max-height: 50vh;
-}
-
-/* scrollbar bonito (opcional) */
-#admin-panel-modal .adminp-tablewrap::-webkit-scrollbar{
-  width: 10px;
-}
-#admin-panel-modal .adminp-tablewrap::-webkit-scrollbar-thumb{
-  background: rgba(0,0,0,.18);
-  border-radius: 999px;
-  border: 2px solid #fff;
-}
-#admin-panel-modal .adminp-tablewrap::-webkit-scrollbar-track{
-  background: #fff;
-}
-
-/* Tabla */
-#admin-panel-modal .adminp-table{
-  width: 100%;
-  border-collapse: collapse;
-}
-
-#admin-panel-modal .adminp-table tr{
-  border-bottom: 1px solid rgba(0,0,0,.06);
-}
-
-#admin-panel-modal .adminp-table td{
-  padding: 12px 10px;
-  font-size: 13px;
-  color: #111827;
-  vertical-align: middle;
-}
-
-/* Filas tipo “cards” visual */
-#admin-panel-modal .adminp-table tr:hover{
-  background: #f9fafb;
-}
-
-/* ====== Botones dentro de cada pedido (Ver / Estado / WhatsApp / Imprimir) ====== */
-/* (Estos estilos aplican a los botones/links que tu JS mete en cada fila) */
-#admin-panel-modal .adminp-table .pill,
-#admin-panel-modal .adminp-table .badge,
-#admin-panel-modal .adminp-table .tag,
-#admin-panel-modal .adminp-table button,
-#admin-panel-modal .adminp-table a{
-  border-radius: 10px;
-}
-
-/* Si tu JS usa clases, estos te ayudan:
-   - .btn-mini, .btn, .adminp-rowbtn, etc.
-   (no rompe si no existen) */
-#admin-panel-modal .adminp-rowbtn{
-  height: 28px;
-  padding: 0 10px;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,.10);
-  font-weight: 900;
-  font-size: 12px;
-  cursor: pointer;
-  background: #f3f4f6;
-  color: #111827;
-}
-
-/* Badges de estado dentro de la tabla */
-#admin-panel-modal .st-pill{
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-weight: 900;
-  font-size: 12px;
-  border: 1px solid rgba(0,0,0,.08);
-  white-space: nowrap;
-}
-
-#admin-panel-modal .st-pendiente{ background:#fff7ed; color:#9a3412; }
-#admin-panel-modal .st-prep{ background:#eff6ff; color:#1d4ed8; }
-#admin-panel-modal .st-entregado{ background:#ecfdf5; color:#047857; }
-#admin-panel-modal .st-cancelado{ background:#fef2f2; color:#b91c1c; }
-
-/* ================= FOOTER (siempre visible en PC pantallas pequeñas) ================= */
-#admin-panel-modal .adminp-foot{
-  padding: 10px 18px 12px;
-  display: flex;
-  justify-content: flex-end;
-  border-top: 1px solid rgba(0,0,0,.08);
-  background: #fff;
-  flex-shrink: 0;
-}
-
-#admin-panel-modal .adminp-close{
-  height: 40px;
-  padding: 0 20px;
-  border-radius: 12px;
-  background: #111827;
-  color: #fff;
-  font-weight: 900;
-  font-size: 14px;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-/* =========================================
-   RESPONSIVE: Tablet (panel completo y profesional)
-   ========================================= */
-@media (max-width: 980px){
-  #admin-panel-modal.modal{
-    padding: 12px;
-    align-items: flex-start;
-  }
-  #admin-panel-modal .adminp-card{
-    max-height: 90vh;
-  }
-  /* Stats: una línea con scroll horizontal si no caben */
-  #admin-panel-modal .adminp-stats{
-    grid-template-columns: repeat(7, minmax(58px, 1fr));
-    min-width: 450px;
-  }
-  #admin-panel-modal .adminp-stat{
-    min-width: 58px;
-    min-height: 42px;
-    padding: 5px 6px;
-  }
-  #admin-panel-modal .adminp-stat .k{ font-size: 7px; }
-  #admin-panel-modal .adminp-stat .v{ font-size: 11px; }
-  /* Filtros: una línea con scroll; botones nunca apilados */
-  #admin-panel-modal .adminp-filters-scroll{
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-filters{
-    grid-template-columns: minmax(80px,1fr) minmax(80px,1fr) minmax(90px,1fr) minmax(100px,1.2fr) minmax(280px,auto);
-    min-width: 560px;
-  }
-  #admin-panel-modal .adminp-field-search{ grid-column: span 1; }
-  #admin-panel-modal .adminp-actions{
-    justify-content: flex-end;
-    min-width: 280px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-tablewrap{
-    max-height: 38vh;
-  }
-}
-
-/* =========================================
-   RESPONSIVE: Celular — panel 100% adaptable, todo visible con scroll
-   ========================================= */
-@media (max-width: 560px){
-  #admin-panel-modal.modal{
-    padding: 6px;
-    align-items: flex-start;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  /* Card: ocupa ancho útil, scroll vertical para ver todo el panel */
-  #admin-panel-modal .adminp-card{
-    width: 100%;
-    max-width: 100%;
-    max-height: 98vh;
-    min-height: 0;
-    border-radius: 14px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    flex-shrink: 0;
-  }
-  #admin-panel-modal .adminp-head{
-    padding: 12px 12px 8px;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-  #admin-panel-modal .adminp-title-main{
-    font-size: 17px;
-  }
-  #admin-panel-modal .adminp-title-sub{
-    font-size: 11px;
-  }
-  /* Chips: una fila con scroll horizontal para ver los 4 botones */
-  #admin-panel-modal .adminp-chips{
-    justify-content: flex-start;
-    gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 4px;
-    min-width: 0;
-  }
-  #admin-panel-modal .adminp-chips::-webkit-scrollbar{ height: 3px; }
-  #admin-panel-modal .adminp-chips::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 3px; }
-  #admin-panel-modal .adminp-chip{
-    min-height: 40px;
-    min-width: max-content;
-    padding: 8px 12px;
-    font-size: 11px;
-    flex-shrink: 0;
-  }
-  /* Stats: más pequeños, una línea con scroll horizontal */
-  #admin-panel-modal .adminp-stats{
-    padding: 0 10px 6px;
-    grid-template-columns: repeat(7, minmax(48px, 1fr));
-    gap: 4px;
-    min-width: 380px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-stats::-webkit-scrollbar{ height: 3px; }
-  #admin-panel-modal .adminp-stats::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 3px; }
-  #admin-panel-modal .adminp-stat{
-    min-height: 36px;
-    min-width: 48px;
-    padding: 4px 5px;
-  }
-  #admin-panel-modal .adminp-stat .k{ font-size: 6px; line-height: 1.1; }
-  #admin-panel-modal .adminp-stat .v{ font-size: 9px; }
-  /* Filtros: una línea con scroll; botones de acción en fila con scroll (nunca apilados) */
-  #admin-panel-modal .adminp-filters-scroll{
-    margin: 0 12px 8px;
-    flex-shrink: 0;
-  }
-  #admin-panel-modal .adminp-filters{
-    padding: 8px 10px;
-    grid-template-columns: minmax(70px,1fr) minmax(70px,1fr) minmax(78px,1fr) minmax(85px,1.2fr) minmax(300px,auto);
-    grid-template-rows: auto auto;
-    gap: 6px;
-    min-width: 600px;
-  }
-  #admin-panel-modal .adminp-field-search{ grid-column: span 1; }
-  #admin-panel-modal .adminp-input{
-    min-height: 36px;
-    height: 36px;
-    font-size: 11px;
-  }
-  /* Botones de acción: siempre en una fila, scroll horizontal si no caben (nunca uno encima de otro) */
-  #admin-panel-modal .adminp-actions{
-    gap: 6px;
-    padding-top: 0;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    min-width: 300px;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-actions::-webkit-scrollbar{ height: 3px; }
-  #admin-panel-modal .adminp-actions::-webkit-scrollbar-thumb{ background: rgba(0,0,0,.2); border-radius: 3px; }
-  #admin-panel-modal .adminp-btn{
-    min-height: 32px;
-    height: 32px;
-    padding: 0 8px;
-    font-size: 10px;
-    flex-shrink: 0;
-    min-width: max-content;
-  }
-  /* Tabla: scroll doble (vertical y horizontal) */
-  #admin-panel-modal .adminp-tablewrap{
-    margin: 0 12px 10px;
-    flex: 1 1 auto;
-    min-height: 100px;
-    max-height: none;
-    overflow-x: auto;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-table{
-    min-width: 680px;
-  }
-  #admin-panel-modal .adminp-table td{
-    padding: 10px 8px;
-    font-size: 12px;
-  }
-  #admin-panel-modal .adminp-foot{
-    padding: 10px 12px 12px;
-    flex-shrink: 0;
-  }
-  #admin-panel-modal .adminp-close{
-    width: 100%;
-    min-height: 46px;
-    font-size: 13px;
-  }
-}
-
-/* =========================================
-   PANEL ADMIN — DISEÑO MÓVIL/TABLET IGUAL A LA FOTO
-   Header con hamburguesas, drawer lateral, tarjetas de pedidos
-   ========================================= */
-
-/* Botones hamburguesa: ocultos en desktop */
-.adminp-hamb{
-  display: none;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  cursor: pointer;
-  flex-shrink: 0;
-  font-size: 1.1rem;
-  color: #fff;
-}
-.adminp-hamb-left{
-  width: 44px;
-  height: 44px;
+/* Logo pequeño */
+.logo {
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: #2563eb;
-  color: #fff;
+  overflow: hidden;
+  border: 1px solid #a70707;
 }
-.adminp-hamb-right{
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  background: #374151;
-  color: #fff;
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-/* Drawer lateral: oculto en desktop */
-.adminp-drawer{
-  display: none;
+/* =================== FOOTER PRO EL POLLÓN =================== */
+.footer-pro{
+  background: radial-gradient(1200px 500px at 20% 0%, rgba(0, 0, 0, 0.12), transparent 60%),
+              radial-gradient(900px 450px at 100% 20%, rgba(0, 0, 0, 0.16), transparent 55%),
+              linear-gradient(180deg, #000000 0%, #020202 100%);
 }
 
-/* En tablet y celular: diseño como la foto */
-@media (max-width: 900px){
-  #admin-panel-modal .adminp-card{
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  /* Header: [hamburger izq] [título centro] [hamburger der] */
-  .adminp-hamb{ display: flex; }
-  #admin-panel-modal .adminp-head{
-    display: grid;
-    grid-template-columns: 44px 1fr 44px;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 12px 10px;
-  }
-  #admin-panel-modal .adminp-title{
-    order: 1;
-    grid-column: 2;
-    justify-content: center;
-    text-align: center;
-    min-width: 0;
-  }
-  #admin-panel-modal .adminp-title .adminp-icon{ display: none; }
-  #admin-panel-modal .adminp-title-main{
-    font-size: 1rem;
-    font-weight: 800;
-    color: #111827;
-  }
-  #admin-panel-modal .adminp-title-sub{
-    font-size: 0.7rem;
-    color: #6b7280;
-    margin-top: 2px;
-  }
-  #admin-panel-modal .adminp-chips{
-    display: none; /* se muestran con .adminp-filters-visible */
-  }
-  #admin-panel-modal .adminp-head .adminp-hamb-left{ order: 0; grid-column: 1; }
-  #admin-panel-modal .adminp-head .adminp-hamb-right{ order: 2; grid-column: 3; }
-
-  /* Filtros y stats colapsables (hamburguesa izquierda) */
-  #admin-panel-modal .adminp-card:not(.adminp-filters-visible) .adminp-filters-scroll,
-  #admin-panel-modal .adminp-card:not(.adminp-filters-visible) .adminp-stats{ display: none; }
-
-  /* Ocultar acciones inline; se usan desde el drawer */
-  #admin-panel-modal .adminp-actions-inline{ display: none !important; }
-
-  /* Drawer lateral derecho (como en la foto) */
-  .adminp-drawer{
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: min(280px, 85vw);
-    background: #fff;
-    box-shadow: -8px 0 24px rgba(0,0,0,.2);
-    z-index: 10001;
-    transform: translateX(100%);
-    transition: transform 0.25s ease;
-    border-radius: 12px 0 0 12px;
-  }
-  .adminp-drawer.open{
-    transform: translateX(0);
-  }
-  .adminp-drawer-header{
-    background: #374151;
-    color: #fff;
-    padding: 14px 12px;
-    flex-shrink: 0;
-  }
-  .adminp-drawer-close-btn{
-    background: transparent;
-    border: none;
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 4px 8px;
-  }
-  .adminp-drawer-body{
-    flex: 1;
-    overflow-y: auto;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .adminp-drawer-item{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    padding: 12px 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    text-align: left;
-    background: #f3f4f6;
-    color: #111827;
-  }
-  .adminp-drawer-item-green{ background: rgba(16,185,129,.15); color: #047857; }
-  .adminp-drawer-item-blue{ background: rgba(37,99,235,.15); color: #1d4ed8; }
-  .adminp-drawer-item-red{ background: rgba(239,68,68,.12); color: #b91c1c; }
-  .adminp-drawer-item-dark{ background: #f3f4f6; color: #374151; }
-  .adminp-drawer-foot{
-    padding: 12px;
-    flex-shrink: 0;
-    border-top: 1px solid rgba(0,0,0,.08);
-  }
-  .adminp-close-drawer{
-    width: 100%;
-    padding: 12px 16px;
-    border-radius: 10px;
-    background: #374151;
-    color: #fff;
-    font-weight: 800;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-  }
-
-  /* Tarjetas de pedidos (layout igual a la foto) */
-  #admin-panel-modal .adminp-tablewrap{
-    margin: 0 12px 12px;
-    max-height: none;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-  }
-  #admin-panel-modal .adminp-table{
-    min-width: 0;
-    display: block;
-  }
-  #admin-panel-modal .adminp-table tbody{
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  #admin-panel-modal .adminp-table tbody tr.adminp-row{
-    display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-rows: auto auto auto auto;
-    gap: 2px 8px;
-    padding: 6px 10px;
-    background: #f3f4f6;
-    border-radius: 12px;
-    border: 1px solid rgba(0,0,0,.06);
-    margin: 0;
-    align-items: start;
-    min-width: 0;
-  }
-  /* Fila 1: ID (izq) | Estado badge (der) — ID con overflow para no invadir nombre */
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(1){
-    grid-column: 1;
-    grid-row: 1;
-    font-weight: 800;
-    font-size: 10px;
-    line-height: 1.2;
-    color: #111827;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-all;
-  }
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(5){
-    grid-column: 2;
-    grid-row: 1;
-    text-align: right;
-  }
-  /* Fila 2: Nombre (izq) | Fecha (der) — nombre en su propia fila, sin superponer ID */
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(2){
-    grid-column: 1;
-    grid-row: 2;
-    padding: 0;
-    font-size: 12px;
-    line-height: 1.25;
-    font-weight: 600;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
-  }
-  /* Fila 3: Teléfono (izq) — en fila propia para no superponer con nombre */
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(3){
-    grid-column: 1;
-    grid-row: 3;
-    padding: 0;
-    margin-top: 0;
-    color: #6b7280;
-    font-size: 11px;
-    line-height: 1.2;
-    font-weight: 400;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(6){
-    grid-column: 2;
-    grid-row: 2;
-    text-align: right;
-    font-size: 10px;
-    line-height: 1.2;
-    color: #6b7280;
-    align-self: start;
-  }
-  /* Fila 4: Total (izq) | Acciones Ver, Estado, WhatsApp, Imprimir (der) */
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(4){
-    grid-column: 1;
-    grid-row: 4;
-    font-weight: 800;
-    font-size: 13px;
-    line-height: 1.2;
-  }
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(7){
-    grid-column: 2;
-    grid-row: 4;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: flex-end;
-    align-items: center;
-  }
-  #admin-panel-modal .adminp-table tbody td::before{ content: none !important; }
-  #admin-panel-modal .adminp-table tbody td.adminp-cell{
-    padding: 0;
-    border: 0;
-    display: block;
-    min-width: 0;
-  }
-  #admin-panel-modal .adminp-table tbody td.adminp-cell:nth-child(7){
-    display: flex;
-  }
-  #admin-panel-modal .adminp-actions-mini{
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    justify-content: flex-end;
-  }
-  #admin-panel-modal .adminp-mini{
-    padding: 4px 8px;
-    font-size: 10px;
-    border-radius: 6px;
-  }
-  #admin-panel-modal .adminp-table .adminp-badge{
-    padding: 2px 6px;
-    font-size: 10px;
-    line-height: 1.2;
-  }
-  #admin-panel-modal .adminp-foot .adminp-close{
-    width: 100%;
-    border-radius: 12px;
-    padding: 12px 16px;
-    background: #374151;
-    font-size: 14px;
-  }
+.footer-top{ margin-bottom:26px; }
+.footer-divider{
+  margin-top: 18px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.15), transparent);
 }
 
-/* En móvil pequeño: filtros visibles por defecto para no esconder datos */
-@media (max-width: 560px){
-  #admin-panel-modal .adminp-card.adminp-filters-visible .adminp-stats,
-  #admin-panel-modal .adminp-card.adminp-filters-visible .adminp-filters-scroll{ display: block; }
-  #admin-panel-modal .adminp-card:not(.adminp-filters-visible) .adminp-filters-scroll{ display: none; }
-  #admin-panel-modal .adminp-card:not(.adminp-filters-visible) .adminp-stats{ display: none; }
-  /* Por defecto mostrar filtros en móvil para que no se pierda funcionalidad */
-  #admin-panel-modal .adminp-card{ padding-bottom: 10px; }
+.footer-brand{
+  display:flex;
+  gap:16px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* ================================
-   MODAL CARRITO: tamaño fijo + scroll interno
-   ================================ */
-
-/* Fondo (si tienes overlay) */
-.modal-overlay,
-#cartModalOverlay,
-.cart-overlay {
-  padding: 14px;
+.footer-brand-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
 }
 
-/* Caja del modal */
-#cartModal,
-.cart-modal,
-.modal-carrito,
-.modal-content.cart,
-.cart-modal-content {
-  width: min(92vw, 720px);
-  max-height: min(86vh, 720px);     /* el modal NO crece más que esto */
-  margin: 0 auto;
+.footer-logo{
+  width:54px;
+  height:54px;
+  border-radius:14px;
+  background: rgb(0, 0, 0);
+  border: 1px solid rgb(0, 0, 0);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow: 0 10px 28px rgb(0, 0, 0);
+}
+.footer-logo img{ width:100%; height:100%; object-fit:cover; }
+
+.footer-title{
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+.footer-subtitle{
+  font-size: 13px;
+  color: rgba(216, 206, 206, 0.75);
+  margin-top: 2px;
+}
+
+.footer-cta{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.footer-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid rgb(5, 5, 5);
+  background: rgb(0, 0, 0);
+  color:#131313;
+  text-decoration:none;
+  transition: transform .12s ease, filter .12s ease, background .12s ease;
+}
+.footer-btn:hover{ transform: translateY(-1px); filter: brightness(1.05); }
+.footer-btn-whatsapp{ background: rgb(1, 255, 90); border-color: rgba(16,185,129,.35); }
+.footer-btn-call{ background: rgba(0, 0, 0, 0.18); border-color: rgba(251,191,36,.35); }
+
+.footer-grid{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.footer-card{
+  background: rgb(6, 6, 6);
+  border: 1px solid rgba(0, 0, 0, 0.981);
   border-radius: 16px;
-  display: flex;
-  flex-direction: column;          /* clave: header / body / footer en columna */
-  overflow: hidden;                /* evita que el modal “se estire” */
+  padding: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.982);
 }
 
-/* Header (título “Tu carrito”) */
-#cartModal .modal-header,
-.cart-modal .modal-header,
-.modal-carrito .modal-header,
-.cart-header {
-  flex: 0 0 auto;
-  padding: 14px 16px;
+.footer-card-title{
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 12px;
 }
 
-/* ====== ZONA QUE SCROLLEA (LISTA) ====== */
-/* Cambia este selector por el contenedor REAL que envuelve los items */
-#cartItems,
-.cart-items,
-.cart-items-list,
-.modal-body .items,
-.items-list,
-.cart-body {
-  flex: 1 1 auto;                  /* toma el espacio disponible */
-  overflow-y: auto;                /* scroll vertical */
-  overflow-x: hidden;
+.footer-list{
+  list-style:none;
+  padding:0;
+  margin:0;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 13px;
+}
+
+.footer-ico{
+  display:inline-flex;
+  width: 22px;
+  justify-content:center;
+  margin-right: 6px;
+  opacity:.9;
+}
+
+.footer-link{
+  color: rgb(249, 248, 248);
+  text-decoration:none;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.936);
+}
+.footer-link:hover{
+  color:#fdf7f7;
+  border-bottom-color: rgb(0, 0, 0);
+}
+
+.footer-mini-note{
+  margin-top: 14px;
+  font-size: 12px;
+  color: rgba(253, 253, 253, 0.7);
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.dot{
+  width:8px; height:8px;
+  border-radius:999px;
+  background:#ffffff;
+  box-shadow: 0 0 0 4px rgba(249, 249, 249, 0.18);
+}
+
+/* Tags */
+.footer-tags{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top: 12px;
+}
+.tag{
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgb(5, 5, 5);
+  border: 1px solid rgb(0, 0, 0);
+  color: rgb(220, 213, 213);
+}
+
+/* Pagos */
+.pay-box{
+  border-radius: 14px;
+  border: 1px solid rgba(209, 77, 77, 0.997);
+  background: rgb(0, 0, 0);
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.pay-head{ display:flex; justify-content:flex-start; margin-bottom: 10px; }
+.pay-badge{
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.988);
+}
+.pay-local{ background: rgba(59, 130, 246, .16); border-color: rgb(0, 0, 0); }
+.pay-delivery{ background: rgba(0, 0, 0, 0.16); border-color: rgb(3, 3, 3); }
+
+.pay-items{ display:flex; flex-wrap:wrap; gap:8px; }
+.pay-pill{
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+}
+.pay-note{
+  margin-top: 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+}
+
+/* Redes */
+.social-grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap:10px;
+}
+.social-btn{
+  display:flex;
+  align-items:center;
+  gap:10px;
   padding: 10px 12px;
-  max-height: calc((var(--item-h, 78px) * 4) + 22px); /* muestra aprox 4 items */
-  scrollbar-gutter: stable;
+  border-radius: 14px;
+  text-decoration:none;
+  color:#fff;
+  font-weight: 800;
+  font-size: 13px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.06);
+  transition: transform .12s ease, filter .12s ease;
+}
+.social-btn:hover{ transform: translateY(-1px); filter: brightness(1.06); }
+
+.social-ico{ width:18px; height:18px; fill: currentColor; opacity: .95; }
+
+/* Colores reales por red */
+.social-btn.wa{ background: rgb(12, 12, 12); border-color: rgb(4, 4, 4); }
+.social-btn.fb{ background: rgba(0, 0, 0, 0.968); border-color: rgba(59,130,246,.32); }
+.social-btn.ig{ background: linear-gradient(90deg, rgb(0, 0, 0), rgba(236,72,153,.18)); border-color: rgba(236,72,153,.28); }
+.social-btn.tt{ background: rgb(0, 0, 0); border-color: rgb(0, 0, 0); }
+
+.footer-bottom{
+  margin-top: 26px;
+  padding-top: 18px;
+  text-align:center;
+  border-top: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.70);
+  font-size: 13px;
+}
+.footer-bottom .small{
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.55);
 }
 
-/* Cada producto (fila/tarjeta) */
-.cart-item,
-.item-carrito,
-.cart-row,
-.modal-item {
-  min-height: var(--item-h, 78px); /* ayuda a que “4 items” sea consistente */
-  border-radius: 12px;
+/* Responsive */
+@media (max-width: 1024px){
+  .footer-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px){
+  .footer-grid{ grid-template-columns: 1fr; }
+  .social-grid{ grid-template-columns: 1fr; }
 }
 
-/* Footer (Total + botones) fijo abajo */
-#cartModal .modal-footer,
-.cart-modal .modal-footer,
-.cart-footer,
-.modal-carrito .modal-footer {
-  flex: 0 0 auto;
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  padding: 12px 16px;
-  border-top: 1px solid rgba(0,0,0,.08);
-  z-index: 2;
+
+
+
+/* ULTIMO MODIFICADO EL DISEÑO DE MAPA SATILETAL  */
+/* ================= UBICACIÓN PRO ================= */
+.location-pro{
+  background: linear-gradient(180deg,#f9f9f9 0%, #eef2f7 100%);
+  padding: 70px 0;
 }
 
-/* Total en una línea, bien alineado */
-.cart-total,
-.total-row,
-.modal-total {
+.location-header{
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.location-header h2{
+  font-size: 20px;
+  font-weight: 500;
+  color: #0e0e0e;
+}
+
+.location-header p{
+  font-size: 14px;
+  color: #564f4e;
+  margin-top: 6px;
+}
+
+.location-pin{
+  font-size: 28px;
+}
+
+.location-card{
+  background: #c10d0d;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 22px rgba(233, 223, 223, 0.15);
+  display: grid;
+  grid-template-columns: 3.2fr 1.1fr;
+
+}
+
+
+.location-map iframe{
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  border: none;
+}
+
+.location-info{
+  background: linear-gradient(135deg,#f7f4f4 0%, #dcd8d8 100%);
+  color: #000000;
+  padding: 20px 18px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  justify-content: center;
+  
+}
+
+.location-info h3{
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 14px;
+}
+
+.location-info ul{
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.location-info li{
+  display: flex;
   align-items: center;
   gap: 10px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.location-info a{
+  color: #121111;
+  text-decoration: underline;
+}
+
+.location-actions{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-map{
+  background: #c51e0f;
+  color: #de440c;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(127, 31, 31, 0.25);
+}
+
+
+
+.btn-map:hover,
+.btn-whatsapp:hover{
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+/* Responsive */
+@media(max-width: 900px){
+  .location-card{
+    grid-template-columns: 1fr;
+  }
+
+  .location-map iframe{
+    min-height: 320px;
+  }
+
+  .location-info{
+    text-align: center;
+  }
+
+  .location-actions{
+    justify-content: center;
+  }
+}
+
+/* =================== CATEGORÍAS PRO (igual a referencia) =================== */
+.catbar{
+  position: relative;
+}
+
+.catbar__scroll{
+  overflow-x: auto;
+  padding-right: 56px; /* espacio para la flecha */
+}
+
+.catbar__row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  min-width:max-content;
+  padding: 2px 6px 10px 2px;
+}
+
+.catbtn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 18px;
+  border-radius:14px;
+  font-weight:800;
+  font-size:14px;
+  white-space:nowrap;
+
+  background:#fff;
+  color:#111827;
+  border:2px solid #e5e7eb;
+  box-shadow: 0 10px 22px rgba(0,0,0,.06);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+
+.catbtn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(0,0,0,.10);
+  border-color:#fecaca;
+}
+
+.catbtn.is-active{
+  background: linear-gradient(135deg,#b40000 0%, #e11d2e 100%);
+  color:#fff;
+  border-color: rgba(255,255,255,.18);
+  box-shadow: 0 18px 34px rgba(180,0,0,.28);
+}
+
+/* Flecha redonda a la derecha (como tu imagen) */
+.catbar__next{
+  position:absolute;
+  right:0;
+  top:43%;
+  transform: translateY(-50%);
+  width:40px;
+  height:40px;
+  border-radius:999px;
+  border:none;
+  cursor:pointer;
+  font-size:26px;
+  font-weight:900;
+  line-height:0;
+
+  color:#ff0000;
+  background: linear-gradient(135deg,#fceaea 0%, #f7eeee 100%);
+  box-shadow: 0 16px 30px rgbagb(255, 255, 255, 0.2);
+}
+
+/* En PC no necesitamos flecha */
+@media (min-width: 1024px){
+  .catbar__next{ display:none; }
+  .catbar__scroll{ padding-right:0; }
+  .catbar__row{ justify-content:center; flex-wrap:wrap; min-width:0; }
+}
+
+/* En celular un poco más compacto */
+@media (max-width:640px){
+  .catbtn{
+    padding:12px 14px;
+    border-radius:12px;
+    font-size:13px;
+  }
+}
+/* ======================================================================= */
+
+
+/* =================== AVISO NAVIDEÑO =================== */
+.aviso{
+  background: #aa1313;
+  /* border: 2px solid #05a012; */
+  padding: 5px 25px;
+  text-align: center;
+  font-size: 14px;
+  color: #fcfcfc;
+  font-weight: 500;
+ 
+}
+
+ /* ===================== ESTILO SECTION COMBOS ===================== */
+  .pollon-combos{
+    padding: 20px 10px;
+    
+  }
+
+  .combo-wrap{
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+
+  .combo-card{
+    background: #e6e6e6;
+    border-radius: 18px;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 44% 56%;
+    min-height: 280px;
+  }
+
+  /* Lado imagen */
+  .combo-media{
+    position: relative;
+    background: #fff;
+    border-top-left-radius: 18px;
+    border-bottom-left-radius: 18px;
+    overflow: hidden;
+  }
+
+  .combo-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transform: scale(1.02);
+    transition: transform .3s ease;
+
+  }
+
+  /* Textos sobre la imagen */
+  .combo-sticker{
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .sticker-top{
+    display: inline-block;
+    background: #ff9800;
+    color: #fff;
+    font-weight: 900;
+    letter-spacing: .6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-transform: uppercase;
+  }
+
+  .sticker-big{
+    margin-top: 8px;
+    color: #ff1e1e;
+    font-weight: 1000;
+    text-transform: uppercase;
+    line-height: .95;
+    font-size: clamp(22px, 2.4vw, 34px);
+    text-shadow: 0 2px 0 rgba(255,255,255,.55);
+  }
+
+  /* Lado texto */
+  .combo-content{
+    padding: 10px 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 15px;
+
+  }
+
+  .combo-content h3{
+    margin: 0;
+    font-size: clamp(22px, 2.2vw, 34px);
+    line-height: 1.05;
+    color: #111;
+    font-weight: 900;
+  }
+
+  .combo-content p{
+    margin: 0;
+    color: #555;
+    font-size: 14px;
+    line-height: 1.55;
+    max-width: 360px;
+  }
+
+  .combo-btn{
+    margin-top: 10px;
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1.6px solid #ff2b2b;
+    color: #ff2b2b;
+    background: transparent;
+    font-weight: 800;
+    font-size: 14px;
+    text-decoration: none;
+    transition: transform .12s ease, background .12s ease, color .12s ease;
+  }
+
+  .combo-btn:hover{
+    background: #ff2b2b;
+    color: #fff;
+    transform: translateY(-1px);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px){
+    .combo-wrap{
+      grid-template-columns: 1fr;
+    }
+
+    .combo-card{
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+
+    .combo-media{
+      border-top-right-radius: 18px;
+      border-bottom-left-radius: 0;
+      height: 220px;
+    }
+
+    .combo-content{
+      padding: 15px 22px;
+      text-align: center;
+    }
+
+    .combo-btn{
+      align-self: center;
+    }
+  }
+
+
+  /* ===================== SIDEBAR: CATEGORÍAS ESTILO LINK PRO ===================== */
+
+/* Contenedor del bloque categorías: quita look "tarjetas" */
+#sidebar-menu .space-y-3{
+  gap: 10px !important;
+}
+
+/* Título (Categorías / Galería) más moderno */
+#sidebar-menu .sidebar-title{
+  font-size: 12px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: rgba(17,24,39,.65);
+  margin: 14px 0 10px;
+}
+
+/* ✅ Estilo LINK para categorías */
+.sidebar-category{
+  /* quitar caja */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  /* aspecto texto moderno */
+  padding: 10px 6px !important;
+  border-radius: 0 !important;
+
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  color: rgba(17,24,39,.82) !important;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  position: relative;
+  transition: color .15s ease, transform .15s ease;
+}
+
+/* línea pro (solo aparece al hover/activo) */
+.sidebar-category::after{
+  content: "";
+  position: absolute;
+  left: 34px;       /* empieza después del icono */
+  right: 8px;
+  bottom: -2px;
+  height: 2px;
+  background: #dc2626;
+  border-radius: 999px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .18s ease;
+  opacity: .9;
+}
+
+/* hover moderno */
+.sidebar-category:hover{
+  color: #dc2626 !important;
+  transform: translateY(-1px);
+}
+.sidebar-category:hover::after{
+  transform: scaleX(1);
+}
+
+/* activo (cuando está seleccionada) */
+.sidebar-category.is-active{
+  color: #dc2626 !important;
+}
+.sidebar-category.is-active::after{
+  transform: scaleX(1);
+}
+
+/* iconos un poco más suaves */
+.sidebar-category{
+  font-smooth: always;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Opcional: separador suave entre links (muy pro) */
+.sidebar-category + .sidebar-category{
+  border-top: 1px solid rgba(17,24,39,.06);
+  padding-top: 12px !important;
+}
+
+/* ✅ Quitar el borde rojo que tú tenías en HTML (si existe) */
+.sidebar-category:hover{
+  border-color: transparent !important;
+}
+
+/* ===================== AJUSTE: BOTÓN VER MI PEDIDO (mantener pro) ===================== */
+#view-cart-mobile{
+  border-radius: 16px !important;
+  box-shadow: 0 14px 30px rgba(0,0,0,.12);
+  border: 1px solid rgba(0,0,0,.06);
+}
+
+/* ===================== GALERÍA: también más limpia ===================== */
+#sidebar-gallery{
+  margin-top: 10px;
+}
+.sidebar-gallery-item{
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(17,24,39,.06);
+  box-shadow: 0 10px 22px rgba(0,0,0,.10);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.sidebar-gallery-item:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0,0,0,.14);
+}
+.sidebar-gallery-item img{
+  width: 100%;
+  height: 82px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ===== TÍTULO "CATEGORÍAS" SUBRAYADO PRO CON BLUR ===== */
+/* ===== "CATEGORÍAS" CON LÍNEA IGUAL A "MENÚ" ===== */
+
+#sidebar-menu .sidebar-title{
+  position: relative;
+  padding-bottom: 10px;
   font-weight: 800;
 }
 
-/* Botones del footer que NO se achican feo */
-.cart-actions,
-.modal-actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 10px;
-}
+/* línea inferior estilo MENÚ */
+#sidebar-menu .sidebar-title::after{
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
 
-.cart-actions button,
-.modal-actions button,
-.btn-whatsapp,
-.btn-seguir,
-.btn-primary,
-.btn-secondary {
   width: 100%;
-  padding: 12px 12px;
-  border-radius: 12px;
-  font-weight: 700;
+  height: 1.5px;
+
+  background: rgba(207, 22, 22, 0.55);
 }
 
-/* ================================
-   RESPONSIVE (CELULAR)
-   ================================ */
-@media (max-width: 520px) {
-  #cartModal,
-  .cart-modal,
-  .modal-carrito,
-  .modal-content.cart,
-  .cart-modal-content {
-    width: 96vw;
-    max-height: 88vh;
-    border-radius: 14px;
+
+/* ===== BASE RESPONSIVE GLOBAL ===== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html{
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body{
+  margin: 0;
+  overflow-x: hidden; /* evita scroll horizontal */
+}
+
+/* Imágenes nunca se salen */
+img{
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Contenedor fluido pro */
+.container-fluid{
+  width: min(1200px, 100%);
+  margin-inline: auto;
+  padding-inline: clamp(10px, 2.4vw, 20px);
+}
+
+/* ===== HEADER RESPONSIVE ===== */
+header .max-w-7xl{
+  padding-left: clamp(8px, 2vw, 16px) !important;
+  padding-right: clamp(8px, 2vw, 16px) !important;
+}
+
+@media (max-width: 640px){
+  /* reduce tamaño de logo */
+  .logo{ width: 44px; height: 44px; }
+
+  /* botones header (DELIVERY/RESERVAS/RETIROS) más compactos */
+  .pedido-link{
+    font-size: 11px;
+    letter-spacing: .2px;
+    padding: 6px 0;
   }
 
-  /* Lista: un poco más compacta en móvil */
-  #cartItems,
-  .cart-items,
-  .cart-items-list,
-  .modal-body .items,
-  .items-list,
-  .cart-body {
-    --item-h: 70px;
-    max-height: calc((var(--item-h) * 4) + 18px);
-    padding: 8px 10px;
-  }
+  /* evita que el texto haga salto raro */
+  header h1{ font-size: 18px !important; }
+}
 
-  /* Botones en columna en móvil */
-  .cart-actions,
-  .modal-actions {
+/* ===== SIDEBAR RESPONSIVE ===== */
+#sidebar-menu{
+  width: min(86vw, 340px);   /* en móvil usa % */
+}
+
+@media (min-width: 768px){
+  #sidebar-menu{ width: 360px; }
+}
+
+@media (min-width: 1024px){
+  #sidebar-menu{ width: 390px; }
+}
+
+
+
+
+
+
+
+
+/* ===== GRID PRODUCTOS AUTO RESPONSIVE ===== */
+.products-grid{
+  display: grid;
+  gap: clamp(12px, 1.8vw, 20px);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+/* en pantallas muy chicas */
+@media (max-width: 360px){
+  .products-grid{
     grid-template-columns: 1fr;
   }
 }
 
+/* ===== PRODUCT CARD RESPONSIVE ===== */
+.product-card{
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.product-image{
+  width: 100%;
+  aspect-ratio: 4 / 3;   /* mantiene proporción bonita */
+  object-fit: cover;
+}
+
+/* textos dentro */
+.product-card h3{
+  font-size: clamp(14px, 1.5vw, 18px);
+}
+.product-card p{
+  font-size: clamp(12px, 1.2vw, 14px);
+  line-height: 1.35;
+}
+
+/* ===== HERO BANNER RESPONSIVE ===== */
+.hero-banner{
+  height: clamp(220px, 35vw, 520px);
+}
 
 
 
+/* ===== TIPOGRAFÍA FLUIDA GENERAL ===== */
+h2{ font-size: clamp(18px, 2.4vw, 28px); }
+h3{ font-size: clamp(16px, 2vw, 22px); }
+p, li, button, a{ font-size: clamp(12px, 1.3vw, 14px); }
 
 
 
+/* ===== GRID RESPONSIVE REAL PARA PRODUCTOS ===== */
+#products-container{
+  display: grid !important;
+  gap: 18px !important;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+  align-items: start;
+}
 
-/* =========================================
-   CARRITO MODAL (tu HTML): fijo + scroll 4 items
-   ========================================= */
+/* Los títulos de categoría (col-span-full) deben ocupar todo el ancho */
+#products-container .col-span-full{
+  grid-column: 1 / -1 !important;
+}
 
-/* 1) El overlay / modal centrado */
-#cart-modal.modal{
-  position: fixed;
-  inset: 0;
-  display: none;              /* tu JS lo mostrará */
+/* Imagen controlada (para que no parezca banner gigante) */
+.product-image{
+  width: 100%;
+  height: 170px;          /* puedes subir a 190 si quieres */
+  object-fit: cover;
+}
+
+.product-card .p-4{
+  padding: 12px !important;
+}
+
+.product-card h3{
+  font-size: 16px !important;
+}
+
+.product-card p{
+  font-size: 12px !important;
+}
+
+/* ===== DROPDOWN MENÚ (estilo "Más") ===== */
+.menu-dd-btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: background .18s ease, transform .18s ease;
+  display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 14px;
+  min-width: 70px;
+}
+
+.menu-dd-btn:hover{
+  background: rgba(255,255,255,.14);
+  transform: translateY(-1px);
+}
+
+.menu-dd-top{
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .14em;
+  opacity: .92;
+  line-height: 1;
+}
+
+.menu-dd-bottom{
+  margin-top: 3px;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-dd-caret{
+  font-size: 16px;
+  transition: transform .18s ease;
+}
+
+.menu-dd-btn[aria-expanded="true"] .menu-dd-caret{
+  transform: rotate(180deg);
+}
+
+/* Panel (cuadro pequeño) */
+.menu-dd-panel{
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 260px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 18px 45px rgba(0,0,0,.25);
+  padding: 10px;
   z-index: 9999;
+  border: 1px solid rgba(0,0,0,.08);
 }
 
-/* si tu JS usa .open / .show / .active cambia el selector según tu código */
-#cart-modal.modal.open,
-#cart-modal.modal.show,
-#cart-modal.modal.active{
-  display: flex;
-}
-
-/* 2) La tarjeta del modal: NO crece más */
-#cart-modal .modal-card.modal-card-lg{
-  width: min(92vw, 760px);
-  max-height: min(86vh, 720px);
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;           /* clave: evita que se estire */
-  display: flex;
-  flex-direction: column;     /* head / body / foot en columna */
-}
-
-/* 3) Header fijo */
-#cart-modal .modal-head{
-  flex: 0 0 auto;
-  padding: 14px 16px;
-}
-
-/* 4) Body: ocupa el espacio disponible */
-#cart-modal .modal-body{
-  flex: 1 1 auto;
-  padding: 12px 14px;
-  overflow: hidden;           /* el scroll NO es aquí, es en #cart-items */
-}
-
-/* 5) SOLO la lista scrollea (muestra aprox 4 items) */
-#cart-items{
-  --item-h: 76px; /* ajusta si tus filas son más altas/bajas */
-  max-height: calc((var(--item-h) * 4) + 18px); /* ~4 productos visibles */
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 6px;         /* para que no tape la scrollbar */
-  scrollbar-gutter: stable;
-}
-
-/* Si tus items tienen una clase, esto ayuda a que “4 items” sea exacto.
-   (Si no existe, no pasa nada.) */
-#cart-items .cart-item,
-#cart-items .item,
-#cart-items > div{
-  min-height: var(--item-h);
-}
-
-/* 6) Total dentro del body: se queda pegado abajo del body (no se pierde) */
-#cart-modal .modal-body > .mt-4{
-  position: sticky;
-  bottom: 0;
-  background: #fff;
-  z-index: 2;
-}
-
-/* 7) Footer fijo abajo, siempre visible */
-#cart-modal .modal-foot{
-  flex: 0 0 auto;
-  padding: 12px 16px;
-  background: #fff;
-  border-top: 1px solid rgba(0,0,0,.08);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-/* Botones bien ajustados */
-#cart-modal .modal-foot .btn-secondary,
-#cart-modal .modal-foot .btn-primary{
+/* Items */
+.menu-dd-item{
   width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
   padding: 12px 12px;
   border-radius: 12px;
   font-weight: 700;
+  font-size: 14px;
+  color: rgba(17,24,39,.88);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .15s ease;
 }
 
-/* =========================================
-   RESPONSIVE CELULAR
-   ========================================= */
-@media (max-width: 520px){
-  #cart-modal .modal-card.modal-card-lg{
-    width: 96vw;
-    max-height: 88vh;
-    border-radius: 14px;
-  }
-
-  #cart-items{
-    --item-h: 70px;
-    max-height: calc((var(--item-h) * 4) + 16px);
-  }
-
-  /* Botones en columna en móvil */
-  #cart-modal .modal-foot{
-    grid-template-columns: 1fr;
-  }
+.menu-dd-item:hover{
+  background: rgba(220,38,38,.10);
+  color: #dc2626;
+  transform: translateX(2px);
 }
 
-/* =========================================================
-   RESPONSIVE MÓVIL GLOBAL - Todas las ventanas adaptadas
-   Sin romper funcionalidades
-========================================================= */
+/* Separador suave */
+.menu-dd-item + .menu-dd-item{
+  border-top: 1px solid rgba(17,24,39,.06);
+}
 
-/* Modales: siempre usables en celular (scroll + ancho) */
+/* En móvil (si decides usarlo también) */
 @media (max-width: 640px){
-  .modal{
-    padding: 10px 8px;
-    align-items: flex-start;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .modal-card,
-  .modal-card-lg,
-  .modal-card-xl{
-    width: 100%;
-    max-width: 100%;
-    margin: auto;
-    max-height: min(90vh, 600px);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-  .modal-head{
-    flex-shrink: 0;
-    padding: 12px 14px;
-  }
-  .modal-body{
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px 14px;
-  }
-  .modal-foot{
-    flex-shrink: 0;
-    padding: 12px 14px;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .modal-foot .btn-secondary,
-  .modal-foot .btn-primary{
-    min-height: 44px;
-  }
-  .modal-x{
-    min-width: 44px;
-    min-height: 44px;
+  .menu-dd-panel{
+    width: min(88vw, 320px);
+    right: 0;
   }
 }
 
-/* Botones y controles táctiles (mínimo 44px para dedos) */
+/* ===== Dropdown: botón "Ver mi pedido" dentro ===== */
+.menu-dd-cart{
+  width: 100%;
+  border: none;
+  background: #facc15; /* amarillo */
+  color: #7f1d1d;      /* rojo oscuro */
+  padding: 12px 12px;
+  border-radius: 14px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.menu-dd-cart:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+}
+
+.menu-dd-cart-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size: 14px;
+}
+
+.menu-dd-cart-badge{
+  background: #dc2626;
+  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.menu-dd-divider{
+  height: 1px;
+  background: rgba(17,24,39,.08);
+  margin: 10px 0;
+}
+
+/* En celular: el panel no debe salirse */
 @media (max-width: 640px){
-  .pedido-link,
-  .menu-dd-btn,
-  .qty-btn,
-  .padd,
-  .btn-primary,
-  .btn-secondary,
-  .combo-btn,
-  .cat-nav,
-  .top-pill,
-  .adminp-btn,
-  .adminp-mini,
-  .adminp-chip{
-    min-height: 44px;
-  }
-  .floating-cart{
-    min-height: 48px;
-    padding: 0 18px;
-    right: 16px;
-    top: auto;
-    bottom: 24px;
+  .menu-dd-panel{
+    width: min(88vw, 320px);
+    right: 0;
   }
 }
-
-/* Carousel hero en móvil */
-@media (max-width: 480px){
-  .carousel-fade{
-    height: clamp(180px, 45vw, 280px);
-  }
-}
-
-/* Productos: tablet – 2–3 columnas iguales, alineación perfecta */
-@media (min-width: 641px) and (max-width: 900px){
-  .products-grid{
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
-    gap: var(--card-gap);
-  }
-}
-
-/* ========== SOLO CELULAR: productos más compactos, más espacio a los lados, imagen con altura equilibrada. PC no se toca. ========== */
-@media (max-width: 640px){
-  .products-grid{
-    grid-template-columns: 1fr;
-    justify-content: stretch;
-    gap: var(--card-gap-sm);
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-  .products-grid .pcard{ max-width: 100%; }
-  .products-grid .pimg{ aspect-ratio: 4 / 3; }
-  .products-grid .pbody{ padding: 10px 12px; }
-  .products-grid .ptitle{ font-size: 0.9375rem; line-height: 1.25; }
-  .products-grid .pdesc{
-    font-size: var(--text-xs);
-    line-height: 1.4;
-    min-height: 0;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    margin-top: 2px;
-  }
-  .products-grid .prow{ margin-top: 6px; gap: 6px; }
-  .products-grid .padd{ padding: 9px 12px; font-size: 13px; min-height: 40px; border-radius: 12px; }
-  .products-grid .pprice{ font-size: 0.9375rem; }
-  .products-grid .pheart{ width: 36px; height: 36px; }
-  .products-grid .pheart-icon svg{ width: 16px; height: 16px; }
-}
-@media (max-width: 480px){
-  .products-grid{
-    gap: 10px;
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  .products-grid .pimg{ aspect-ratio: 4 / 3; }
-  .products-grid .pcard{ border-radius: var(--card-radius-sm); }
-  .products-grid .pbody{ padding: 8px 10px; }
-  .products-grid .ptitle{ font-size: 0.875rem; }
-  .products-grid .pdesc{ line-height: 1.35; min-height: 0; }
-  .products-grid .prow{ margin-top: 5px; gap: 5px; }
-  .products-grid .padd{ padding: 8px 11px; font-size: 12px; min-height: 38px; }
-  .products-grid .pprice{ font-size: 0.875rem; }
-  .products-grid .pheart{ width: 34px; height: 34px; }
-  .products-grid .pheart-icon svg{ width: 14px; height: 14px; }
-}
-
-/* Location: móvil apilado, iframe autoajustable */
-@media (max-width: 640px){
-  .location-map iframe{ height: clamp(260px, 55vw, 360px); }
-  .location-address{ padding: 10px 14px; font-size: 13px; }
-}
-
-/* Chatbot en móvil */
-@media (max-width: 640px){
-  .chatbot-toggle{
-    bottom: 90px;
-    right: 16px;
-    width: 52px;
-    height: 52px;
-  }
-  .chatbot-panel{
-    left: 8px;
-    right: 8px;
-    width: auto;
-    max-height: 70vh;
-  }
-}
-
-/* Toast no tapar el carrito flotante */
-@media (max-width: 640px){
-  .toast{
-    bottom: 85px;
-    left: 12px;
-    right: 12px;
-    max-width: none;
-  }
-}
-
-
-
-
