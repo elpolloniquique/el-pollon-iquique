@@ -1324,10 +1324,11 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
       }
       showToast('Pedido guardado ✅ Abriendo WhatsApp…');
 
-      /* 2) Abrir WhatsApp con el mismo detalle que el ticket para imprimir */
-      const textoPedido = buildWhatsappTextFromOrder(order); /* mismo formato que buildTicketText80mm */
-      const urlWhatsApp = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(textoPedido);
-      window.open(urlWhatsApp, '_blank');
+      /* 2) Abrir WhatsApp con el formulario del ticket de impresión (mismo texto exacto) */
+      const textoTicket = buildTicketText80mm(order);
+      const urlWhatsApp = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(textoTicket);
+      const ventanaWa = window.open(urlWhatsApp, '_blank', 'noopener,noreferrer');
+      if (!ventanaWa) showToast('Permite ventanas emergentes para abrir WhatsApp.');
 
       cart = [];
       updateCartUI();
