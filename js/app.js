@@ -1260,28 +1260,19 @@ function closeCheckout(){ closeModal('#checkout-modal'); }
 document.getElementById('cancel-checkout')?.addEventListener('click', closeCheckout);
 document.getElementById('cancel-checkout-2')?.addEventListener('click', closeCheckout);
 
+/* Botón Enviar: toda la lógica en el clic del botón (sin depender del submit del form) */
 (function attachCheckoutSubmit(){
   const form = document.getElementById('checkout-form');
   const submitBtn = document.getElementById('checkout-submit-btn');
-  if (!form) return;
+  if (!form || !submitBtn) return;
 
-  // Respaldo: clic en Enviar fuerza el envío del formulario (por si el submit no se dispara en algún navegador)
-  if (submitBtn) {
-    submitBtn.addEventListener('click', function(e){
-      e.preventDefault();
-      form.requestSubmit();
-    });
-  }
+  let enviando = false;
 
-  form.addEventListener('submit', async (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-
-    const submitBtn = form.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.disabled = true;
-      submitBtn.setAttribute('aria-busy', 'true');
-    }
+  async function enviarPedido(){
+    if (enviando) return;
+    enviando = true;
+    submitBtn.disabled = true;
+    submitBtn.setAttribute('aria-busy', 'true');
 
     try {
       if (cart.length === 0){
@@ -1323,7 +1314,7 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
 
       orders.push(order);
 
-      // 1) Guardar en base de datos (Firestore o localStorage)
+      /* 1) Guardar en base de datos en tiempo real (Firestore) */
       try {
         await saveSingleOrder(order);
       } catch (err) {
@@ -1332,7 +1323,7 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
         showToast('Pedido guardado localmente. Abriendo WhatsApp…');
       }
 
-      // 2) Abrir WhatsApp con el texto del pedido
+      /* 2) Abrir WhatsApp con el texto del pedido */
       const text = buildWhatsappTextFromOrder(order);
       const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
       window.open(url, '_blank');
@@ -1346,11 +1337,22 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
       console.error('[Checkout] Error:', err);
       showToast('Error al procesar. Intenta de nuevo.');
     } finally {
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.removeAttribute('aria-busy');
-      }
+      enviando = false;
+      submitBtn.disabled = false;
+      submitBtn.removeAttribute('aria-busy');
     }
+  }
+
+  submitBtn.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    enviarPedido();
+  });
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    enviarPedido();
   });
 })();
 
