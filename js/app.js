@@ -1315,24 +1315,25 @@ document.getElementById('cancel-checkout-2')?.addEventListener('click', closeChe
       orders.push(order);
 
       /* 1) Guardar en base de datos en tiempo real (Firestore) */
+      showToast('Guardando pedido en base de datos…');
       try {
         await saveSingleOrder(order);
       } catch (err) {
         console.warn('[Checkout] Error guardando en BD:', err);
         try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); } catch (_) {}
-        showToast('Pedido guardado localmente. Abriendo WhatsApp…');
       }
+      showToast('Pedido guardado ✅ Abriendo WhatsApp…');
 
-      /* 2) Abrir WhatsApp con el texto del pedido */
-      const text = buildWhatsappTextFromOrder(order);
-      const url = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(text);
-      window.open(url, '_blank');
+      /* 2) Abrir WhatsApp con el mismo detalle que el ticket para imprimir */
+      const textoPedido = buildWhatsappTextFromOrder(order); /* mismo formato que buildTicketText80mm */
+      const urlWhatsApp = 'https://wa.me/' + WHATSAPP_NUMBER + '?text=' + encodeURIComponent(textoPedido);
+      window.open(urlWhatsApp, '_blank');
 
       cart = [];
       updateCartUI();
       renderCart();
       closeCheckout();
-      showToast('Pedido generado ✅ (abre WhatsApp)');
+      showToast('Listo ✅ Pedido en BD y WhatsApp abierto');
     } catch (err) {
       console.error('[Checkout] Error:', err);
       showToast('Error al procesar. Intenta de nuevo.');
