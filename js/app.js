@@ -944,13 +944,23 @@ function closePanels(){
 }
 
 /* =========================
-   Carousel fade PRO
+   Carousel fade PRO (10 fotos, autoplay 1s infinito, 10 puntos, Ver Menú)
 ========================= */
 let carouselIndex = 0;
 let carouselTimer = null;
+let carouselImgs = [];
+let carouselDots = [];
+
+function updateCarouselDots(){
+  carouselDots.forEach((dot, i) => {
+    dot.classList.toggle('is-active', i === carouselIndex);
+    dot.setAttribute('aria-selected', i === carouselIndex ? 'true' : 'false');
+  });
+}
 
 function startCarousel(){
   const container = document.getElementById('carousel-container');
+  const dotsContainer = document.getElementById('carousel-dots');
   if(!container) return;
 
   const imgs = Array.from(container.querySelectorAll('img'))
@@ -958,16 +968,52 @@ function startCarousel(){
 
   if(!imgs.length) return;
 
+  carouselImgs = imgs;
   imgs.forEach(img => img.classList.remove('is-active'));
   carouselIndex = 0;
   imgs[0].classList.add('is-active');
 
+  // Crear o actualizar 10 puntitos redondos (según cantidad de imágenes visibles)
+  if(dotsContainer){
+    dotsContainer.innerHTML = '';
+    carouselDots = imgs.map((_, i) => {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'carousel-dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('role', 'tab');
+      dot.setAttribute('aria-label', `Diapositiva ${i + 1}`);
+      dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+      dot.dataset.index = String(i);
+      dot.addEventListener('click', () => {
+        imgs[carouselIndex].classList.remove('is-active');
+        carouselIndex = i;
+        imgs[carouselIndex].classList.add('is-active');
+        updateCarouselDots();
+      });
+      dotsContainer.appendChild(dot);
+      return dot;
+    });
+  }
+
   if(carouselTimer) clearInterval(carouselTimer);
+  // Autoplay infinito cada 1 segundo
   carouselTimer = setInterval(()=>{
     imgs[carouselIndex].classList.remove('is-active');
     carouselIndex = (carouselIndex + 1) % imgs.length;
     imgs[carouselIndex].classList.add('is-active');
-  }, 2000);
+    updateCarouselDots();
+  }, 1000);
+}
+
+// Botón "Ver Menú" del carrusel: ir al menú completo
+function initCarouselVerMenu(){
+  const btn = document.getElementById('carousel-ver-menu-btn');
+  if(!btn) return;
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    setCategory('todo-el-menu');
+    scrollToMenu();
+  });
 }
 
 /* =========================
@@ -1296,6 +1342,7 @@ function init(){
   renderCart();
   chatbotWelcome();
   startCarousel();
+  initCarouselVerMenu();
 }
 init();
 

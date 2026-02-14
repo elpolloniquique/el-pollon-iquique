@@ -429,6 +429,66 @@ main#ofertas > section{
 }
 .carousel-fade img.is-active{ opacity:1; }
 
+/* Overlay del carrusel: botón Ver Menú + 10 puntitos */
+.hero-card--carousel{ position: relative; }
+.carousel-overlay{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(0,0,0,.5), transparent);
+}
+.carousel-overlay > *{ pointer-events: auto; }
+.carousel-ver-menu{
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: #facc15;
+  color: #000;
+  font-weight: 800;
+  font-size: 1rem;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0,0,0,.25);
+  transition: transform .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.carousel-ver-menu:hover{
+  background: #fde047;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.3);
+}
+.carousel-dots{
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.carousel-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: none;
+  padding: 0;
+  background: rgba(255,255,255,.7);
+  cursor: pointer;
+  transition: background .25s ease, transform .2s ease;
+}
+.carousel-dot:hover{ background: rgba(255,255,255,.95); transform: scale(1.15); }
+.carousel-dot.is-active{
+  background: #dc2626;
+  transform: scale(1.2);
+}
+
 /* Aviso */
 .aviso{
   margin-top: 0;          /* 🔥 clave: elimina espacio blanco */
