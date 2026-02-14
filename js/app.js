@@ -636,10 +636,11 @@ function buildTicketText80mm(order){
   const { date, time } = formatDateTicket(order.createdAt);
   const pedido = pad3(order.ticketNumber || '001');
 
-  const cliente = wrapText(order.customer?.name || '', 25).split('\n');
+  // En ticket: nombre, fono, comentario y productos en mayúsculas (solo para impresión)
+  const cliente = wrapText((order.customer?.name || '').toUpperCase(), 25).split('\n');
   const direccion = wrapText(order.customer?.address || '', 25).split('\n');
-  const comentario = wrapText(order.customer?.comment || '', 25).split('\n').filter(Boolean);
-  const fono = (order.customer?.phone || '').trim();
+  const comentario = wrapText((order.customer?.comment || '').toUpperCase(), 25).split('\n').filter(Boolean);
+  const fono = (order.customer?.phone || '').trim().toUpperCase();
 
   let t = '';
   t += `POLLERÍA EL POLLÓN   - DELIVERY\n`;
@@ -663,7 +664,7 @@ function buildTicketText80mm(order){
 
   order.items.forEach((it, idx)=>{
     const n = idx + 1;
-    const nameLines = wrapText(it.name || '', 30).split('\n');
+    const nameLines = wrapText((it.name || '').toUpperCase(), 30).split('\n');
     const qty = it.qty || 1;
 
     t += `${n}) ${nameLines[0] || ''} ( X${qty} )\n`;
@@ -673,7 +674,7 @@ function buildTicketText80mm(order){
     }
 
     if(it.drink){
-      t += `   Bebida   : ${it.drink}\n`;
+      t += `   Bebida   : ${(it.drink || '').toUpperCase()}\n`;
     }
 
     if(it.bagQty && it.bagQty > 0){
