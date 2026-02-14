@@ -312,6 +312,9 @@ function printTicket80mm(order){
             white-space: pre-wrap;
           }
           b{ font-weight: 900; }
+          .ticket-fono{ font-size: 1.2em; }
+          .ticket-comment{ font-weight: 700; }
+          .ticket-product{ font-size: 1.15em; font-weight: 700; }
         </style>
       </head>
       <body>

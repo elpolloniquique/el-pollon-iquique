@@ -703,9 +703,18 @@ function buildTicketHtml80mm(order){
     .replaceAll('<','&lt;')
     .replaceAll('>','&gt;');
 
-  const html = esc
+  let html = esc
     .replace('POLLERÍA EL POLLÓN', '<b>POLLERÍA EL POLLÓN</b>')
     .replace('TOTAL A PAGAR', '<b>TOTAL A PAGAR</b>');
+
+  // Número de celular: letras un poco más grandes
+  html = html.replace(/(Fono\s+:\s+)([^\n]+)(\n)/, '$1<span class="ticket-fono">$2</span>$3');
+  // Comentario: descripción con letras más gruesas
+  html = html.replace(/Comentario: ([\s\S]*?)(?=\n\n)/, (_, c) => `Comentario: <span class="ticket-comment">${c}</span>`);
+  // Nombres de productos: un poco más grandes y en negrita (líneas "n) Nombre ( Xqty )")
+  html = html.replace(/^(\d+\))\s+(.+?)(\s+\( X\d+ \)\s*)$/gm, '$1 <span class="ticket-product">$2</span>$3');
+  // Bebida (nombre de producto): mismo estilo
+  html = html.replace(/(   Bebida   : )(.+?)(\n)/g, '$1<span class="ticket-product">$2</span>$3');
 
   return html;
 }
