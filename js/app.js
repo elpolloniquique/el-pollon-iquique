@@ -9,13 +9,29 @@ const BAG_PRICE = 200; // CLP
 const WHATSAPP_NUMBER = '56986925310';
 
 // ======================= FIREBASE CONFIGURACIÓN =========================
-// IMPORTANTE:
-// 1) Entra a https://console.firebase.google.com
-// 2) Crea un proyecto Web y activa "Cloud Firestore"
-// 3) Copia la configuración de tu app web y reemplaza los valores de abajo
-// 4) En Firestore crea una colección llamada: pollon_orders_v1
+// Realtime Database: los pedidos se guardan en la ruta "pollon_orders_v1".
+// Reglas obligatorias en Firebase Console > Realtime Database > Reglas:
+//   { "rules": { "pollon_orders_v1": { ".read": true, ".write": true } } }
+// Ver FIREBASE-BASE-DATOS.md para desplegar reglas y comprobar que todo funcione.
 // -----------------------------------------------------------------------
-const firebaseConfig = {
+
+
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyDc4omnC9sxGUKEYjUVrJUxcG9RMiidkr4",
+//   authDomain: "pollonpagina01.firebaseapp.com",
+//   databaseURL: "https://pollonpagina01-default-rtdb.firebaseio.com",
+//   projectId: "pollonpagina01",
+//   storageBucket: "pollonpagina01.firebasestorage.app",
+//   messagingSenderId: "211369350355",
+//   appId: "1:211369350355:web:11d849533761780a5df026",
+//   measurementId: "G-NE5XP5N3VS"
+// };
+
+
+
+
+ const firebaseConfig = {
   apiKey: "AIzaSyDc4omnC9sxGUKEYjUVrJUxcG9RMiidkr4",
   authDomain: "pollonpagina01.firebaseapp.com",
   databaseURL: "https://pollonpagina01-default-rtdb.firebaseio.com",
@@ -29,97 +45,182 @@ const firebaseConfig = {
 
 
 
+let ordersRef = null;
+let db = null;
+let rtdb = null;
+const ORDERS_PATH = 'pollon_orders_v1';
+let _ordersSnapshotInitialized = false;
+let useRealtimeDB = false;
 
-
-// const firebaseConfig = {
-//   apiKey: "AIzaSyCks-YWsfvV8NTyebTLC3FHGeyEQiVEUj4",
-//   authDomain: "pollon-db-2026.firebaseapp.com",
-//   databaseURL: "https://pollon-db-2026-default-rtdb.firebaseio.com",
-//   projectId: "pollon-db-2026",
-//   storageBucket: "pollon-db-2026.firebasestorage.app",
-//   messagingSenderId: "749646607216",
-//   appId: "1:749646607216:web:6f26a11f138828eb8695b5",
-//   measurementId: "G-XXXXXXXXXX"
-// en es correo usolibrettrabajo@gmail.com   --- pollonpagina001
-// };
-
-let ordersRef = null; // referencia a la colección de Firestore
-let db = null;        // referencia a Firestore
-const ORDERS_PATH = 'pollon_orders_v1'; // nombre de la colección en Firestore
-
-// Base de datos de pedidos (en memoria, sincronizada con Firestore)
 let orders = [];
-const ORDERS_KEY = 'pollon_orders_v1'; // respaldo local
+const ORDERS_KEY = 'pollon_orders_v1';
 
-// Inicializa Firestore y suscripción en tiempo real
-function initOrdersBackend() {
-  try {
-    if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
-    if (typeof firebase !== 'undefined') {
-      db = firebase.firestore();
-      ordersRef = db.collection(ORDERS_PATH);
+// Elimina undefined para Firestore
+function sanitizeForFirestore(obj) {
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) return obj.map(sanitizeForFirestore).filter(v => v !== undefined);
+  const out = {};
+  for (const k of Object.keys(obj)) {
+    if (obj[k] === undefined) continue;
+    out[k] = sanitizeForFirestore(obj[k]);
+  }
+  return out;
+}
 
-      // Suscripción en tiempo real a la colección (ordenada por fecha)
-      ordersRef.orderBy('createdAt', 'asc').onSnapshot(snapshot => {
-        const list = [];
-        snapshot.forEach(doc => {
-          const data = doc.data() || {};
-          list.push({
-            id: doc.id,
-            ...data
-          });
-        });
-        orders = list;
-        // Aseguramos orden por fecha por si acaso
-        orders.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
-        const adminVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
-        if (adminVisible) {
-          renderAdminPanel();
-        }
-      });
-    }
-  } catch (e) {
-    console.warn('No se pudo inicializar Firebase/Firestore. Se usará solo almacenamiento local.', e);
+function syncOrdersToList(list) {
+  const prevCount = orders.length;
+  orders = list;
+  orders.sort((a, b) => (a.createdAt || '').localeCompare(b.createdAt || ''));
+  if (_ordersSnapshotInitialized && list.length > prevCount && window.PollonAdmin?.isSoundEnabled?.()) {
+    window.PollonAdmin.playOrderAlarm();
+  }
+  _ordersSnapshotInitialized = true;
+  if (document.getElementById('admin-panel-modal')?.classList.contains('active')) {
+    renderAdminPanel();
   }
 }
 
-// Guarda el array completo de pedidos (Firestore + respaldo local)
+// Inicializa Firebase: Realtime DB primero (más simple), luego Firestore
+function initOrdersBackend() {
+  try {
+    if (typeof firebase === 'undefined') {
+      loadOrdersFromLocal();
+      return;
+    }
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    // 1) Realtime Database (databaseURL configurado = más fácil de usar)
+    if (firebase.database && firebaseConfig.databaseURL) {
+      try {
+        rtdb = firebase.database();
+        const ref = rtdb.ref(ORDERS_PATH);
+        ref.on('value', snapshot => {
+          const list = [];
+          const val = snapshot.val();
+          if (val && typeof val === 'object') {
+            Object.keys(val).forEach(key => {
+              const data = val[key];
+              if (data && typeof data === 'object') {
+                list.push({ id: key, ...data });
+              }
+            });
+          }
+          syncOrdersToList(list);
+        });
+        useRealtimeDB = true;
+        return;
+      } catch (rtErr) {
+        console.warn('Realtime DB no disponible:', rtErr);
+      }
+    }
+
+    // 2) Fallback: Firestore
+    initFirestore();
+  } catch (e) {
+    console.warn('Firebase init error:', e);
+    loadOrdersFromLocal();
+  }
+}
+
+function initFirestore() {
+  try {
+    db = firebase.firestore();
+    ordersRef = db.collection(ORDERS_PATH);
+    ordersRef.orderBy('createdAt', 'asc').onSnapshot(
+      snapshot => {
+        const list = [];
+        snapshot.forEach(doc => {
+          list.push({ id: doc.id, ...(doc.data() || {}) });
+        });
+        syncOrdersToList(list);
+      },
+      err => {
+        console.warn('Firestore error:', err);
+        ordersRef = null;
+        db = null;
+        loadOrdersFromLocal();
+      }
+    );
+  } catch (e) {
+    console.warn('Firestore no disponible:', e);
+    loadOrdersFromLocal();
+  }
+}
+
+
+function loadOrdersFromLocal() {
+  try {
+    const raw = localStorage.getItem(ORDERS_KEY);
+    orders = raw ? JSON.parse(raw) : [];
+  } catch (_) {
+    orders = [];
+  }
+}
+
+// Agregar pedido (Firestore o Realtime DB). El id debe ser válido para Firebase (sin ., $, #, [, ], /).
+function addOrderToBackend(order) {
+  if (!order || !order.id) {
+    return Promise.reject(new Error('Pedido inválido: falta id'));
+  }
+  const safe = sanitizeForFirestore(order);
+
+  if (ordersRef && db && !useRealtimeDB) {
+    return ordersRef.doc(order.id).set(safe);
+  }
+
+  if (rtdb && useRealtimeDB) {
+    const ref = rtdb.ref(ORDERS_PATH).child(order.id);
+    return ref.set(safe);
+  }
+
+  return Promise.reject(new Error('Base de datos no disponible'));
+}
+
+// Actualizar pedido (estado, deliveredAt, etc.)
+function updateOrderInBackend(order) {
+  if (!order || !order.id) {
+    return Promise.reject(new Error('Pedido inválido: falta id'));
+  }
+  const safe = sanitizeForFirestore(order);
+  if (ordersRef && db && !useRealtimeDB) {
+    return ordersRef.doc(order.id).set(safe, { merge: true });
+  }
+  if (rtdb && useRealtimeDB) {
+    return rtdb.ref(ORDERS_PATH).child(order.id).set(safe);
+  }
+  return Promise.reject(new Error('Base de datos no disponible'));
+}
+
 function saveOrders() {
-  if (ordersRef && db) {
+  if (ordersRef && db && !useRealtimeDB) {
     const batch = db.batch();
     orders.forEach(o => {
-      if (!o.id) {
-        o.id = 'P' + Date.now();
-      }
-      const docRef = ordersRef.doc(o.id);
-      batch.set(docRef, o, { merge: true });
+      if (!o.id) o.id = 'P' + Date.now();
+      batch.set(ordersRef.doc(o.id), sanitizeForFirestore(o), { merge: true });
     });
     batch.commit().catch(err => {
-      console.error('Error guardando pedidos en Firestore', err);
+      console.error('Error guardando:', err);
+      showToast('Error al guardar. Intenta de nuevo.');
+    });
+  } else if (rtdb && useRealtimeDB) {
+    orders.forEach(o => {
+      if (!o.id) o.id = 'P' + Date.now();
+      rtdb.ref(ORDERS_PATH).child(o.id).set(sanitizeForFirestore(o));
     });
   } else {
     try {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     } catch (e) {
-      console.error('Error guardando pedidos en localStorage', e);
+      console.error('Error localStorage:', e);
     }
   }
 }
 
-// Cargar pedidos (si no hay Firestore, usamos respaldo local)
 function loadOrders() {
-  if (ordersRef && db) {
-    return;
-  } else {
-    try {
-      const raw = localStorage.getItem(ORDERS_KEY);
-      orders = raw ? JSON.parse(raw) : [];
-    } catch (e) {
-      orders = [];
-    }
-  }
+  if ((ordersRef && db) || (rtdb && useRealtimeDB)) return;
+  loadOrdersFromLocal();
 }
 
 
@@ -242,10 +343,38 @@ function showToast(msg) {
   setTimeout(() => t.remove(), 3000);
 }
 
+// ======== WRAP TEXTO PARA TICKET 80mm (máx 35 caracteres por línea) ========
+const TICKET_LINE_LENGTH = 35;
+function wrapText(text, maxLen) {
+  const len = maxLen != null ? maxLen : TICKET_LINE_LENGTH;
+  const str = String(text || '').trim();
+  if (!str) return '';
+  const lines = [];
+  let remaining = str;
+  while (remaining.length > 0) {
+    if (remaining.length <= len) {
+      lines.push(remaining);
+      break;
+    }
+    let chunk = remaining.slice(0, len);
+    const lastSpace = chunk.lastIndexOf(' ');
+    if (lastSpace > 0) {
+      chunk = chunk.slice(0, lastSpace);
+      remaining = remaining.slice(lastSpace + 1).trim();
+    } else {
+      remaining = remaining.slice(len);
+    }
+    lines.push(chunk);
+  }
+  return lines.join('\n');
+}
+
 // ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
-   // ======== TEXTO WHATSAPP (USADO TAMBIÉN PARA IMPRESORA TÉRMICA) ========
 function buildWhatsappTextFromOrder(order) {
-  const { customer, items, total } = order;
+  if (!order) return '';
+  const customer = order.customer || {};
+  const items = Array.isArray(order.items) ? order.items : [];
+  const total = order.total != null ? order.total : 0;
 
   // Formato de fecha y hora en base a createdAt
   const fechaBase = order.createdAt ? new Date(order.createdAt) : new Date();
@@ -270,10 +399,16 @@ function buildWhatsappTextFromOrder(order) {
   msg += `◆ DATOS DEL CLIENTE\n`;
   msg += `────────────────────────────────\n\n`;
 
-  // DATOS CLIENTE
-  msg += `◆ Nombre:   ${customer.name}\n`;
-  msg += `◆ Teléfono: ${customer.phone}\n`;
-  msg += `◆ Dirección: ${customer.address}\n\n`;
+  // DATOS CLIENTE (seguro si customer viene vacío desde BD). Dirección y comentarios con wrap 35 chars para ticket 80mm.
+  msg += `◆ Nombre:   ${customer.name || '-'}\n`;
+  msg += `◆ Teléfono: ${customer.phone || '-'}\n`;
+  const addrWrapped = wrapText(customer.address, TICKET_LINE_LENGTH);
+  msg += `◆ Dirección:\n${addrWrapped ? addrWrapped.split('\n').map(l => '   ' + l).join('\n') : '   -'}\n\n`;
+  const commentsRaw = (customer.comments || '').trim();
+  if (commentsRaw) {
+    const commentsWrapped = wrapText(commentsRaw, TICKET_LINE_LENGTH);
+    msg += `◆ Comentarios:\n${commentsWrapped.split('\n').map(l => '   ' + l).join('\n')}\n\n`;
+  }
 
   // DETALLE PEDIDO
   msg += `────────────────────────────────\n`;
@@ -281,12 +416,16 @@ function buildWhatsappTextFromOrder(order) {
   msg += `────────────────────────────────\n\n`;
 
   items.forEach((it, i) => {
-    msg += `${i + 1}. ${it.name} × ${it.qty}\n`;
-    msg += `— Subtotal: ${money(it.total)}\n`;
+    if (!it || typeof it !== 'object') return;
+    const name = it.name || 'Producto';
+    const qty = it.qty != null ? it.qty : 1;
+    const totalItem = it.total != null ? it.total : 0;
+    msg += `${i + 1}. ${name} × ${qty}\n`;
+    msg += `— Subtotal: ${money(totalItem)}\n`;
     if (it.drink) {
       msg += `— Bebida: ${it.drink}\n`;
     }
-    if (it.bagQty > 0) {
+    if ((it.bagQty || 0) > 0) {
       msg += `— Bolsa: x ${it.bagQty} (+ ${money(BAG_PRICE)} /u)\n`;
     }
     msg += `\n`;
@@ -338,11 +477,18 @@ function renderProductsSingle(category) {
       <div class="p-4">
         <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
         <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
-        <div class="flex justify-between items-center">
+        <div class="flex justify-between items-center gap-2">
           <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
-          <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
-                  style="background-color:#dc2626"
-                  data-product='${JSON.stringify(payload)}'>Agregar</button>
+          <div class="product-card-actions flex items-center gap-2 flex-1 justify-end">
+            <span class="product-like-wrap">
+              <button type="button" class="product-like-btn" aria-label="Me gusta" title="Me gusta">
+                <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              </button>
+            </span>
+            <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+                    style="background-color:#dc2626"
+                    data-product='${JSON.stringify(payload)}'>Agregar</button>
+          </div>
         </div>
       </div>
     `;
@@ -350,6 +496,12 @@ function renderProductsSingle(category) {
   });
 
   setActiveCategoryButton(category);
+}
+
+function setActiveCategoryButton(category) {
+  document.querySelectorAll('.category-btn.catbtn').forEach(btn => {
+    btn.classList.toggle('is-active', (btn.dataset.category || '') === category);
+  });
 }
 
 // Render “TODO EL MENÚ”: todas las categorías con encabezados
@@ -365,14 +517,14 @@ function renderProductsAll() {
     const list = products[catKey] || [];
     if (!list.length) return;
 
-    // Encabezado por categoría (como tu foto)
+    // Encabezado: nombre de categoría al canto izquierdo + línea roja hasta el final
     const header = document.createElement('div');
-    header.className = 'col-span-full mt-4 mb-2';
+    header.className = 'col-span-full mt-4 mb-2 category-header';
     header.innerHTML = `
-      <h3 class="text-1.8xl font-bold text-gray-900 flex items-center gap-2">
-        ${CATEGORY_META[catKey]?.title || catKey}
-      </h3>
-      <div class="h-[3px] w-70 bg-red-300 rounded-full mt-1"></div>
+      <div class="category-header-inner">
+        <h3 class="category-header-title">${CATEGORY_META[catKey]?.title || catKey}</h3>
+        <span class="category-line"></span>
+      </div>
     `;
     container.appendChild(header);
 
@@ -388,11 +540,18 @@ function renderProductsAll() {
         <div class="p-4">
           <h3 class="font-bold text-lg mb-2 text-red-900">${p.name}</h3>
           <p class="text-gray-600 text-sm mb-3">${p.description || ''}</p>
-          <div class="flex justify-between items-center">
+          <div class="flex justify-between items-center gap-2">
             <span class="text-2xl font-bold text-red-700">${money(p.price)}</span>
-            <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
-                    style="background-color:#dc2626"
-                    data-product='${JSON.stringify(payload)}'>Agregar</button>
+            <div class="product-card-actions flex items-center gap-2 flex-1 justify-end">
+              <span class="product-like-wrap">
+                <button type="button" class="product-like-btn" aria-label="Me gusta" title="Me gusta">
+                  <svg class="heart-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                </button>
+              </span>
+              <button class="add-to-cart px-4 py-2 rounded-lg font-bold text-white hover:opacity-90"
+                      style="background-color:#dc2626"
+                      data-product='${JSON.stringify(payload)}'>Agregar</button>
+            </div>
           </div>
         </div>
       `;
@@ -550,19 +709,20 @@ function getTodayString() {
 }
 
 function filteredOrders() {
-  return orders.filter(o => {
+  const list = orders.filter(o => {
     const d = o.createdAt ? o.createdAt.substring(0, 10) : '';
     if (adminFilters.from && d < adminFilters.from) return false;
     if (adminFilters.to && d > adminFilters.to) return false;
     if (adminFilters.status !== 'todos' && o.status !== adminFilters.status) return false;
     if (adminFilters.search) {
       const term = adminFilters.search.toLowerCase();
-      const inName = (o.customer.name || '').toLowerCase().includes(term);
-      const inPhone = (o.customer.phone || '').toLowerCase().includes(term);
+      const inName = (o.customer?.name || '').toLowerCase().includes(term);
+      const inPhone = (o.customer?.phone || '').toLowerCase().includes(term);
       if (!inName && !inPhone) return false;
     }
     return true;
   });
+  return list.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''));
 }
 
 function computeAdminStats() {
@@ -626,12 +786,13 @@ function renderAdminPanel() {
     return;
   }
   tbody.innerHTML = list.map(o => {
+    const cust = o.customer || {};
     const dateStr = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
     return `
       <tr>
-        <td class="px-3 py-2 text-xs font-mono text-gray-700">${o.id}</td>
-        <td class="px-3 py-2 text-xs text-gray-800">${o.customer.name || '-'}</td>
-        <td class="px-3 py-2 text-xs text-gray-700">${o.customer.phone || '-'}</td>
+        <td class="px-3 py-2 text-xs font-mono text-gray-700">${o.id || '-'}</td>
+        <td class="px-3 py-2 text-xs text-gray-800">${cust.name || '-'}</td>
+        <td class="px-3 py-2 text-xs text-gray-700">${cust.phone || '-'}</td>
         <td class="px-3 py-2 text-xs font-semibold text-gray-900">${money(o.total)}</td>
         <td class="px-3 py-2 text-xs">
           <span class="${statusBadgeClass(o.status)}">${o.status}</span>
@@ -666,9 +827,17 @@ function openAdminPanelModal() {
     const toInput = document.getElementById('admin-filter-to');
     if (fromInput) fromInput.value = adminFilters.from;
     if (toInput) toInput.value = adminFilters.to;
+    updateAdminStatusFilterButtons();
     renderAdminPanel();
     modal.classList.add('active');
   }
+}
+
+function updateAdminStatusFilterButtons() {
+  document.querySelectorAll('.admin-filter-status-btn').forEach(btn => {
+    const status = btn.dataset.status || '';
+    btn.classList.toggle('active', adminFilters.status === status);
+  });
 }
 function closeAdminPanelModal() {
   const modal = document.getElementById('admin-panel-modal');
@@ -708,8 +877,39 @@ function printOrderTicket(order) {
   win.print();
 }
 
+// --------- Corazón like (burst de corazoncitos) ----------
+function playHeartBurst(wrapEl) {
+  if (!wrapEl || !wrapEl.classList.contains('product-like-wrap')) return;
+  var count = 7;
+  var radius = 38;
+  var heartSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+  for (var i = 0; i < count; i++) {
+    var angle = -90 + (i / (count - 1 || 1)) * 100 - 50;
+    var rad = (angle * Math.PI) / 180;
+    var bx = Math.sin(rad) * radius;
+    var by = -Math.cos(rad) * radius;
+    var el = document.createElement('span');
+    el.className = 'heart-burst-item';
+    el.style.setProperty('--bx', bx + 'px');
+    el.style.setProperty('--by', by + 'px');
+    el.innerHTML = heartSvg;
+    wrapEl.appendChild(el);
+    setTimeout(function (node) {
+      if (node.parentNode) node.parentNode.removeChild(node);
+    }, 600, el);
+  }
+}
+
 // --------- Eventos globales ----------
 document.addEventListener('click', (e) => {
+  // corazón like (burst)
+  var likeBtn = e.target.closest('.product-like-btn');
+  if (likeBtn) {
+    var wrap = likeBtn.closest('.product-like-wrap');
+    if (wrap) playHeartBurst(wrap);
+    return;
+  }
+
   // cambiar categoría
   if (e.target.classList.contains('category-btn') || (e.target.closest && e.target.closest('.category-btn'))) {
   const btn = e.target.closest('.category-btn');
@@ -954,6 +1154,15 @@ document.addEventListener('click', (e) => {
     closeAdminPanelModal();
   }
 
+  // ADMIN botones de filtro por estado (Pendiente, Entregado, etc.)
+  if (e.target.classList.contains('admin-filter-status-btn')) {
+    adminFilters.status = e.target.dataset.status || 'todos';
+    const fs = document.getElementById('admin-filter-status');
+    if (fs) fs.value = adminFilters.status;
+    updateAdminStatusFilterButtons();
+    renderAdminPanel();
+  }
+
   // ADMIN limpiar filtros
   if (e.target.id === 'admin-filter-clear') {
     const ff = document.getElementById('admin-filter-from');
@@ -965,6 +1174,7 @@ document.addEventListener('click', (e) => {
     if (fs) fs.value = 'todos';
     if (fsearch) fsearch.value = '';
     adminFilters = { from: '', to: '', status: 'todos', search: '' };
+    updateAdminStatusFilterButtons();
     renderAdminPanel();
   }
 
@@ -978,8 +1188,9 @@ document.addEventListener('click', (e) => {
     let lines = 'ID\tFecha\tNombre\tTeléfono\tDirección\tTotal\tEstado\n';
     list.forEach(o => {
       const fecha = o.createdAt ? new Date(o.createdAt).toLocaleString('es-CL') : '';
-      const dir = (o.customer.address || '').replace(/\s+/g, ' ');
-      lines += `${o.id}\t${fecha}\t${o.customer.name || ''}\t${o.customer.phone || ''}\t${dir}\t${o.total}\t${o.status}\n`;
+      const c = o.customer || {};
+      const dir = (c.address || '').replace(/\s+/g, ' ');
+      lines += `${o.id}\t${fecha}\t${c.name || ''}\t${c.phone || ''}\t${dir}\t${o.total}\t${o.status}\n`;
     });
     const copiar = async () => {
       try {
@@ -1023,14 +1234,28 @@ document.addEventListener('click', (e) => {
     const id = e.target.dataset.id;
     const order = orders.find(o => o.id === id);
     if (order) {
-      const nuevo = nextStatus(order.status);
+      const anterior = order.status;
+      const nuevo = nextStatus(anterior);
       order.status = nuevo;
       if (nuevo === 'Entregado' && !order.deliveredAt) {
         order.deliveredAt = new Date().toISOString();
       }
-      saveOrders();
-      renderAdminPanel();
-      showToast(`Estado actualizado a: ${nuevo}`);
+      if ((ordersRef && db) || (rtdb && useRealtimeDB)) {
+        updateOrderInBackend(order).then(() => {
+          renderAdminPanel();
+          showToast(`Estado actualizado a: ${nuevo}`);
+        }).catch(err => {
+          console.error(err);
+          order.status = anterior;
+          if (nuevo === 'Entregado') order.deliveredAt = null;
+          renderAdminPanel();
+          showToast('Error al actualizar. Intenta de nuevo.');
+        });
+      } else {
+        saveOrders();
+        renderAdminPanel();
+        showToast(`Estado actualizado a: ${nuevo}`);
+      }
     }
   }
 
@@ -1038,9 +1263,10 @@ document.addEventListener('click', (e) => {
     const id = e.target.dataset.id;
     const order = orders.find(o => o.id === id);
     if (order) {
-      const phoneRaw = (order.customer.phone || '').replace(/\D/g, '');
+      const cust = order.customer || {};
+      const phoneRaw = (cust.phone || '').replace(/\D/g, '');
       const to = phoneRaw || WHATSAPP_NUMBER;
-      let msg = `Hola ${order.customer.name || ''}, te escribimos de Pollería El Pollón respecto a tu pedido ${order.id} (${order.status}).`;
+      let msg = `Hola ${cust.name || ''}, te escribimos de Pollería El Pollón respecto a tu pedido ${order.id} (${order.status}).`;
       const url = `https://wa.me/${to}?text=${encodeURIComponent(msg)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
     }
@@ -1054,21 +1280,6 @@ document.addEventListener('click', (e) => {
     }
   }
 
-  // CHATBOT toggle
-  if (e.target.id === 'chatbot-toggle' || (e.target.closest && e.target.closest('#chatbot-toggle'))) {
-    const panel = document.getElementById('chatbot-panel');
-    if (panel) panel.classList.toggle('hidden');
-  }
-  if (e.target.id === 'chatbot-close') {
-    const panel = document.getElementById('chatbot-panel');
-    if (panel) panel.classList.add('hidden');
-  }
-
-  // CHATBOT chips
-  if (e.target.classList.contains('chatbot-chip')) {
-    const action = e.target.dataset.action;
-    handleChatbotAction(action);
-  }
 });
 
 // ADMIN filtros (input)
@@ -1083,6 +1294,7 @@ document.addEventListener('input', (e) => {
   }
   if (e.target.id === 'admin-filter-status') {
     adminFilters.status = e.target.value || 'todos';
+    updateAdminStatusFilterButtons();
     renderAdminPanel();
   }
   if (e.target.id === 'admin-filter-search') {
@@ -1099,6 +1311,8 @@ if (checkoutForm) {
     e.preventDefault();
     const name = document.getElementById('customer-name').value.trim();
     const address = document.getElementById('customer-address').value.trim();
+    const commentsEl = document.getElementById('customer-comments');
+    const comments = commentsEl ? commentsEl.value.trim() : '';
     const phone = document.getElementById('customer-phone').value.trim();
 
     let total = 0;
@@ -1115,42 +1329,64 @@ if (checkoutForm) {
       });
     });
 
-    // 🔢 NUEVO: número correlativo de ticket (001, 002, 003, ...)
-    const ticketNumber = String(orders.length + 1).padStart(3, "0");
+    // Número de ticket correlativo (001, 002, ...). Si la BD no ha cargado aún, se usa al menos 1.
+    const ticketNumber = String(Math.max(1, orders.length + 1)).padStart(3, "0");
 
     const order = {
       id: 'P' + Date.now(),
       createdAt: new Date().toISOString(),
-      ticketNumber, // 👈 guardamos el número de ticket
-      customer: { name, address, phone },
+      ticketNumber,
+      customer: { name, address, phone, ...(comments ? { comments } : {}) },
       items: itemsForOrder,
       total,
       status: 'Pendiente',
       deliveredAt: null
     };
 
-
-
-//-------------------
-
-    orders.push(order);
-    saveOrders();
-//----------------------
-    const rawMsg = buildWhatsappTextFromOrder(order);
-    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`;
-    window.open(url, '_blank', 'noopener,noreferrer');
-
-    const adminPanelVisible = document.getElementById('admin-panel-modal')?.classList.contains('active');
-    if (adminPanelVisible) {
-      renderAdminPanel();
+    if ((ordersRef && db) || (rtdb && useRealtimeDB)) {
+      addOrderToBackend(order)
+        .then(() => {
+          orders.push(order);
+          const rawMsg = buildWhatsappTextFromOrder(order);
+          window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`, '_blank', 'noopener,noreferrer');
+          cart = [];
+          updateCartUI();
+          document.getElementById('checkout-modal')?.classList.remove('active');
+          e.target.reset();
+          showToast('✅ ¡Pedido enviado a WhatsApp y guardado en la base de datos!');
+          if (document.getElementById('admin-panel-modal')?.classList.contains('active')) {
+            renderAdminPanel();
+          }
+        })
+        .catch(err => {
+          console.error('Error guardando en base de datos:', err);
+          orders.push(order);
+          try { localStorage.setItem(ORDERS_KEY, JSON.stringify(orders)); } catch (_) {}
+          const rawMsg = buildWhatsappTextFromOrder(order);
+          window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`, '_blank', 'noopener,noreferrer');
+          cart = [];
+          updateCartUI();
+          document.getElementById('checkout-modal')?.classList.remove('active');
+          e.target.reset();
+          if (document.getElementById('admin-panel-modal')?.classList.contains('active')) {
+            renderAdminPanel();
+          }
+          showToast('⚠️ Pedido enviado a WhatsApp. Guardado localmente (revisa reglas de Firebase).');
+        });
+    } else {
+      orders.push(order);
+      saveOrders();
+      const rawMsg = buildWhatsappTextFromOrder(order);
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(rawMsg)}`, '_blank', 'noopener,noreferrer');
+      cart = [];
+      updateCartUI();
+      document.getElementById('checkout-modal')?.classList.remove('active');
+      e.target.reset();
+      if (document.getElementById('admin-panel-modal')?.classList.contains('active')) {
+        renderAdminPanel();
+      }
+      showToast('✅ ¡Pedido enviado a WhatsApp y registrado!');
     }
-
-    cart = [];
-    updateCartUI();
-    const chm = document.getElementById('checkout-modal');
-    if (chm) chm.classList.remove('active');
-    e.target.reset();
-    showToast('✅ ¡Pedido enviado a WhatsApp y registrado en Firestore!');
   });
 }
 
@@ -1211,122 +1447,182 @@ if (viewCartDesktop) {
   });
 }
 
-// Carrusel auto
-let currentSlide = 0;
+// Carrusel infinito: 1 segundo por slide, bucle sin salto visible (clon de la 1ª imagen al final)
 const totalSlides = 10;
+const totalSlidesInDom = totalSlides + 1; // 11: 10 originales + clon de la primera
+let currentSlide = 0;
+let isResetting = false;
 const carouselContainer = document.getElementById('carousel-container');
-function updateCarousel() {
-  if (carouselContainer) carouselContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
-}
-setInterval(() => {
-  currentSlide = (currentSlide + 1) % totalSlides;
-  updateCarousel();
-}, 2000);
-updateCarousel();
+const carouselIndicators = document.getElementById('carousel-indicators');
+const CAROUSEL_INTERVAL_MS = 1000;
 
-// --------- CHATBOT LÓGICA ----------
-const chatbotMessagesEl = document.getElementById('chatbot-messages');
-
-function appendChatbotMessage(text, from = 'bot') {
-  if (!chatbotMessagesEl) return;
-  const div = document.createElement('div');
-  div.className = 'chatbot-msg ' + (from === 'bot' ? 'chatbot-msg-bot' : 'chatbot-msg-user');
-  div.innerHTML = text;
-  chatbotMessagesEl.appendChild(div);
-  chatbotMessagesEl.scrollTop = chatbotMessagesEl.scrollHeight;
-}
-
-function chatbotWelcome() {
-  appendChatbotMessage(`
-    👋 ¡Bienvenido a <strong>Pollería El Pollón</strong> en Iquique!<br><br>
-    Soy tu asistente virtual tipo <strong>WhatsApp</strong> 💬.<br><br>
-    Te puedo ayudar con:<br>
-    • Ver combos familiares, para dos y personales 🍗<br>
-    • Ubicación, horarios y delivery 🚚<br>
-    • Método de pago y redes sociales 💳📲<br>
-    • Dejar tu pedido listo para WhatsApp ✅<br><br>
-    Elige una opción de abajo y te llevo directo donde necesitas.
-  `, 'bot');
-}
-
-function handleChatbotAction(action) {
-  if (action === 'familiares') {
-    appendChatbotMessage('Quiero ver los combos familiares más pedidos.', 'user');
-    appendChatbotMessage(`
-      Excelente elección 🙌<br><br>
-      Nuestros <strong>Combos Familiares</strong> son los más vendidos del local:<br><br>
-      ⭐ <strong>Ofertón más chaufa</strong>: pollo entero + papas + chaufa + ensalada + bebida 1.5L.<br>
-      ⭐ <strong>Ofertón pura papa</strong>: ideal para los que aman las papas fritas 🤤<br>
-      ⭐ <strong>Mega Familiar</strong>: pensado para grupos grandes.<br><br>
-      👉 Te llevo directo a la sección de <strong>Ofertas Familiares</strong> para que agregues tu combo al carrito.
-    `, 'bot');
-    const sectionBtn = document.querySelector('.category-btn[data-category="ofertas-familiares"]');
-    if (sectionBtn) sectionBtn.click();
-    document.querySelector('#products-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function updateCarousel(useTransition = true) {
+  if (!carouselContainer) return;
+  if (!useTransition) {
+    carouselContainer.style.transition = 'none';
   }
-
-  if (action === 'horarios') {
-    appendChatbotMessage('Quiero saber los horarios y la dirección.', 'user');
-    appendChatbotMessage(`
-      Perfecto 🕐<br><br>
-      📍 <strong>Dirección:</strong><br>
-      Calle Vivar 1086, Iquique, Chile.<br><br>
-      🕐 <strong>Horario de atención:</strong><br>
-      Lunes a Domingo de <strong>11:30 a 23:00 hrs</strong>.<br><br>
-      Puedes venir al local, retirar para llevar o pedir delivery.
-    `, 'bot');
+  carouselContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+  if (!useTransition) {
+    carouselContainer.offsetHeight; // reflow
+    carouselContainer.style.transition = '';
   }
-
-  if (action === 'delivery') {
-    appendChatbotMessage('Quiero información del delivery.', 'user');
-    appendChatbotMessage(`
-      Te explico el delivery 🚚<br><br>
-      • Repartimos dentro de Iquique 🏙️<br>
-      • Costo de envío según la zona:<br>
-      &nbsp;&nbsp;👉 Entre <strong>$2.500 y $4.000</strong> aprox.<br><br>
-      El valor exacto se confirma por WhatsApp según tu dirección.<br><br>
-      Sugerencia: arma tu pedido en la carta y al final lo enviamos directo a WhatsApp ✅
-    `, 'bot');
-  }
-
-  if (action === 'pedido') {
-    appendChatbotMessage('Quiero dejar mi pedido listo por WhatsApp.', 'user');
-    appendChatbotMessage(`
-      Vamos a dejar tu pedido listo 😋<br><br>
-      1️⃣ Agrega tus combos y platos al carrito.<br>
-      2️⃣ Presiona <strong>"Realizar Pedido por WhatsApp"</strong>.<br>
-      3️⃣ Completa tus datos y confirma.<br><br>
-      También puedes escribirnos directo aquí 👇<br><br>
-      <a href="https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent('Hola, quiero hacer un pedido en Pollería El Pollón. ¿Me pueden ayudar con las opciones de combos familiares?')}"
-         target="_blank"
-         class="inline-block bg-green-600 text-white px-3 py-2 rounded-lg text-xs font-semibold">
-        💬 Abrir WhatsApp
-      </a>
-    `, 'bot');
-  }
-
-  if (action === 'pagos') {
-    appendChatbotMessage('Quiero saber los métodos de pago.', 'user');
-    appendChatbotMessage(`
-      💳 <strong>Método de pago actual</strong><br><br>
-      • Aceptamos <strong>solo efectivo</strong> en este momento.<br>
-      • El pago se realiza <strong>contra entrega</strong> en el local o al recibir tu pedido a domicilio.<br><br>
-      Cualquier cambio futuro en métodos de pago lo informaremos por nuestras redes sociales.
-    `, 'bot');
-  }
-
-  if (action === 'redes') {
-    appendChatbotMessage('Quiero ver las redes sociales.', 'user');
-    appendChatbotMessage(`
-      📲 <strong>Nuestras redes sociales</strong><br><br>
-      • WhatsApp: <a href="https://wa.me/56968788613" target="_blank" class="text-green-600 font-semibold">+56 9 6878 8613</a><br>
-      • Facebook: <span class="font-semibold">Pollería El Pollón (Iquique)</span><br>
-      • Instagram y TikTok: contenido de promociones, combos y novedades 🔥<br><br>
-      Al final de la página tienes los botones directos a todas las redes.
-    `, 'bot');   
+  const activeIndex = currentSlide === totalSlides ? 0 : currentSlide;
+  if (carouselIndicators) {
+    const dots = carouselIndicators.querySelectorAll('.carousel-dot');
+    dots.forEach((dot, i) => {
+      const isActive = i === activeIndex;
+      dot.classList.toggle('active', isActive);
+      dot.setAttribute('aria-selected', isActive);
+    });
   }
 }
 
+function goNext() {
+  if (isResetting) return;
+  currentSlide++;
+  if (currentSlide === totalSlides) {
+    updateCarousel(true);
+    isResetting = true;
+    return;
+  }
+  if (currentSlide >= totalSlidesInDom) {
+    currentSlide = 0;
+    updateCarousel(false);
+    return;
+  }
+  updateCarousel(true);
+}
+
+function onCarouselTransitionEnd() {
+  if (!isResetting || currentSlide !== totalSlides) return;
+  isResetting = false;
+  currentSlide = 0;
+  updateCarousel(false);
+}
+
+if (carouselContainer) {
+  carouselContainer.addEventListener('transitionend', onCarouselTransitionEnd);
+}
+
+let carouselInterval = setInterval(goNext, CAROUSEL_INTERVAL_MS);
+
+if (carouselIndicators) {
+  carouselIndicators.querySelectorAll('.carousel-dot').forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = parseInt(dot.getAttribute('data-index'), 10);
+      if (Number.isNaN(index) || index < 0 || index >= totalSlides) return;
+      currentSlide = index;
+      updateCarousel(true);
+      clearInterval(carouselInterval);
+      carouselInterval = setInterval(goNext, CAROUSEL_INTERVAL_MS);
+    });
+  });
+}
+
+updateCarousel(true);
+
+// --------- CATEGORÍAS: scrollbar solo cuando hay overflow, flechas y arrastre con mouse ----------
+(function initCategoriesScrollbar() {
+  const wrap = document.getElementById('categories-scroll-wrap');
+  const scrollbarEl = wrap && wrap.nextElementSibling ? wrap.nextElementSibling : null;
+  const thumb = document.getElementById('categories-scrollbar-thumb');
+  const track = scrollbarEl && scrollbarEl.querySelector('.categories-scrollbar__track');
+  const prevBtn = document.getElementById('categories-scroll-prev');
+  const nextBtn = document.getElementById('categories-scroll-next');
+
+  function needsScroll() {
+    return wrap && wrap.scrollWidth > wrap.clientWidth;
+  }
+
+  function toggleScrollbarVisibility() {
+    if (!scrollbarEl) return;
+    if (needsScroll()) {
+      scrollbarEl.classList.remove('categories-scrollbar--hidden');
+    } else {
+      scrollbarEl.classList.add('categories-scrollbar--hidden');
+    }
+  }
+
+  function updateThumb() {
+    if (!wrap || !thumb || !track) return;
+    const scrollWidth = wrap.scrollWidth;
+    const clientWidth = wrap.clientWidth;
+    const scrollLeft = wrap.scrollLeft;
+    const trackRect = track.getBoundingClientRect();
+    const trackWidth = trackRect.width;
+    if (scrollWidth <= clientWidth) {
+      thumb.style.width = '100%';
+      thumb.style.left = '0';
+      return;
+    }
+    const ratio = clientWidth / scrollWidth;
+    const thumbWidthPx = Math.max(32, trackWidth * ratio);
+    const maxScroll = scrollWidth - clientWidth;
+    const thumbLeft = maxScroll <= 0 ? 0 : (scrollLeft / maxScroll) * (trackWidth - thumbWidthPx);
+    thumb.style.width = thumbWidthPx + 'px';
+    thumb.style.left = thumbLeft + 'px';
+  }
+
+  if (wrap && thumb) {
+    wrap.addEventListener('scroll', updateThumb);
+    function onResizeOrLoad() {
+      toggleScrollbarVisibility();
+      updateThumb();
+    }
+    window.addEventListener('resize', onResizeOrLoad);
+    window.addEventListener('load', onResizeOrLoad);
+    toggleScrollbarVisibility();
+    updateThumb();
+  }
+
+  const scrollStep = 180;
+  if (prevBtn && wrap) {
+    prevBtn.addEventListener('click', () => {
+      wrap.scrollBy({ left: -scrollStep, behavior: 'smooth' });
+    });
+  }
+  if (nextBtn && wrap) {
+    nextBtn.addEventListener('click', () => {
+      wrap.scrollBy({ left: scrollStep, behavior: 'smooth' });
+    });
+  }
+
+  if (wrap) {
+    let dragStartX = null;
+    let dragScrollLeft = 0;
+    let isDragging = false;
+
+    wrap.addEventListener('mousedown', function (e) {
+      isDragging = false;
+      dragStartX = e.pageX;
+      dragScrollLeft = wrap.scrollLeft;
+    });
+
+    wrap.addEventListener('mousemove', function (e) {
+      if (dragStartX === null) return;
+      const dx = e.pageX - dragStartX;
+      if (!isDragging && Math.abs(dx) > 5) isDragging = true;
+      if (isDragging) {
+        wrap.scrollLeft = dragScrollLeft - dx;
+      }
+    });
+
+    function endDrag() {
+      dragStartX = null;
+    }
+
+    wrap.addEventListener('mouseup', endDrag);
+    wrap.addEventListener('mouseleave', endDrag);
+
+    wrap.addEventListener('click', function (e) {
+      if (isDragging) {
+        e.preventDefault();
+        e.stopPropagation();
+        isDragging = false;
+      }
+    }, true);
+  }
+})();
 
 // ===== Flecha para deslizar categorías (móvil) =====
 const catbarScroll = document.getElementById('catbar-scroll');
@@ -1506,8 +1802,4 @@ buildSidebarGallery();
 
 
 updateCartUI();
-if (chatbotMessagesEl) {
-  chatbotWelcome();
-}
-
 

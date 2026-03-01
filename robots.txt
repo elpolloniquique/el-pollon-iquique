@@ -1,3 +1,8 @@
+# robots.txt para El Pollon Iquique
+# permite a todos los bots rastrear el sitio completo
+
 User-agent: *
-Allow: /
-Sitemap: https://elpolloniquique.github.io/el-pollon-iquique/sitemap.xml
+Disallow:
+
+# indicar la ubicación del sitemap para que los buscadores lo encuentren fácilmente
+Sitemap: https://www.elpolloniquique.cl/sitemap.xml

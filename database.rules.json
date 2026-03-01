@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "pollon_orders_v1": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
