@@ -32,16 +32,13 @@ const WHATSAPP_NUMBER = '56986925310';
 
 
  const firebaseConfig = {
-  
-  apiKey: "AIzaSyDc4omnC9sxGUKEYjUVrJUxcG9RMiidkr4",
-  authDomain: "pollonpagina01.firebaseapp.com",
-  databaseURL: "https://pollonpagina01-default-rtdb.firebaseio.com",
-  projectId: "pollonpagina01",
-  storageBucket: "pollonpagina01.firebasestorage.app",
-  messagingSenderId: "211369350355",
-  appId: "1:211369350355:web:7fb382363ed8e4365df026",
-  measurementId: "G-D61RDYTX6L"
-  
+    apiKey: "AIzaSyAI2CXBbhd9zndV1d8aANY7IgG0pxdAntw",
+  authDomain: "bd02pagina01.firebaseapp.com",
+  databaseURL: "https://bd02pagina01-default-rtdb.firebaseio.com",
+  projectId: "bd02pagina01",
+  storageBucket: "bd02pagina01.firebasestorage.app",
+  messagingSenderId: "865821622549",
+  appId: "1:865821622549:web:755e45516329f783a0a91c"
 };
 
 
