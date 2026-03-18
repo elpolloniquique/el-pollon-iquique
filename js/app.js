@@ -32,13 +32,14 @@ const WHATSAPP_NUMBER = '56986925310';
 
 
  const firebaseConfig = {
-    apiKey: "AIzaSyAI2CXBbhd9zndV1d8aANY7IgG0pxdAntw",
-  authDomain: "bd02pagina01.firebaseapp.com",
-  databaseURL: "https://bd02pagina01-default-rtdb.firebaseio.com",
-  projectId: "bd02pagina01",
-  storageBucket: "bd02pagina01.firebasestorage.app",
-  messagingSenderId: "865821622549",
-  appId: "1:865821622549:web:755e45516329f783a0a91c"
+     apiKey: "AIzaSyDjvpzP_e7Gz4SxlQH_GnCzppoNzTjeFGM",
+     authDomain: "polleria-el-pollon-ef966.firebaseapp.com",
+     databaseURL: "https://polleria-el-pollon-ef966-default-rtdb.firebaseio.com",
+     projectId: "polleria-el-pollon-ef966",
+     storageBucket: "polleria-el-pollon-ef966.firebasestorage.app",
+     messagingSenderId: "492976720902",
+     appId: "1:492976720902:web:867f3770b760723c59c787",
+     measurementId: "G-5TW9H1CKYM"
 };
 
 
