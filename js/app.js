@@ -15,7 +15,7 @@ const WHATSAPP_NUMBER = '56986925310';
 // Ver FIREBASE-BASE-DATOS.md para desplegar reglas y comprobar que todo funcione.
 // -----------------------------------------------------------------------
 
-
+//esta con este nombre BD02pagina01 correo  usolibletrabajos@gmail.com
 
 // const firebaseConfig = {
 //   apiKey: "AIzaSyDc4omnC9sxGUKEYjUVrJUxcG9RMiidkr4",
@@ -50,8 +50,8 @@ const firebaseConfig = {
   storageBucket: "bd02pagina01.firebasestorage.app",
   messagingSenderId: "865821622549",
   appId: "1:865821622549:web:7007f506cbebfe88a0a91c"
-};
 
+ };
 
 
 
