@@ -294,8 +294,8 @@ function loadOrders() {
 
 const products = {
   "ofertas-familiares": [
-    { name: "Oferton mas chaufa", description: "Pollo entero, papas fritas, arroz chaufa, ensalada y bebidas 1.5lt.", price: 25500, image: "img/oferton mas chaufa.png" },
-    { name: "Oferton c/ fideos al pesto + ensalada", description: "Pollo entero, papas fritas, fideos al pesto, ensalada y bebidas 1.5lt.", price: 25500, image: "img/oferton mas fideo.png" },
+    { name: "Oferton mas chaufa", description: "Pollo entero, papas fritas, arroz chaufa, ensalada y bebidas 1.5lt.", price: 25500, image: "img/ofertas familiares.png" },
+    { name: "Oferton c/ fideos al pesto + ensalada", description: "Pollo entero, papas fritas, fideos al pesto, ensalada y bebidas 1.5lt.", price: 25500, image: "img/todo el menu.png" },
     { name: "Oferton con fideos al pesto pura papa", description: "Pollo entero, papas fritas, fideos al pesto, extra papa frita y bebida 1.5lt.", price: 25500, image: "" },
     { name: "Oferton mas chaufa pura papa", description: "Pollo entero, papas fritas, extra papa frita, arroz chaufa y bebidas 1.5lt.", price: 25500, image: "img/oferton mas chaufa pura papa.png" },
     { name: "Oferton c/ fideos al pesto", description: "Pollo entero, papas fritas, fideos al pesto y bebidas 1.5lt", price: 24500, image:"img/oferton con fideo.png" },
