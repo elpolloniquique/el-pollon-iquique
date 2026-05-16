@@ -30,15 +30,27 @@ const WHATSAPP_NUMBER = '56986925310';
 
 
 
- const firebaseConfig = {
-  apiKey: "AIzaSyBD5r9imipixHA0bVhvNh4Oc-mjTXvuQ0E",
-  authDomain: "bd03pagina01.firebaseapp.com",
-  databaseURL: "https://bd03pagina01-default-rtdb.firebaseio.com",
-  projectId: "bd03pagina01",
-  storageBucket: "bd03pagina01.firebasestorage.app",
-  messagingSenderId: "292447052053",
-  appId: "1:292447052053:web:9d6cce4d6cfb5bcf7cc91c"
-};
+//  const firebaseConfig = {
+//   apiKey: "AIzaSyBD5r9imipixHA0bVhvNh4Oc-mjTXvuQ0E",
+//   authDomain: "bd03pagina01.firebaseapp.com",
+//   databaseURL: "https://bd03pagina01-default-rtdb.firebaseio.com",
+//   projectId: "bd03pagina01",
+//   storageBucket: "bd03pagina01.firebasestorage.app",
+//   messagingSenderId: "292447052053",
+//   appId: "1:292447052053:web:9d6cce4d6cfb5bcf7cc91c"
+// };
+
+
+   const firebaseConfig = {
+     apiKey: "AIzaSyB3QActmcrweop2S4Q26shBxc0ateIQiBw",
+     authDomain: "bd04pagina01.firebaseapp.com",
+     databaseURL: "https://bd04pagina01-default-rtdb.firebaseio.com/",
+     projectId: "bd04pagina01",
+     storageBucket: "bd04pagina01.firebasestorage.app",
+     messagingSenderId: "391487717972",
+     appId: "1:391487717972:web:2c290003bcd18bcff9e3c1"
+   };
+
 
 
 
