@@ -43,8 +43,6 @@ const WHATSAPP_NUMBER = '56986925310';
 };
 
 
-
-
 let ordersRef = null;
 let db = null;
 let rtdb = null;
