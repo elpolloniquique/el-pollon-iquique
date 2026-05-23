@@ -6,3 +6,10 @@ Disallow:
 
 # indicar la ubicación del sitemap para que los buscadores lo encuentren fácilmente
 Sitemap: https://www.elpolloniquique.cl/sitemap.xml
+
+
+
+User-agent: *
+Allow: /
+
+Sitemap: https://el-pollon-iquique.vercel.app/sitemap.xml
