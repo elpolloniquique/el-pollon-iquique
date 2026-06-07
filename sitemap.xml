@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
   <url>
-    <loc>https://el-pollon-iquique.vercel.app/</loc>
-    <lastmod>2026-05-22</lastmod>
-    <changefreq>daily</changefreq>
+    <loc>https://elpolloniquique.github.io/el-pollon-iquique/</loc>
+    <lastmod>2026-06-06</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20mas%20chaufa.png</image:loc>
+      <image:title>Ofertón más chaufa — Pollería El Pollón Iquique</image:title>
+      <image:caption>Pollo a la brasa entero con arroz chaufa, papas fritas y ensalada</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/lomo%20saltado%20de%20pollo%20con%20arroz%20blanco.png</image:loc>
+      <image:title>Lomo saltado de pollo — El Pollón Iquique</image:title>
+      <image:caption>Lomo saltado de pollo con arroz blanco, estilo peruano</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/chaufa%20brasa.png</image:loc>
+      <image:title>Chaufa brasa — El Pollón Iquique</image:title>
+      <image:caption>Cuarto de pollo a la brasa con arroz chaufa</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20familiar.png</image:loc>
+      <image:title>Ofertón familiar — El Pollón Iquique</image:title>
+      <image:caption>Combo familiar de pollo a la brasa con papas, ensalada y bebidas</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/bistec%20a%20lo%20pobre.png</image:loc>
+      <image:title>Bistec a lo pobre — El Pollón Iquique</image:title>
+      <image:caption>Bistec a lo pobre con papas fritas, plátano y huevo</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/chuleta%20de%20cerdo.png</image:loc>
+      <image:title>Chuleta de cerdo — El Pollón Iquique</image:title>
+      <image:caption>Chuleta de cerdo a la plancha</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/pechuga%20a%20la%20plancha.png</image:loc>
+      <image:title>Pechuga a la plancha — El Pollón Iquique</image:title>
+      <image:caption>Pechuga de pollo a la plancha</image:caption>
+    </image:image>
+
+    <image:image>
+      <image:loc>https://elpolloniquique.github.io/el-pollon-iquique/img/logo%20pollon.png</image:loc>
+      <image:title>Logo Pollería El Pollón Iquique</image:title>
+      <image:caption>Logo oficial de Pollería El Pollón en Iquique</image:caption>
+    </image:image>
   </url>
 
 </urlset>

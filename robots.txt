@@ -1,15 +1,9 @@
-# robots.txt para El Pollon Iquique
-# permite a todos los bots rastrear el sitio completo
-
-User-agent: *
-Disallow:
-
-# indicar la ubicación del sitemap para que los buscadores lo encuentren fácilmente
-Sitemap: https://www.elpolloniquique.cl/sitemap.xml
-
-
-
+# Pollería El Pollón — Galería Gastronómica Iquique
 User-agent: *
 Allow: /
 
-Sitemap: https://el-pollon-iquique.vercel.app/sitemap.xml
+# Imágenes indexables para Google Images
+User-agent: Googlebot-Image
+Allow: /img/
+
+Sitemap: https://elpolloniquique.github.io/el-pollon-iquique/sitemap.xml

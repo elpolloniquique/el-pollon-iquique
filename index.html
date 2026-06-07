@@ -1,47 +1,120 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-CL" prefix="og: https://ogp.me/ns#">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
-  <title>Pollería El Pollón Iquique | Delivery de Pollos y Comida</title>
-  <meta name="description" content="Pollería El Pollón en Iquique. Delivery de pollo a la brasa, ofertas familiares, bebidas y comida rápida en Iquique. Pide online fácil y rápido.">
-  <meta name="keywords" content="pollería en iquique, pollo delivery iquique, el pollón iquique, comida delivery iquique, pollo a la brasa iquique">
-  <meta name="robots" content="index, follow">
+  <title>El Pollón Iquique | Galería Gastronómica — Pollo a la Brasa y Comida Peruana</title>
+  <meta name="description" content="Galería gastronómica oficial de Pollería El Pollón en Iquique: pollo a la brasa, combos familiares, lomo saltado y platos peruanos. Para pedir delivery y comprar online visita www.el-pollon.cl">
+  <meta name="keywords" content="el pollón iquique, pollería iquique, pollo a la brasa iquique, comida peruana iquique, delivery pollo iquique, galería gastronómica el pollón">
+  <meta name="author" content="Pollería El Pollón">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <meta name="googlebot" content="index, follow, max-image-preview:large">
+  <meta name="theme-color" content="#C1121F">
+  <meta name="geo.region" content="CL-TA">
+  <meta name="geo.placename" content="Iquique">
+  <link rel="canonical" href="https://elpolloniquique.github.io/el-pollon-iquique/">
 
-  <meta property="og:title" content="Pollería El Pollón Iquique">
-  <meta property="og:description" content="Delivery de pollo y comida rápida en Iquique">
+  <!-- Google Search Console -->
+  <meta name="google-site-verification" content="wP0Z2Xpm_WT1NmATkBxRzldcJGwU1xlw2Wt0VNcNyw4">
+
+  <!-- Open Graph (Facebook, WhatsApp, Google Discover) -->
+  <meta property="og:locale" content="es_CL">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://el-pollon-iquique.vercel.app">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="google-site-verification" content="wP0Z2Xpm_WT1NmATkBxRzldcJGwU1xlw2Wt0VNcNyw4" />
-  
+  <meta property="og:site_name" content="Pollería El Pollón">
+  <meta property="og:title" content="El Pollón Iquique — Galería Gastronómica de Pollo a la Brasa">
+  <meta property="og:description" content="Descubre nuestros platos: pollo a la brasa, combos familiares y comida peruana en Iquique. Pide delivery en www.el-pollon.cl">
+  <meta property="og:url" content="https://elpolloniquique.github.io/el-pollon-iquique/">
+  <meta property="og:image" content="https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20mas%20chaufa.png">
+  <meta property="og:image:secure_url" content="https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20mas%20chaufa.png">
+  <meta property="og:image:alt" content="Ofertón más chaufa — Pollo a la brasa El Pollón Iquique">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
-
-
-  <title>El Pollón — Galería Gastronómica | Pollo a la Brasa en Iquique</title>
+  <!-- Twitter / X Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="El Pollón Iquique — Galería Gastronómica">
+  <meta name="twitter:description" content="Pollo a la brasa, combos familiares y platos peruanos. Pide en www.el-pollon.cl">
+  <meta name="twitter:image" content="https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20mas%20chaufa.png">
+  <meta name="twitter:image:alt" content="Ofertón más chaufa El Pollón Iquique">
 
   <!-- Favicon -->
   <link rel="icon" href="img/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="img/logo.png">
-  <link rel="shortcut icon" href="img/logo.png">
 
-  <!-- SEO / Open Graph -->
-  <meta name="description" content="Galería gastronómica de El Pollón: pollo a la brasa, combos familiares y platos peruanos en Iquique. Para pedir delivery o comprar online, visita www.el-pollon.cl">
-  <meta property="og:title" content="El Pollón — Galería Gastronómica">
-  <meta property="og:description" content="Descubre nuestros platos. Para pedir delivery y compras online: www.el-pollon.cl">
-  <meta property="og:image" content="https://tuservidoom/portada.jpg">
-  <meta property="og:url" content="https://elpolloniquique.github.io/el-pollon-iquique/">
-  <meta property="og:type" content="website">
+  <!-- Preload imagen principal (LCP + Google Images) -->
+  <link rel="preload" as="image" href="img/oferton mas chaufa.png" fetchpriority="high">
 
-  <!-- Tipografía: Inter (general) + Playfair Display (logotipo "Pollería El Pollón") -->
+  <!-- Tipografía -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Datos estructurados JSON-LD (Google Rich Results + imágenes) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://elpolloniquique.github.io/el-pollon-iquique/#website",
+        "url": "https://elpolloniquique.github.io/el-pollon-iquique/",
+        "name": "Pollería El Pollón — Galería Gastronómica",
+        "description": "Galería visual de platos de El Pollón en Iquique. Compras y delivery en www.el-pollon.cl",
+        "inLanguage": "es-CL",
+        "publisher": { "@id": "https://elpolloniquique.github.io/el-pollon-iquique/#restaurant" }
+      },
+      {
+        "@type": "Restaurant",
+        "@id": "https://elpolloniquique.github.io/el-pollon-iquique/#restaurant",
+        "name": "Pollería El Pollón",
+        "alternateName": "El Pollón Iquique",
+        "description": "Pollería peruana en Iquique especializada en pollo a la brasa, combos familiares, lomo saltado y comida casera con delivery.",
+        "url": "https://elpolloniquique.github.io/el-pollon-iquique/",
+        "image": [
+          "https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20mas%20chaufa.png",
+          "https://elpolloniquique.github.io/el-pollon-iquique/img/lomo%20saltado%20de%20pollo%20con%20arroz%20blanco.png",
+          "https://elpolloniquique.github.io/el-pollon-iquique/img/chaufa%20brasa.png",
+          "https://elpolloniquique.github.io/el-pollon-iquique/img/oferton%20familiar.png"
+        ],
+        "logo": "https://elpolloniquique.github.io/el-pollon-iquique/img/logo%20pollon.png",
+        "telephone": "+56986925310",
+        "servesCuisine": ["Pollo a la brasa", "Comida peruana", "Comida chilena"],
+        "priceRange": "$$",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Calle Vivar 1086",
+          "addressLocality": "Iquique",
+          "addressRegion": "Tarapacá",
+          "addressCountry": "CL"
+        },
+        "geo": {
+          "@type": "GeoCoordinates",
+          "latitude": -20.2141,
+          "longitude": -70.1522
+        },
+        "openingHoursSpecification": [{
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+          "opens": "11:30",
+          "closes": "23:00"
+        }],
+        "hasMenu": "https://www.el-pollon.cl/",
+        "sameAs": ["https://www.el-pollon.cl/"]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          { "@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://elpolloniquique.github.io/el-pollon-iquique/" },
+          { "@type": "ListItem", "position": 2, "name": "Galería de platos", "item": "https://elpolloniquique.github.io/el-pollon-iquique/#menu" }
+        ]
+      }
+    ]
+  }
+  </script>
 
-  <!-- Estilos personalizados -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-white">
@@ -52,7 +125,7 @@
       <div class="header-inner flex items-center justify-between flex-nowrap gap-1 sm:gap-2">
         <a href="#inicio" class="header-logo flex items-center gap-2 flex-shrink-0 header-logo-link" aria-label="Volver al inicio">
           <div class="logo">
-            <img src="img/logo pollon.png" alt="Logo Pollería"
+            <img src="img/logo pollon.png" alt="Logo Pollería El Pollón Iquique — Pollo a la brasa"
                  onerror="this.src=''; this.alt='Logo no disponible'; this.style.display='none';">
           </div>
           <div class="hidden md:block">
@@ -181,16 +254,16 @@
   <section id="inicio" class="py-0 px-0 hero-section">
     <div class="relative overflow-hidden hero-banner">
       <div id="carousel-container" class="carousel-track flex h-full">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/porcion de fideo.png" alt="Porción de fideo">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/chuleta de cerdo.png" alt="Chuleta de cerdo">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/lomo saltado de pollo con arroz blanco.png" alt="Lomo saltado">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton sin ensalada.png" alt="Oferton sin ensalada">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/chaufa brasa.png" alt="Chaufa brasa">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/bistec a lo pobre.png" alt="Bistec a lo pobre">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton con fideo.png" alt="Oferton con fideo">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/pechuga a la plancha.png" alt="Pechuga a la plancha">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/tallarin saltado de carne.png" alt="Tallarín saltado">
-        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton mas chaufa.png" alt="Oferton mas chaufa">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/porcion de fideo.png" alt="Porción de fideos al pesto — El Pollón Iquique" fetchpriority="high">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/chuleta de cerdo.png" alt="Chuleta de cerdo a la plancha — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/lomo saltado de pollo con arroz blanco.png" alt="Lomo saltado de pollo con arroz — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton sin ensalada.png" alt="Ofertón sin ensalada pollo a la brasa — El Pollón" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/chaufa brasa.png" alt="Chaufa brasa con pollo — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/bistec a lo pobre.png" alt="Bistec a lo pobre — comida peruana El Pollón" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton con fideo.png" alt="Ofertón con fideos al pesto — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/pechuga a la plancha.png" alt="Pechuga a la plancha — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/tallarin saltado de carne.png" alt="Tallarín saltado de carne — El Pollón Iquique" loading="lazy">
+        <img class="carousel-slide min-w-full h-full object-cover" src="img/oferton mas chaufa.png" alt="Ofertón más chaufa pollo a la brasa — El Pollón Iquique" loading="lazy">
         <!-- Clon de la primera imagen para bucle infinito sin salto visible -->
         <img class="carousel-slide min-w-full h-full object-cover" src="img/porcion de fideo.png" alt="Porción de fideo" aria-hidden="true">
       </div>
@@ -238,8 +311,11 @@
       </p>
     </div>
 
-  <!-- Menú -->
-  <section id="menu" class="py-5 px-5 sm:px-6 md:px-4 bg-gray-50 shadow-inner">
+  <!-- Menú / Galería -->
+  <main id="contenido-principal">
+  <section id="menu" class="py-5 px-5 sm:px-6 md:px-4 bg-gray-50 shadow-inner" itemscope itemtype="https://schema.org/Menu">
+    <meta itemprop="name" content="Carta gastronómica El Pollón Iquique">
+    <meta itemprop="description" content="Galería de platos: pollo a la brasa, combos familiares, lomo saltado y comida peruana">
     <div class="max-w-6xl 2xl:max-w-[1600px] mx-auto">
       <h2 class="text-2xl font-bold text-center mb-2 text-red-800">Nuestra Galería</h2>
       <p class="menu-intro text-center max-w-2xl mx-auto mb-5">
@@ -545,9 +621,9 @@
   </div>
  </section>
 
-  
+  </main>
 
-  <!-- Footer formal (diseño tipo referencia: Logo | Conócenos | Redes | Mi cuenta) -->
+  <!-- Footer formal -->
   <footer class="footer-pro footer-formal text-white">
     <div class="footer-formal-inner max-w-7xl mx-auto px-4 py-12">
       <div class="footer-formal-grid">
@@ -598,7 +674,7 @@
 
       <div class="footer-formal-divider"></div>
       <div class="footer-bottom">
-        <p>© 2024 Pollería El Pollón - Iquique, Chile. Todos los derechos reservados.</p>
+        <p>© 2026 Pollería El Pollón — Iquique, Chile. Galería gastronómica · Pedidos en <a href="https://www.el-pollon.cl/" target="_blank" rel="noopener noreferrer" class="footer-formal-link--cta">el-pollon.cl</a></p>
         <p class="small">Desarrollado con ❤️ para los amantes del buen pollo a la brasa</p>
       </div>
     </div>
