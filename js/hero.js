@@ -24,6 +24,10 @@
 
   menuToggle?.addEventListener('click', () => toggleMobileMenu());
 
+  document.querySelectorAll('.mobile-menu__link[href^="#"]').forEach(link => {
+    link.addEventListener('click', () => toggleMobileMenu(false));
+  });
+
   document.querySelectorAll('[data-open-delivery]').forEach(el => {
     el.addEventListener('click', () => {
       toggleMobileMenu(false);
