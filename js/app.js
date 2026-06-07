@@ -329,7 +329,7 @@ desktopMenuOverlay?.addEventListener('click', e => {
 });
 
 // --------- Carrusel ---------
-const totalSlides = 10;
+const totalSlides = 5;
 const totalSlidesInDom = totalSlides + 1;
 let currentSlide = 0;
 let isResetting = false;
